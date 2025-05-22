@@ -1,0 +1,10 @@
+
+.rendondo_grand{
+    border-radius: 70px;
+}
+.rendondo_pequeno{
+    border-radius: 50px;
+}
+.shadow_nim{
+    box-shadow: 4px 8px 10px rgba(0, 0, 0, 0.5);
+}
