@@ -1,0 +1,21 @@
+
+/* .rendondo_grand{
+    border-radius: 70px;
+}
+.rendondo_pequeno{
+    border-radius: 50px;
+} */
+.shadow_nim{
+    box-shadow: 4px 8px 10px rgba(0, 0, 0, 0.5);
+}
+
+.scrol {
+    overflow-y: scroll;           /* ou auto, se preferir */
+    scrollbar-width: none;       /* Firefox */
+    -ms-overflow-style: none;    /* Internet Explorer 10+ */
+  }
+  
+  /* Chrome, Edge, Safari */
+  .scrol::-webkit-scrollbar {
+    display: none;
+  }

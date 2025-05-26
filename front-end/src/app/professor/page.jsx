@@ -1,0 +1,259 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
+
+export default function ProfessorTable() {
+  const [alunos, setAlunos] = useState([]);
+  const [token, setToken] = useState(null);
+  const [decoded, setDecoded] = useState(null);
+
+  const backendUrl = `http://${
+    typeof window !== "undefined" ? window.location.hostname : "localhost"
+  }:3001`;
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+
+    if (storedToken) {
+      try {
+        const decodedData = jwtDecode(storedToken);
+        setToken(storedToken);
+        setDecoded(decodedData);
+        view(storedToken, decodedData);
+      } catch (error) {
+        console.error("Erro ao decodificar o token (ProfessorTable):", error);
+      }
+    }
+  }, []);
+
+  const togglePresence = (alunoId) => {
+    setAlunos((prevAlunos) =>
+      prevAlunos.map((aluno) =>
+        aluno.ID_aluno === alunoId
+          ? { ...aluno, presente: !aluno.presente }
+          : aluno
+      )
+    );
+  };
+
+  const comfirmaPresenca = async () => {
+    if (token && decoded && alunos.length > 0) {
+      const alunosPresentes = alunos.filter((aluno) => aluno.presente);
+
+      if (alunosPresentes.length === 0) {
+        console.warn("Nenhum aluno selecionado para registrar presença.");
+        return;
+      }
+
+      let presencasRegistradasComSucesso = 0;
+      let errosAoRegistrarPresenca = 0;
+      let idAlunoParaMarcarAula = null; // Vamos pegar o ID do primeiro aluno presente para usar na chamada de marcaAula
+
+      for (const aluno of alunosPresentes) {
+        // 1. Registrar Presença individualmente
+        try {
+          const response = await fetch(`${backendUrl}/presenca/registrar`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              materia: decoded?.materia,
+              id: aluno.ID_aluno,
+            }),
+          });
+
+          if (response.ok) {
+            presencasRegistradasComSucesso++;
+            console.log(
+              `Presença registrada para o aluno (ID: ${aluno.ID_aluno})`
+            );
+            if (!idAlunoParaMarcarAula) { // Salva o ID do primeiro aluno com presença confirmada
+              idAlunoParaMarcarAula = aluno.ID_aluno;
+            }
+          } else {
+            errosAoRegistrarPresenca++;
+            const errorData = await response.json();
+            console.error(
+              `Erro ao registrar presença do aluno ${aluno.nome_aluno} (ID: ${aluno.ID_aluno}): ${response.status}`,
+              errorData
+            );
+          }
+        } catch (error) {
+          errosAoRegistrarPresenca++;
+          console.error(
+            `Erro ao enviar requisição de presença para o aluno ${aluno.nome_aluno} (ID: ${aluno.ID_aluno}):`,
+            error
+          );
+        }
+      }
+
+      // 2. Enviar para marcaAula UMA VEZ, se houver presenças registradas com sucesso
+      if (presencasRegistradasComSucesso > 0 && idAlunoParaMarcarAula) {
+        try {
+          const aulaResponse = await fetch(`${backendUrl}/presenca/aula`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              materia: decoded?.materia,
+              idAluno: idAlunoParaMarcarAula, // Usamos o ID de um dos alunos presentes
+            }),
+          });
+
+          if (aulaResponse.ok) {
+            console.log(
+              `Contador de aulas dadas para a matéria ${decoded?.materia} atualizado com sucesso.`
+            );
+          } else {
+            const aulaErrorData = await aulaResponse.json();
+            console.error(
+              `Erro ao marcar aula para a matéria ${decoded?.materia} (usando aluno ID: ${idAlunoParaMarcarAula}): ${aulaResponse.status}`,
+              aulaErrorData
+            );
+          }
+        } catch (aulaError) {
+          console.error(
+            `Erro na requisição de marcar aula para a matéria ${decoded?.materia}:`,
+            aulaError
+          );
+        }
+      }
+
+      // 3. Atualizar a visualização
+      // Atualiza a view se pelo menos uma presença foi registrada,
+      // independentemente do sucesso da chamada de marcaAula (que é mais um efeito colateral para o professor)
+      if (presencasRegistradasComSucesso > 0) {
+        console.log("Atualizando a lista de alunos...");
+        view(token, decoded);
+      } else if (errosAoRegistrarPresenca > 0 && presencasRegistradasComSucesso === 0) {
+         console.warn("Nenhuma presença foi registrada com sucesso. A lista não será atualizada.");
+      } else if (alunosPresentes.length > 0 && presencasRegistradasComSucesso === 0 && errosAoRegistrarPresenca === 0) {
+        // Este caso não deveria acontecer se alunosPresentes.length > 0
+        console.warn("Havia alunos selecionados, mas nenhuma presença foi processada.");
+      }
+
+    } else {
+      console.warn("Token não encontrado, dados decodificados ausentes ou nenhum aluno na lista.");
+    }
+  };
+
+  const view = async (token, decoded) => {
+    try {
+      const response = await fetch(`${backendUrl}/presenca/viewP`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          turmaProfessor: decoded?.turma_professor,
+          turma: decoded?.turma_professor, // Parece redundante, mas mantendo como estava
+          materia: decoded?.materia,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data && Array.isArray(data.view)) {
+        const alunosComPresencaInicial = data.view.map((aluno) => ({
+          ...aluno,
+          presente: false,
+        }));
+        setAlunos(alunosComPresencaInicial);
+      } else {
+        console.warn(
+          "A resposta da API não continha um array 'view' válido:",
+          data
+        );
+        setAlunos([]);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar presenças (ProfessorTable):", error);
+      setAlunos([]);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-300 flex items-center justify-center p-8">
+      <div className="bg-white shadow-2xl rounded-3xl w-full max-w-6xl p-6 relative overflow-hidden">
+        <h1 className=" font-bold text-gray-800 mb-6 border-b pb-4 text-xl sm:text-4xl ">
+          Painel da Presença
+        </h1>
+
+        <div className="flex  flex-row justify-between mb-6 gap-4 sm:flex-row ">
+          <div className="bg-sky-100 text-sky-800 px-3 py-3 rounded-full font-medium shadow-inner text-sm sm:text-xl sm:px-6 ">
+            Turma:{" "}
+            <span className="font-semibold">{decoded?.turma_professor}</span>
+          </div>
+          <div className="bg-emerald-100 text-emerald-800 px-3 py-3 rounded-full font-medium shadow-inner  text-sm sm:text-xl  sm:px-6">
+            Matéria: <span className="font-semibold">{decoded?.materia}</span>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-[280px] table-fixed rounded-xl overflow-hidden shadow-md sm:min-w-full  sm:table-auto ">
+            <thead>
+              <tr className="bg-gradient-to-r from-slate-700 to-slate-900 text-white text-left text-sm  sm:text-lg ">
+                <th className=" px-6   font-semibold text-[0.7rem] sm:text-sm">
+                  Nome
+                </th>
+                <th className="py-4 px-6 font-semibold hidden sm:block text-xs sm:text-sm">
+                  RA
+                </th>
+                <th className="py-4 px-6 font-semibold    text-[0.7rem] sm:text-sm">
+                  Frequência
+                </th>
+                <th className="py-4 px-6 font-semibold  text-[0.7rem] sm:text-sm">
+                  Presente
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {alunos.map((aluno) => (
+                <tr
+                  key={aluno.ID_aluno}
+                  className="odd:bg-white even:bg-slate-100 hover:bg-slate-200 transition-all"
+                >
+                  <td className="py-1 px-6 text-gray-700 text-xs sm:text-sm sm:py-4">
+                    {aluno.nome_aluno}
+                  </td>
+                  <td className="py-4 px-6 text-gray-700 hidden sm:block text-xs sm:text-sm">
+                    {aluno.RA_aluno}
+                  </td>
+                  <td className="py-4 px-6 text-gray-700 text-xs sm:text-sm">
+                    {aluno?.percentual_frequencia}%
+                  </td>
+                  <td className="py-4 px-6">
+                    <button
+                      onClick={() => togglePresence(aluno.ID_aluno)}
+                      className={`w-8 h-8 cursor-pointer rounded-full border-5 transition-colors duration-300 ${
+                        aluno.presente
+                          ? "bg-green-500 border-green-700"
+                          : "bg-gray-400 border-gray-600"
+                      }`}
+                      title={aluno.presente ? "Presente" : "Ausente"}
+                    ></button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className=" mt-[2%]   flex justify-end ">
+          <button
+            onClick={comfirmaPresenca}
+            className="px-6 py-3 bg-sky-600   hover:bg-sky-700 text-white rounded-full font-bold shadow-lg transition-transform transform hover:scale-105"
+          >
+            Confirmar Presença
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
