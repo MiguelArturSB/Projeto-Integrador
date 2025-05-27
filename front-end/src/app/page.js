@@ -73,7 +73,7 @@ export default function Portal() {
     e.preventDefault();
     if (activeForm === 'aluno') {
       try {
-        const response = await fetch(`${backendUrl}/login/Aluno`, {
+        const response = await fetch(`${backendUrl}/login/aluno`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

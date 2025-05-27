@@ -11,16 +11,22 @@ const loginAlunoController = async (req, res) => {
         if (!Aluno) {
             return res.status(404).json({ mensagem: 'Usuário não encontrado' });
         }
+        // isso e nessesario
+        const alunoEncontrado = Aluno;
 
-        const senhaCorreta = await compare(senha_aluno, Aluno.senha_aluno);
+        if (!alunoEncontrado.senha_aluno) {
+            return res.status(500).json({ mensagem: 'Erro interno: dados incompletos do usuário' });
+        }
+
+        const senhaCorreta = await compare(senha_aluno,alunoEncontrado.senha_aluno);
         console.log("Senha recebida:", senha_aluno);
-        console.log("Senha no banco (hash):", Aluno.senha_aluno);
+        console.log("Senha no banco (hash):", alunoEncontrado.senha_aluno);
 
         if (!senhaCorreta) {
             return res.status(401).json({ mensagem: 'Senha incorreta' });
         }
-
-        const token = jwt.sign({ id: Aluno.id, tipo: Aluno.tipo }, JWT_SECRET, { expiresIn: '1h' });
+                                    //precisa ser o id do banco de dados
+        const token = jwt.sign({ idAluno: alunoEncontrado.ID_aluno, tipo:alunoEncontrado.tipo }, JWT_SECRET, { expiresIn: '1h' });
 
         res.status(200).json({ mensagem: 'Login realizado com sucesso', token });
     } catch (err) {
@@ -43,8 +49,7 @@ const loginProfessorController = async (req, res) => {
         }
 
         const senhaCorreta = await compare(senha_professor, Professore.senha_professor);
-        console.log("Senha recebida:", senha_professor);
-        console.log("Senha no banco (hash):", Professore.senha_professor);
+
 
         if (!senhaCorreta) {
             return res.status(401).json({ mensagem: 'Senha incorreta' });
@@ -53,8 +58,8 @@ const loginProfessorController = async (req, res) => {
         const token = jwt.sign({
     id: Professore.id,
     tipo: Professore.tipo,
-    turma_professor: Professore.turma_professor, // ✅ Adicione a turma do professor
-    materia: Professore.materia             // ✅ Adicione a matéria do professor
+    turma_professor: Professore.turma_professor, 
+    materia: Professore.materia             
   }, JWT_SECRET, { expiresIn: '1h' });
 
         res.status(200).json({ mensagem: 'Login realizado com sucesso', token });

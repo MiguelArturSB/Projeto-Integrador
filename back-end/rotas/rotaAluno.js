@@ -5,6 +5,6 @@ import authMiddleware  from "../middlewares/authMiddleware.js";
 
 const rota = express.Router()
 
-rota.put('/viewA',authMiddleware,viewA);
+rota.post('/viewA',authMiddleware,viewA);
 
 export default rota

@@ -3,7 +3,6 @@ import {viewAluno} from '../database/database.js';
 
 const viewA = async (req, res) => {
   try {
-    console.log('Recebido no backend:', req.body);  // <-- log para debug
 
     const { idAluno } = req.body;
 
