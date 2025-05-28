@@ -4,9 +4,6 @@ import authMiddleware  from "../middlewares/authMiddleware.js";
 
 const rota = express.Router()
 
-
-// rota.post('/professor', loginProfessorController)
-
 rota.post('/viewP',authMiddleware,viewP);
 
 rota.put('/registrar',authMiddleware,marcaFalta);

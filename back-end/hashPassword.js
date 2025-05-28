@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 
 async function generateHashedPasssword() {
+    
     const password = 'senha123'
     try {
         const salt = await bcrypt.genSalt(10)

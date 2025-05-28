@@ -1,8 +1,17 @@
 import { readAll, read, create, update, deleteRecord } from '../database/database.js';
 
-const listarUsuarios = async () => {
+const listarAlunos = async () => {
     try {
-        return await readAll('Alunos', 'Professores');
+        return await readAll('Alunos');
+    } catch (err) {
+        console.error('Erro ao listar usuários: ', err);
+        throw err;
+    }
+}
+
+const listarProfessores = async () => {
+    try {
+        return await readAll('Professores');
     } catch (err) {
         console.error('Erro ao listar usuários: ', err);
         throw err;
@@ -20,7 +29,7 @@ const alunoDetalhado = async (id) => {
 
 const professorDetalhado = async (id) => {
     try {
-        return await read('Professor', `ID_professor = ${id}`);
+        return await read('Professores', `ID_professor = ${id}`);
     } catch (err) {
         console.error('Erro ao exibir usuário: ', err);
         throw err;
@@ -29,7 +38,7 @@ const professorDetalhado = async (id) => {
 
 const criarAluno = async (dadosAluno) => {
     try {
-        return await create('Aluno', dadosAluno);
+        return await create('Alunos', dadosAluno);
     } catch (err) {
         console.error('Erro ao criar usuário: ', err)
         throw err
@@ -38,7 +47,7 @@ const criarAluno = async (dadosAluno) => {
 
 const criarProfessor = async (dadosProfessor) => {
     try {
-        return await create('Professor', dadosProfessor);
+        return await create('Professores', dadosProfessor);
     } catch (err) {
         console.error('Erro ao criar usuário: ', err)
         throw err
@@ -47,7 +56,7 @@ const criarProfessor = async (dadosProfessor) => {
 
 const atualizarAluno = async (id, dadosAluno) => {
     try {
-        return await update('Aluno', dadosAluno, `ID_aluno = ${id}`)
+        return await update('Alunos', dadosAluno, `ID_aluno = ${id}`)
     } catch (err) {
         console.error('Erro ao atualizar usuário: ', err)
         throw err
@@ -56,7 +65,7 @@ const atualizarAluno = async (id, dadosAluno) => {
 
 const atualizarProfessor = async (id, dadosProfessor) => {
     try {
-        return await update('Professor', dadosProfessor, `ID_professor = ${id}`)
+        return await update('Professores', dadosProfessor, `ID_professor = ${id}`)
     } catch (err) {
         console.error('Erro ao atualizar usuário: ', err)
         throw err
@@ -65,7 +74,7 @@ const atualizarProfessor = async (id, dadosProfessor) => {
 
 const excluirAluno = async (id) => {
     try {
-        return await deleteRecord('Aluno', `ID_aluno = ${id}`)
+        return await deleteRecord('Alunos', `ID_aluno = ${id}`)
     } catch (err) {
         console.error('Erro ao excluir usuário: ', err)
         throw err
@@ -74,11 +83,11 @@ const excluirAluno = async (id) => {
 
 const excluirProfessor = async (id) => {
     try {
-        return await deleteRecord('Professor', `ID_professor = ${id}`)
+        return await deleteRecord('Professores', `ID_professor = ${id}`)
     } catch (err) {
         console.error('Erro ao excluir usuário: ', err)
         throw err
     }
 }
 
-export { listarUsuarios, alunoDetalhado, professorDetalhado, criarAluno, criarProfessor, atualizarAluno, atualizarProfessor, excluirAluno, excluirProfessor }
+export {listarAlunos, listarProfessores, alunoDetalhado, professorDetalhado, criarAluno, criarProfessor, atualizarAluno, atualizarProfessor, excluirAluno, excluirProfessor}
