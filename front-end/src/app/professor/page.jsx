@@ -2,11 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
+import { useRouter } from "next/navigation";
+import './prof.css';
 
 export default function ProfessorTable() {
+  const router = useRouter();
   const [alunos, setAlunos] = useState([]);
   const [token, setToken] = useState(null);
   const [decoded, setDecoded] = useState(null);
+  const [animado, setAnimado] = useState(false)
 
   const backendUrl = `http://${typeof window !== "undefined" ? window.location.hostname : "localhost"
     }:3001`;
@@ -37,6 +41,13 @@ export default function ProfessorTable() {
   };
 
   const comfirmaPresenca = async () => {
+    setAnimado(true)
+
+    
+      const timeout = setTimeout(() => {
+        router.push('../')
+      }, 4200)
+
 
 
 
@@ -180,9 +191,13 @@ export default function ProfessorTable() {
 
   return (
     <>
-      <div className="animacao z-50 fixed w-[100%] h-[100vh] animate-ping bg-sky-800"><div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
-        <p className="text-black font-bold">Presenças enviada!!</p>
-      </div></div>
+      {animado && (
+        <div className=" slide-in-left bg-sky-800 z-50 fixed w-[100%] h-[100vh]">
+          <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
+            <p className="p_adm text-black font-bold">Presenças enviada!!</p>
+          </div>
+        </div>
+      )}
       <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-300 flex items-center justify-center p-8">
         <div className="bg-white shadow-2xl rounded-3xl w-full max-w-6xl p-6 relative overflow-hidden">
           <h1 className=" font-bold text-gray-800 mb-6 border-b pb-4 text-xl sm:text-4xl ">

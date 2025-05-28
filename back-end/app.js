@@ -4,11 +4,8 @@ import cors from 'cors'
 
 import os from 'os';
 
-<<<<<<< HEAD
 
 
-=======
->>>>>>> b7ceca66d7b2e3bf4823e2db3f7e22a0599b9d43
 import login from './rotas/rotasLogin.js'
 import viewP from './rotas/rotasPresenca.js'
 import viewA from './rotas/rotaAluno.js';
