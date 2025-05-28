@@ -1,13 +1,10 @@
 import express from 'express';
 const app = express();
-const port = 3001;
 import cors from 'cors'
 
 import os from 'os';
 
-// import rotaAlunoLogin from './rotas/rotasLogin.js'
-// import rotaProfessorLogin from './rotas/rotasLogin.js'
-// import rotaCoordenadorLogin from './rotas/rotasLogin.js'
+
 
 import login from './rotas/rotasLogin.js'
 import viewP from './rotas/rotasPresenca.js'
