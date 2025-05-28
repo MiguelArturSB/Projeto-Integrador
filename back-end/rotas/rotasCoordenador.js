@@ -1,51 +1,27 @@
 import express from "express";
-import {listarUsuariosController, alunoDetalhadoController, professorDetalhadoController, criarAlunoController, criarProfessorController, atualizarAlunoController, atualizarProfessorController, excluirAlunoController, excluirProfessorController} from '../controllersrotas/controllCoordenador.js'
+import { listarProfessoresController, listarAlunosController, alunoDetalhadoController, professorDetalhadoController, criarAlunoController, criarProfessorController, atualizarAlunoController, atualizarProfessorController, excluirAlunoController, excluirProfessorController } from '../controllersrotas/controllCoordenador.js'
 import authMiddleware from "../middlewares/authMiddleware.js";
-import multer from 'multer'
-import path from 'path'
-import {fileURLToPath} from 'url'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const rota = express.Router();
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '../uploads/'))
-    }, 
-    flien: (req, file, cb)=> {
-        const nomeArquivo = `${Date.now()}-${file.originalname}`
-        cb(null, nomeArquivo)
-    }
-})
+rota.get('/alunos', listarAlunosController)
 
-const uploads = multer({storage: storage})
+rota.get('/professores', listarProfessoresController)
 
-const router = express.Router();
+rota.post('/aluno', authMiddleware, criarAlunoController)
 
-router.get('/', listarUsuariosController)
+rota.post('/professor', authMiddleware, criarProfessorController)
 
-router.post('/criaraluno', authMiddleware, criarAlunoController)
+rota.get('/aluno/:id', alunoDetalhadoController)
 
-router.post('/criarprofessor', authMiddleware, criarProfessorController)
+rota.get('/professor/:id', professorDetalhadoController)
 
-router.get('/aluno/:id', alunoDetalhadoController);
+rota.patch('/aluno/:id', authMiddleware, atualizarAlunoController)
 
-router.get('/professor/:id', professorDetalhadoController);
+rota.patch('/professor/:id', authMiddleware, atualizarProfessorController)
 
-router.put('/aluno/:id', authMiddleware, atualizarAlunoController)
+rota.delete('/aluno/:id', authMiddleware, excluirAlunoController)
 
-router.put('/professor/:id', authMiddleware, atualizarProfessorController)
+rota.delete('/professor/:id', authMiddleware, excluirProfessorController)
 
-router.delete('/aluno/:id', authMiddleware, excluirLivrosController)
-
-router.options('/', (req, res) => {
-    res.setHeaders('Allow', 'GET, OPTIONS')
-    res.status(204).send()
-})
-
-router.options('/:id', (req, res) => {
-    res.setHeaders('Allow', 'GET, PUT, DELETE, OPTIONS')
-    res.status(204).send()
-})
-
-export default router;
+export default rota;

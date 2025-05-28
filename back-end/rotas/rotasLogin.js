@@ -4,9 +4,6 @@ import { loginAlunoController,loginProfessorController,loginCoordenadorControlle
 
 const rota = express.Router()
 
-
-// rota.post('/professor', loginProfessorController)
-
 rota.post('/coordenador', loginCoordenadorController)
 
 rota.post('/professor',loginProfessorController);
