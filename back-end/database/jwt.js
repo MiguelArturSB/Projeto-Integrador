@@ -1,1 +1,1 @@
-export const JWT_SECRET = '$2b$10$YrVU.y5/VRAHFB9qkCYuvuRbYuwntVVlmYpQuDqrQwrS7ZV8fNbcG'
+export const JWT_SECRET = 'e6996fbfd41da032f74fe40c62dfec496f896ca7a93acf37e98680e2d2924518c8b4b6f5d9deb36d26ca357450b7afe76685722e6af0d4cc6f47d16d0f3232a9'

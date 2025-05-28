@@ -5,13 +5,11 @@ import cors from 'cors'
 
 import os from 'os';
 
-// import rotaAlunoLogin from './rotas/rotasLogin.js'
-// import rotaProfessorLogin from './rotas/rotasLogin.js'
-// import rotaCoordenadorLogin from './rotas/rotasLogin.js'
-
 import login from './rotas/rotasLogin.js'
 import viewP from './rotas/rotasPresenca.js'
 import viewA from './rotas/rotaAluno.js';
+
+import rotaCoordenador from './rotas/rotasCoordenador.js'
 
 app.use(cors())
 app.use(express.json());
@@ -20,6 +18,7 @@ app.use('/aluno', viewA)
 
 app.use('/login', login)
 
+app.use('/coordenador', rotaCoordenador)
 
 app.use('/presenca', viewP)
 

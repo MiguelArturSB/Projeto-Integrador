@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from '../database/jwt.js'
 
 const authMiddleware = (req, res, next) => {
-    const authHeader = req.headers. authorization
+    const authHeader = req.headers.authorization
 
     if (!authHeader) {
         return res.status(401).json({mensagem: 'Não autorizado: token não fornecido'})

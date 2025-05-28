@@ -1,17 +1,28 @@
-import { listarUsuarios, alunoDetalhado, professorDetalhado, criarAluno, criarProfessor, atualizarAluno, atualizarProfessor, excluirAluno, excluirProfessor } from '../configs/configCoordenador'
+import { listarAlunos, listarProfessores, alunoDetalhado, professorDetalhado, criarAluno, criarProfessor, atualizarAluno, atualizarProfessor, excluirAluno, excluirProfessor } from '../configs/configCoordenador.js'
 import { fileURLToPath } from 'url'
+import bcrypt from 'bcryptjs'
 import path from 'path'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const listarUsuariosController = async (req, res) => {
+const listarAlunosController = async (req, res) => {
     try {
-        const usuarios = await listarUsuarios()
-        res.status(200).send(usuarios)
+        const alunos = await listarAlunos()
+        res.status(200).send(alunos)
     } catch (err) {
-        console.error('Erro ao listar usuários:', err)
-        res.status(500).json({ mensagem: 'Erro ao listar usuários' })
+        console.error('Erro ao listar alunos:', err)
+        res.status(500).json({ mensagem: 'Erro ao listar alunos' })
+    }
+}
+
+const listarProfessoresController = async (req, res) => {
+    try {
+        const professores = await listarProfessores()
+        res.status(200).send(professores)
+    } catch (err) {
+        console.error('Erro ao listar professores:', err)
+        res.status(500).json({ mensagem: 'Erro ao listar professores' })
     }
 }
 
@@ -47,11 +58,14 @@ const criarAlunoController = async (req, res) => {
     try {
         const { nome_aluno, turma, RA_aluno, senha_aluno } = req.body
 
+        // Gerar hash da senha com salt
+        const senhaHash = await bcrypt.hash(senha_aluno, 10); // 10 é o salt rounds
+
         const dadosAluno = {
-            nome: nome_aluno,
+            nome_aluno: nome_aluno,
             turma: turma,
-            RA: RA_aluno,
-            senha: senha_aluno
+            RA_aluno: RA_aluno,
+            senha_aluno: senhaHash
         }
 
         const ID_aluno = await criarAluno(dadosAluno)
@@ -62,40 +76,49 @@ const criarAlunoController = async (req, res) => {
     }
 }
 
+
 const criarProfessorController = async (req, res) => {
     try {
-        const { nome_professor, materia, qntd_aula, turma_professor, cpf_professor, senha_professor } = req.body
+        const {nome_professor,materia,qntd_aula,aulas_dadas,turma_professor,cpf_professor,senha_professor} = req.body;
+
+        // Gerar hash da senha com salt
+        const senhaHash = await bcrypt.hash(senha_professor, 10); // 10 é o salt rounds
 
         const dadosProfessor = {
-            nome: nome_professor,
-            materia: materia,
-            aulas: qntd_aula,
-            turma: turma_professor,
-            CPF: cpf_professor,
-            senha: senha_professor
-        }
+            nome_professor,
+            materia,
+            qntd_aula,
+            aulas_dadas,
+            turma_professor,
+            cpf_professor,
+            senha_professor: senhaHash // salvar a senha já hasheada
+        };
 
-        const ID_professor = await criarProfessor(dadosProfessor)
-        res.status(201).json({ mensagem: 'Usuário criado com sucesso!!!', ID_professor })
+        const ID_professor = await criarProfessor(dadosProfessor);
+
+        res.status(201).json({ mensagem: 'Usuário criado com sucesso!!!', ID_professor });
     } catch (err) {
-        console.error('Erro ao criar professor: ', err)
-        res.status(500).json({ mensagem: 'Erro ao criar professor' })
+        console.error('Erro ao criar professor: ', err);
+        res.status(500).json({ mensagem: 'Erro ao criar professor' });
     }
-}
+};
 
 const atualizarAlunoController = async (req, res) => {
     try {
         const ID_aluno = req.params.id
         const { nome_aluno, turma, RA_aluno, senha_aluno } = req.body
+        // Gerar hash da senha com salt
+        const senhaHash = await bcrypt.hash(senha_aluno, 10); // 10 é o salt rounds
 
         const dadosAluno = {
-            nome: nome_aluno,
+            nome_aluno: nome_aluno,
             turma: turma,
-            RA: RA_aluno,
-            senha: senha_aluno
+            RA_aluno: RA_aluno,
+            senha_aluno: senhaHash
         }
 
-        await atualizarAluno(dadosAluno)
+        console.log(`esse é os dados recebidos${dadosAluno}`)
+        await atualizarAluno(ID_aluno, dadosAluno)
         res.status(200).json({ mensagem: 'Usuário atualizado com sucesso!!!' })
     } catch (err) {
         console.error('Erro ao atualizar aluno: ', err)
@@ -106,18 +129,21 @@ const atualizarAlunoController = async (req, res) => {
 const atualizarProfessorController = async (req, res) => {
     try {
         const ID_professor = req.params.id
-        const { nome_professor, materia, qntd_aula, turma_professor, cpf_professor, senha_professor } = req.body
+        const { nome_professor, materia, qntd_aula, aulas_dadas, turma_professor, cpf_professor, senha_professor } = req.body
+        // Gerar hash da senha com salt
+        const senhaHash = await bcrypt.hash(senha_professor, 10); // 10 é o salt rounds
 
         const dadosProfessor = {
-            nome: nome_professor,
+            nome_professor: nome_professor,
             materia: materia,
-            aulas: qntd_aula,
-            turma: turma_professor,
-            CPF: cpf_professor,
-            senha: senha_professor
+            qntd_aula: qntd_aula,
+            aulas_dadas: aulas_dadas,
+            turma_professor: turma_professor,
+            cpf_professor: cpf_professor,
+            senha_professor: senhaHash
         }
 
-        await atualizarProfessor(dadosProfessor)
+        await atualizarProfessor(ID_professor, dadosProfessor)
         res.status(200).json({ mensagem: 'Usuário atualizado com sucesso!!!' })
     } catch (err) {
         console.error('Erro ao atualizar professor: ', err)
@@ -147,4 +173,4 @@ const excluirProfessorController = async (req, res) => {
     }
 }
 
-export { listarUsuariosController, alunoDetalhadoController, professorDetalhadoController, criarAlunoController, criarProfessorController, atualizarAlunoController, atualizarProfessorController, excluirAlunoController, excluirProfessorController }
+export { listarProfessoresController, listarAlunosController, alunoDetalhadoController, professorDetalhadoController, criarAlunoController, criarProfessorController, atualizarAlunoController, atualizarProfessorController, excluirAlunoController, excluirProfessorController }
