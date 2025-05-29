@@ -1,9 +1,11 @@
 "use client";
+
 import { useState, useEffect } from 'react';
 import './page.css';
 import { useRouter } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 // import link from '/homealuno/page.js'
+import { useSearchParams } from "next/navigation";
 
 
 
@@ -11,6 +13,10 @@ import { QRCodeSVG } from 'qrcode.react';
 
 
 export default function Portal() {
+
+  const searchParams = useSearchParams();
+  const [mostrarMensagem, setMostrarMensagem] = useState(false);
+  const [outraMensagem, setOutraMensagem] = useState(false);
 
   const backendUrl = `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3001`;
   const [activeForm, setActiveForm] = useState(null);
@@ -69,6 +75,26 @@ export default function Portal() {
     setAnimado(true);
   };
 
+  useEffect(() => {
+    const vindoDeRedirect = searchParams.get("redirect") === "true";
+
+    if (vindoDeRedirect) {
+      setMostrarMensagem(true);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("redirect");
+      window.history.replaceState({}, "", url.toString());
+    }
+
+    const sucesso = searchParams.get("sucesso") === "ok";
+    if (sucesso) {
+      setOutraMensagem(true);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("sucesso");
+      window.history.replaceState({}, "", url.toString());
+    }
+
+
+  }, [searchParams]);
 
 
 
@@ -97,7 +123,7 @@ export default function Portal() {
           // Feedback ou redirecionamento pra saber que deu certo
           animacao();
           const timeout = setTimeout(() => {
-            router.push('/homealuno');
+            router.push('/homealuno?redirect=true');
           }, 1950)
 
 
@@ -141,7 +167,7 @@ export default function Portal() {
           // Feedback ou redirecionamento pra saber que deu certo
           animacao();
           const timeout = setTimeout(() => {
-            router.push('/professor');
+            router.push('/professor?redirect=true');
           }, 1950)
 
 
@@ -226,14 +252,28 @@ export default function Portal() {
   return (
     <>
       {animado && (
-        <div className=" slide-in-left bg-sky-800 z-50 fixed w-[100%] h-[100vh]">
+        <div className=" slide-in-left bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
           <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
-            <p className=" text-black font-bold">Carregando <b>...</b></p>
+            <p className=" text-black font-bold">Carregando <b className='ponto1'>.</b> <b className='ponto2'>.</b> <b className='ponto3'>.</b> </p>
           </div>
         </div>
       )}
 
-      <div className=" slide-in-volta bg-sky-800 z-50 fixed w-[100%] h-[100vh]"></div>
+      {outraMensagem && (
+        <div className=" slide-in-volta bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
+          <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
+            <p className=" text-black font-bold">Saindo <b className='ponto1'>.</b> <b className='ponto2'>.</b> <b className='ponto3'>.</b> </p>
+          </div>
+        </div>
+      )}
+
+      {mostrarMensagem && (
+
+        <div className=" slide-in-volta bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
+          <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
+            <p className=" text-black font-bold">Presenças enviada!!</p>
+          </div></div>
+      )}
 
 
 
@@ -367,7 +407,7 @@ export default function Portal() {
                     <p
                       onClick={() => {
                         setShowModal(true);
-                        animacao();
+
                       }}
                       className="cursor-pointer hover:text-blue-900 mt-4 text-center text-sm text-blue-600 font-semibold"
                     >
@@ -384,7 +424,7 @@ export default function Portal() {
                           <p
                             onClick={() => {
                               setShowModal(true);
-                              animacao();
+
                             }}
                             className="cursor-pointer hover:text-blue-900 mt-4 text-center text-sm text-blue-600 font-semibold"
                           >

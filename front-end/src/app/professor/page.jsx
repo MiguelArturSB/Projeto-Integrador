@@ -7,7 +7,14 @@ import './prof.css';
 import HeaderProfessor from '../components/HeaderProfessor/headerprof';
 import Footer from '../components/Footer/page.jsx'
 
+import { useSearchParams } from "next/navigation";
+
+
+
 export default function ProfessorTable() {
+  const searchParams = useSearchParams();
+  const [mostrarMensagem, setMostrarMensagem] = useState(false);
+
   const router = useRouter();
   const [alunos, setAlunos] = useState([]);
   const [token, setToken] = useState(null);
@@ -15,6 +22,16 @@ export default function ProfessorTable() {
   const [animado, setAnimado] = useState(false)
 
 
+  useEffect(() => {
+    const vindoDeRedirect = searchParams.get("redirect") === "true";
+
+    if (vindoDeRedirect) {
+      setMostrarMensagem(true);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("redirect");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [searchParams]);
 
 
   const backendUrl = `http://${typeof window !== "undefined" ? window.location.hostname : "localhost"
@@ -50,7 +67,7 @@ export default function ProfessorTable() {
 
 
     const timeout = setTimeout(() => {
-      router.push('../')
+      router.push('../?redirect=true')
     }, 1950)
 
 
@@ -64,8 +81,8 @@ export default function ProfessorTable() {
         return;
       }
 
-      let presencasRegistradasComSucesso = 0;
       let errosAoRegistrarPresenca = 0;
+      let presencasRegistradasComSucesso = 0;
       let idAlunoParaMarcarAula = null;
 
       for (const aluno of alunosPresentes) {
@@ -178,7 +195,7 @@ export default function ProfessorTable() {
       if (data && Array.isArray(data.view)) {
         const alunosComPresencaInicial = data.view.map((aluno) => ({
           ...aluno,
-          presente: false,
+          presente: true,
         }));
         setAlunos(alunosComPresencaInicial);
       } else {
@@ -204,10 +221,15 @@ export default function ProfessorTable() {
           </div>
         </div>
       )}
-      <div className=" slide-in-volta bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
-        <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
-          <p className=" text-black font-bold">Carregando <b>...</b></p>
-        </div></div>
+
+      {mostrarMensagem && (
+        <div className=" slide-in-volta bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
+          <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
+            <p className=" text-black font-bold">Carregando <b className='ponto1'>.</b> <b className='ponto2'>.</b> <b className='ponto3'>.</b> </p>
+          </div>
+        </div>
+      )}
+
 
       <div className="min-h-screen bg-gradient-to-br  flex items-center justify-center p-8">
         <div className="bg-white shadow-2xl rounded-3xl w-full max-w-6xl p-6 relative overflow-hidden">
@@ -263,7 +285,7 @@ export default function ProfessorTable() {
                         onClick={() => togglePresence(aluno.ID_aluno)}
                         className={`w-8 h-8 cursor-pointer rounded-full border-5 transition-colors duration-300 ${aluno.presente
                           ? "bg-green-500 border-green-700"
-                          : "bg-gray-400 border-gray-600"
+                          : "bg-red-500 border-red-700"
                           }`}
                         title={aluno.presente ? "Presente" : "Ausente"}
                       ></button>

@@ -58,6 +58,7 @@ const loginProfessorController = async (req, res) => {
         const token = jwt.sign({
     id: Professore.id,
     tipo: Professore.tipo,
+    ID_professor: Professore.ID_professor,
     turma_professor: Professore.turma_professor, 
     materia: Professore.materia             
   }, JWT_SECRET, { expiresIn: '1h' });

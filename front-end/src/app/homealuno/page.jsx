@@ -2,11 +2,20 @@
 
 import Header from '../components/Header/header.jsx'
 import Footer from '../components/Footer/page.jsx'
+import './alun.css'
 import { useState, useEffect } from 'react'
 import { jwtDecode } from "jwt-decode";
+import { useSearchParams } from "next/navigation";
+
+
+
 
 export default function HomeAluno() {
     const backendUrl = `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3001`;
+
+    const searchParams = useSearchParams();
+    const [mostrarMensagem, setMostrarMensagem] = useState(false);
+
     const [token, setToken] = useState(null);
     const [decoded, setDecoded] = useState(null);
     const [showWelcome, setShowWelcome] = useState(true);
@@ -16,6 +25,18 @@ export default function HomeAluno() {
     const handleCloseWelcome = () => {
         setShowWelcome(false);
     };
+
+
+    useEffect(() => {
+        const vindoDeRedirect = searchParams.get("redirect") === "true";
+
+        if (vindoDeRedirect) {
+            setMostrarMensagem(true);
+            const url = new URL(window.location.href);
+            url.searchParams.delete("redirect");
+            window.history.replaceState({}, "", url.toString());
+        }
+    }, [searchParams]);
 
     const handleSubmit = async (token, decoded) => {
         try {
@@ -67,6 +88,13 @@ export default function HomeAluno() {
 
     return (
         <>
+            {mostrarMensagem && (
+
+                <div className=" slide-in-volta bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
+                    <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
+                        <p className=" text-black font-bold">Carregando <b className='ponto1'>.</b> <b className='ponto2'>.</b> <b className='ponto3'>.</b> </p>
+                    </div></div>
+            )}
             {showWelcome && (
                 <div className="text-3xl font-bold">
                     <div className="bg-blue-100 p-6 rounded-lg shadow-lg">
