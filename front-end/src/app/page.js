@@ -186,7 +186,7 @@ export default function Portal() {
           // Feedback ou redirecionamento pra saber que deu certo
           const timeout = setTimeout(() => {
             animacao();
-            router.push('/aluno/dashboard');
+            router.push('/coordenador');
           }, 4200)
 
 
