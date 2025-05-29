@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import './prof.css';
+import HeaderProfessor from '../components/HeaderProfessor/headerprof';
+import Footer from '../components/Footer/page.jsx'
 
 export default function ProfessorTable() {
   const router = useRouter();
@@ -11,6 +13,9 @@ export default function ProfessorTable() {
   const [token, setToken] = useState(null);
   const [decoded, setDecoded] = useState(null);
   const [animado, setAnimado] = useState(false)
+
+
+
 
   const backendUrl = `http://${typeof window !== "undefined" ? window.location.hostname : "localhost"
     }:3001`;
@@ -191,6 +196,7 @@ export default function ProfessorTable() {
 
   return (
     <>
+    <HeaderProfessor />
       {animado && (
         <div className=" slide-in-left bg-sky-800 z-50 fixed w-[100%] h-[100vh]">
           <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
@@ -198,7 +204,9 @@ export default function ProfessorTable() {
           </div>
         </div>
       )}
-      <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-300 flex items-center justify-center p-8">
+
+
+      <div className="min-h-screen bg-gradient-to-br  flex items-center justify-center p-8">
         <div className="bg-white shadow-2xl rounded-3xl w-full max-w-6xl p-6 relative overflow-hidden">
           <h1 className=" font-bold text-gray-800 mb-6 border-b pb-4 text-xl sm:text-4xl ">
             Painel da Presença
@@ -217,7 +225,7 @@ export default function ProfessorTable() {
           <div className="overflow-x-auto">
             <table className="w-[280px] table-fixed rounded-xl overflow-hidden shadow-md sm:min-w-full  sm:table-auto ">
               <thead>
-                <tr className="bg-gradient-to-r from-slate-700 to-slate-900 text-white text-left text-sm  sm:text-lg ">
+                <tr className=" bg-[#1d577b] text-white text-left text-sm  sm:text-lg ">
                   <th className=" px-6   font-semibold text-[0.7rem] sm:text-sm">
                     Nome
                   </th>
@@ -236,7 +244,7 @@ export default function ProfessorTable() {
                 {alunos.map((aluno) => (
                   <tr
                     key={aluno.ID_aluno}
-                    className="odd:bg-white even:bg-slate-100 hover:bg-slate-200 transition-all"
+                    className="odd:bg-white even:bg-blue-50 hover:bg-slate-200 transition-all"
                   >
                     <td className="py-1 px-6 text-gray-700 text-xs sm:text-sm sm:py-4">
                       {aluno.nome_aluno}
@@ -271,8 +279,9 @@ export default function ProfessorTable() {
               Confirmar Presença
             </button>
           </div>
-        </div>
+        </div>  
       </div>
+    <Footer />
     </>
   );
 }

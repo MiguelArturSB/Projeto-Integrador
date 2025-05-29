@@ -1,6 +1,6 @@
 'use client'
 
-import './header.css'
+import './headerprof.css'
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'; 
 
@@ -51,10 +51,10 @@ export default function HomeAluno() {
 
                     <img src='./logo2.png' width={200} className='mt-2' alt="Logo" />
                     <h1 className='text-white font-bold text-shadow-2xs text-shadow-black text-center mt-2'>
-                        Seja Bem-vindo ao Portal de frequência do Aluno!
+                        Seja Bem-vindo ao Portal de frequência do Professor!
                     </h1>
                     <h4 className='text-blue-50 text-[20px] mt-2 mb-2 text-center font-bold'>
-                        Verifique suas faltas e presenças em tempo real!
+                        Atualize faltas e presenças diariamente!
                     </h4>
                 </div>
             </header>
@@ -86,23 +86,23 @@ export default function HomeAluno() {
 
                             <div className="p-4 space-y-4">
                                 <div>
-                                    <h1 className='text-lg md:text-xl text-[#054068] font-bold mb-1'>Nome do Aluno:</h1>
+                                    <h1 className='text-lg md:text-xl text-[#054068] font-bold mb-1'>Nome do Professor:</h1>
                                     <p className='bg-blue-50 w-full rounded-lg text-gray-700 p-3 text-sm md:text-base'>
                                         Rafael Teixeira de Almeida
                                     </p>
                                 </div>
 
                                 <div>
-                                    <h1 className='text-lg md:text-xl text-[#054068] font-bold mb-1'>Registro do Aluno (RA):</h1>
+                                    <h1 className='text-lg md:text-xl text-[#054068] font-bold mb-1'>CPF de login:</h1>
                                     <p className='bg-blue-50 w-full rounded-lg text-gray-700 p-3 text-sm md:text-base'>
-                                        100.000.015
+                                        666.666.666
                                     </p>
                                 </div>
 
                                 <div>
                                     <h1 className='text-lg md:text-xl text-[#054068] font-bold mb-1'>Turma:</h1>
                                     <p className='bg-blue-50 w-full rounded-lg text-gray-700 p-3 text-sm md:text-base'>
-                                        2MD
+                                        2TD
                                     </p>
                                 </div>
                             </div>

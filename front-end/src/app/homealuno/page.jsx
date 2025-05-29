@@ -99,7 +99,7 @@ export default function HomeAluno() {
                         </h1>
                     )}
                     <h4 className=' flex justify-center font-bold mb-2'>faltas no semestre atual</h4>
-                    <h1 className='w-full flex justify-center rounded-b-3xl bg-[#1d577b] text-white font-bold p-2 cursor-pointer'>
+                    <h1 className='w-full flex justify-center rounded-b-3xl bg-[#1d577b] text-white font-bold p-2'>
                              de 480 aulas no semestre
                     </h1>
                 </div>
