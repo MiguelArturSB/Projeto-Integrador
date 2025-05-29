@@ -1,11 +1,19 @@
-import { listarAlunos, listarProfessores, alunoDetalhado, professorDetalhado, criarAluno, criarProfessor, atualizarAluno, atualizarProfessor, excluirAluno, excluirProfessor } from '../configs/configCoordenador.js'
+// Importa funções de manipulação de dados e dependências necessárias
+import { 
+    listarAlunos, listarProfessores, alunoDetalhado, professorDetalhado, 
+    criarAluno, criarProfessor, atualizarAluno, atualizarProfessor, 
+    excluirAluno, excluirProfessor 
+} from '../configs/configCoordenador.js'
+
 import { fileURLToPath } from 'url'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcryptjs' // Para criptografar senhas
 import path from 'path'
 
+// Configuração de diretório
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+// Controller para listar todos os alunos
 const listarAlunosController = async (req, res) => {
     try {
         const alunos = await listarAlunos()
@@ -16,6 +24,7 @@ const listarAlunosController = async (req, res) => {
     }
 }
 
+// Controller para listar todos os professores
 const listarProfessoresController = async (req, res) => {
     try {
         const professores = await listarProfessores()
@@ -26,6 +35,7 @@ const listarProfessoresController = async (req, res) => {
     }
 }
 
+// Detalhar aluno por ID
 const alunoDetalhadoController = async (req, res) => {
     try {
         const aluno = await alunoDetalhado(req.params.id);
@@ -40,6 +50,7 @@ const alunoDetalhadoController = async (req, res) => {
     }
 }
 
+// Detalhar professor por ID
 const professorDetalhadoController = async (req, res) => {
     try {
         const professor = await professorDetalhado(req.params.id);
@@ -54,17 +65,18 @@ const professorDetalhadoController = async (req, res) => {
     }
 }
 
+// Cria um novo aluno (inclui hash da senha)
 const criarAlunoController = async (req, res) => {
     try {
         const { nome_aluno, turma, RA_aluno, senha_aluno } = req.body
 
-        // Gerar hash da senha com salt
-        const senhaHash = await bcrypt.hash(senha_aluno, 10); // 10 é o salt rounds
+        // Gera hash da senha
+        const senhaHash = await bcrypt.hash(senha_aluno, 10);
 
         const dadosAluno = {
-            nome_aluno: nome_aluno,
-            turma: turma,
-            RA_aluno: RA_aluno,
+            nome_aluno,
+            turma,
+            RA_aluno,
             senha_aluno: senhaHash
         }
 
@@ -76,13 +88,13 @@ const criarAlunoController = async (req, res) => {
     }
 }
 
-
+// Cria um novo professor (inclui hash da senha)
 const criarProfessorController = async (req, res) => {
     try {
-        const {nome_professor,materia,qntd_aula,aulas_dadas,turma_professor,cpf_professor,senha_professor} = req.body;
+        const { nome_professor, materia, qntd_aula, aulas_dadas, turma_professor, cpf_professor, senha_professor } = req.body;
 
-        // Gerar hash da senha com salt
-        const senhaHash = await bcrypt.hash(senha_professor, 10); // 10 é o salt rounds
+        // Gera hash da senha
+        const senhaHash = await bcrypt.hash(senha_professor, 10);
 
         const dadosProfessor = {
             nome_professor,
@@ -91,7 +103,7 @@ const criarProfessorController = async (req, res) => {
             aulas_dadas,
             turma_professor,
             cpf_professor,
-            senha_professor: senhaHash // salvar a senha já hasheada
+            senha_professor: senhaHash
         };
 
         const ID_professor = await criarProfessor(dadosProfessor);
@@ -103,21 +115,21 @@ const criarProfessorController = async (req, res) => {
     }
 };
 
+// Atualiza dados de um aluno (inclui hash da nova senha)
 const atualizarAlunoController = async (req, res) => {
     try {
         const ID_aluno = req.params.id
         const { nome_aluno, turma, RA_aluno, senha_aluno } = req.body
-        // Gerar hash da senha com salt
-        const senhaHash = await bcrypt.hash(senha_aluno, 10); // 10 é o salt rounds
+
+        const senhaHash = await bcrypt.hash(senha_aluno, 10);
 
         const dadosAluno = {
-            nome_aluno: nome_aluno,
-            turma: turma,
-            RA_aluno: RA_aluno,
+            nome_aluno,
+            turma,
+            RA_aluno,
             senha_aluno: senhaHash
         }
 
-        console.log(`esse é os dados recebidos${dadosAluno}`)
         await atualizarAluno(ID_aluno, dadosAluno)
         res.status(200).json({ mensagem: 'Usuário atualizado com sucesso!!!' })
     } catch (err) {
@@ -126,20 +138,21 @@ const atualizarAlunoController = async (req, res) => {
     }
 }
 
+// Atualiza dados de um professor (inclui hash da nova senha)
 const atualizarProfessorController = async (req, res) => {
     try {
         const ID_professor = req.params.id
         const { nome_professor, materia, qntd_aula, aulas_dadas, turma_professor, cpf_professor, senha_professor } = req.body
-        // Gerar hash da senha com salt
-        const senhaHash = await bcrypt.hash(senha_professor, 10); // 10 é o salt rounds
+
+        const senhaHash = await bcrypt.hash(senha_professor, 10);
 
         const dadosProfessor = {
-            nome_professor: nome_professor,
-            materia: materia,
-            qntd_aula: qntd_aula,
-            aulas_dadas: aulas_dadas,
-            turma_professor: turma_professor,
-            cpf_professor: cpf_professor,
+            nome_professor,
+            materia,
+            qntd_aula,
+            aulas_dadas,
+            turma_professor,
+            cpf_professor,
             senha_professor: senhaHash
         }
 
@@ -151,6 +164,7 @@ const atualizarProfessorController = async (req, res) => {
     }
 }
 
+// Exclui um aluno pelo ID
 const excluirAlunoController = async (req, res) => {
     try {
         const ID_aluno = req.params.id
@@ -162,6 +176,7 @@ const excluirAlunoController = async (req, res) => {
     }
 }
 
+// Exclui um professor pelo ID
 const excluirProfessorController = async (req, res) => {
     try {
         const ID_professor = req.params.id
@@ -173,4 +188,16 @@ const excluirProfessorController = async (req, res) => {
     }
 }
 
-export { listarProfessoresController, listarAlunosController, alunoDetalhadoController, professorDetalhadoController, criarAlunoController, criarProfessorController, atualizarAlunoController, atualizarProfessorController, excluirAlunoController, excluirProfessorController }
+// Exporta todos os controllers
+export { 
+    listarProfessoresController,
+    listarAlunosController,
+    alunoDetalhadoController,
+    professorDetalhadoController,
+    criarAlunoController,
+    criarProfessorController,
+    atualizarAlunoController,
+    atualizarProfessorController,
+    excluirAlunoController,
+    excluirProfessorController 
+}

@@ -1,17 +1,16 @@
 import express from "express";
-import { viewP,marcaFalta,marcaAula,} from "../controllersrotas/controllPresenca.js"
-import authMiddleware  from "../middlewares/authMiddleware.js";
+import { viewP, marcaFalta, marcaAula } from "../controllersrotas/controllPresenca.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 
-const rota = express.Router()
+const rota = express.Router();
 
-rota.post('/viewP',authMiddleware,viewP);
+// Rota para visualizar presenças, protegida por autenticação
+rota.post('/viewP', authMiddleware, viewP);
 
-rota.put('/registrar',authMiddleware,marcaFalta);
+// Rota para marcar falta, protegida por autenticação
+rota.put('/registrar', authMiddleware, marcaFalta);
 
-rota.put('/aula',authMiddleware,marcaAula);
-// 
+// Rota para registrar aula dada, protegida por autenticação
+rota.put('/aula', authMiddleware, marcaAula);
 
-
-
-
-export default rota
+export default rota;

@@ -1,17 +1,11 @@
 import express from "express";
-import { loginAlunoController,loginProfessorController,loginCoordenadorController} from "../controllersrotas/controllLogin.js"
+import { loginAlunoController, loginProfessorController, loginCoordenadorController } from "../controllersrotas/controllLogin.js";
 
+const rota = express.Router();
 
-const rota = express.Router()
-
-rota.post('/coordenador', loginCoordenadorController)
-
-rota.post('/professor',loginProfessorController);
-
+// Rotas de login para cada tipo de usuário
+rota.post('/coordenador', loginCoordenadorController);
+rota.post('/professor', loginProfessorController);
 rota.post('/aluno', loginAlunoController);
 
-
-
-
-
-export default rota
+export default rota;

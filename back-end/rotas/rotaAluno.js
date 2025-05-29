@@ -1,9 +1,11 @@
 import express from "express";
-import {viewA} from "../controllersrotas/controllAluno.js"
-import authMiddleware  from "../middlewares/authMiddleware.js";
+import { viewA } from "../controllersrotas/controllAluno.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 
-const rota = express.Router()
+const rota = express.Router();
 
-rota.post('/viewA',authMiddleware,viewA);
+// Define a rota POST /viewA que usa o middleware de autenticação
+// e chama o controller viewA
+rota.post('/viewA', authMiddleware, viewA);
 
-export default rota
+export default rota;

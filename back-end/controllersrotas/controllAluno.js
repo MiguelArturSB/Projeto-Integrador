@@ -1,16 +1,18 @@
-import {viewAluno} from '../database/database.js';
+// Importa a função viewAluno do módulo de banco de dados
+import { viewAluno } from '../database/database.js';
 
-
+// Função para criar uma view de aluno a partir do ID recebido na requisição
 const viewA = async (req, res) => {
   try {
+    const { idAluno } = req.body; // Recebe o ID do aluno do corpo da requisição
 
-    const { idAluno } = req.body;
-
-    // Optional: forçar null se undefined
+    // Garante que o valor não seja undefined, atribuindo null se for o caso
     const safealunoID = idAluno ?? null;
 
+    // Executa a view no banco de dados
     const view = await viewAluno(safealunoID);
 
+    // Retorna sucesso com status 201 e o resultado da view
     res.status(201).json({ mensagem: 'View criado com sucesso!!!', view });
   } catch (err) {
     console.error('Erro ao criar view: ', err);
@@ -18,5 +20,5 @@ const viewA = async (req, res) => {
   }
 };
 
-
-export {viewA };
+// Exporta a função para uso externo
+export { viewA };
