@@ -69,7 +69,7 @@ export default function Portal() {
     setAnimado(true);
   };
 
-  
+
 
 
 
@@ -98,7 +98,7 @@ export default function Portal() {
           animacao();
           const timeout = setTimeout(() => {
             router.push('/homealuno');
-          }, 4200)
+          }, 1950)
 
 
 
@@ -142,7 +142,7 @@ export default function Portal() {
           animacao();
           const timeout = setTimeout(() => {
             router.push('/professor');
-          }, 4200)
+          }, 1950)
 
 
 
@@ -187,7 +187,7 @@ export default function Portal() {
           const timeout = setTimeout(() => {
             animacao();
             router.push('/aluno/dashboard');
-          }, 4200)
+          }, 1950)
 
 
 
@@ -228,11 +228,12 @@ export default function Portal() {
       {animado && (
         <div className=" slide-in-left bg-sky-800 z-50 fixed w-[100%] h-[100vh]">
           <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
-            <p className=" text-black font-bold">Carregando ...</p>
+            <p className=" text-black font-bold">Carregando <b>...</b></p>
           </div>
         </div>
       )}
 
+      <div className=" slide-in-volta bg-sky-800 z-50 fixed w-[100%] h-[100vh]"></div>
 
 
 
@@ -364,10 +365,10 @@ export default function Portal() {
                     <p>Problemas com seu R.A.? Entre em contato com a secretaria.</p>
                     <hr className="my-4 h-0.5 border-t-0 bg-neutral-100 dark:bg-white/10" />
                     <p
-                            onClick={() => {
-                              setShowModal(true);
-                              animacao();
-                            }}
+                      onClick={() => {
+                        setShowModal(true);
+                        animacao();
+                      }}
                       className="cursor-pointer hover:text-blue-900 mt-4 text-center text-sm text-blue-600 font-semibold"
                     >
                       Entre em outros dispositivos através do QR code!

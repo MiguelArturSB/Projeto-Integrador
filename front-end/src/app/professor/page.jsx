@@ -48,10 +48,10 @@ export default function ProfessorTable() {
   const comfirmaPresenca = async () => {
     setAnimado(true)
 
-    
-      const timeout = setTimeout(() => {
-        router.push('../')
-      }, 4200)
+
+    const timeout = setTimeout(() => {
+      router.push('../')
+    }, 1950)
 
 
 
@@ -196,15 +196,18 @@ export default function ProfessorTable() {
 
   return (
     <>
-    <HeaderProfessor />
+      <HeaderProfessor />
       {animado && (
-        <div className=" slide-in-left bg-sky-800 z-50 fixed w-[100%] h-[100vh]">
+        <div className="slide-in-left bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
           <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
             <p className=" text-black font-bold">Presenças enviada!!</p>
           </div>
         </div>
       )}
-
+      <div className=" slide-in-volta bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
+        <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
+          <p className=" text-black font-bold">Carregando <b>...</b></p>
+        </div></div>
 
       <div className="min-h-screen bg-gradient-to-br  flex items-center justify-center p-8">
         <div className="bg-white shadow-2xl rounded-3xl w-full max-w-6xl p-6 relative overflow-hidden">
@@ -279,9 +282,9 @@ export default function ProfessorTable() {
               Confirmar Presença
             </button>
           </div>
-        </div>  
+        </div>
       </div>
-    <Footer />
+      <Footer />
     </>
   );
 }

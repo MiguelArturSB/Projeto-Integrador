@@ -45,6 +45,28 @@ body{
     slide-in-left-indoembora 0.7s ease 4.5s forwards;
 }
 
+/* e o que ja ta ativo */
+@keyframes slide-in-left-aocontrario {
+  100% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+
+.slide-in-volta{
+  animation: 
+    slide-in-left-aocontrario 0.7s ease .5s forwards;
+}
+
+/* ------------- */
+
+
+
 
   @keyframes slideIn {
     0% {

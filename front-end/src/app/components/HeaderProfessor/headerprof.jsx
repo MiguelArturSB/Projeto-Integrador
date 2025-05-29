@@ -25,8 +25,8 @@ export default function HomeAluno() {
 
     return (
         <>
-            <header className="bg-[#054068]">
-                <div className='flex flex-col items-center justify-center text-4xl shadow-xl/30 shadow-blue-900 relative py-4'>
+            <header className="bg-[#054068] z-40 relative">
+                <div className='flex flex-col items-center justify-center  text-4xl shadow-xl/30 shadow-blue-900 relative py-4'>
                    
                     <div className='absolute top-4 right-4 cursor-pointer'>
                         <img 
