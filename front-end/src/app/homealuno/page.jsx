@@ -37,15 +37,15 @@ export default function HomeAluno() {
             console.log('Resposta recebida do backend:', data);
 
             if (response.ok) {
-                console.log("✅ Requisição bem-sucedida. Dados das presenças:");
+                console.log("Requisição bem-sucedida. Dados das presenças:");
                 console.log(data.view);
                 setPresencas(data.view || []);
             } else {
-                console.error("❌ Erro na resposta do servidor:", data.mensagem);
+                console.error(" Erro na resposta do servidor:", data.mensagem);
                 setErro(data.mensagem || "Erro ao enviar dados.");
             }
         } catch (error) {
-            console.error("❌ Erro na requisição:", error);
+            console.error(" Erro na requisição:", error);
             document.getElementById('mensagemErro').textContent = "Erro na conexão com o servidor.";
         }
     };
@@ -99,9 +99,13 @@ export default function HomeAluno() {
                         </h1>
                     )}
                     <h4 className=' flex justify-center font-bold mb-2'>faltas no semestre atual</h4>
-                    <h1 className='w-full flex justify-center rounded-b-3xl bg-[#1d577b] text-white font-bold p-2'>
-                             de 480 aulas no semestre
-                    </h1>
+                    {presencas.length > 0 && (
+
+
+                        <h1 className='w-full flex justify-center rounded-b-3xl bg-[#1d577b] text-white font-bold p-2 cursor-pointer'>
+                            de {presencas[0].total_aulas_turma} aulas no semestre
+                        </h1>
+                    )}
                 </div>
             </div>
 

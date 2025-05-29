@@ -200,7 +200,7 @@ export default function ProfessorTable() {
       {animado && (
         <div className=" slide-in-left bg-sky-800 z-50 fixed w-[100%] h-[100vh]">
           <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
-            <p className="p_adm text-black font-bold">Presenças enviada!!</p>
+            <p className=" text-black font-bold">Presenças enviada!!</p>
           </div>
         </div>
       )}
@@ -223,7 +223,7 @@ export default function ProfessorTable() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-[280px] table-fixed rounded-xl overflow-hidden shadow-md sm:min-w-full  sm:table-auto ">
+            <table className="w-[100%] table-fixed rounded-xl overflow-hidden shadow-md sm:min-w-full  sm:table-auto ">
               <thead>
                 <tr className=" bg-[#1d577b] text-white text-left text-sm  sm:text-lg ">
                   <th className=" px-6   font-semibold text-[0.7rem] sm:text-sm">
