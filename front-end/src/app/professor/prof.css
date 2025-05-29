@@ -71,11 +71,7 @@
          max-width: 100%;
      }
  }
-/* p{
-    user-select: none;
-    visibility: hidden;
-    opacity: 0;
-} */
+
 .p_adm{
     white-space: nowrap;
     overflow: hidden;
