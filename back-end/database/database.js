@@ -143,7 +143,7 @@ async function viewPresenca(turma_professor, turma_aluno, materia) {
 async function viewAluno(idAluno) {
   const connection = await getConnection();
   try {
-    const sql = `SELECT nome_aluno,materia,faltas,total_faltas, percentual_frequencia
+    const sql = `SELECT nome_aluno,RA_aluno,turma,materia,faltas,total_faltas,total_aulas_turma,percentual_frequencia
                   FROM total_aluno
                   WHERE ID_aluno = ?`;
 
