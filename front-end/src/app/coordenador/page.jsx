@@ -142,6 +142,10 @@ export default function Coordenador() {
                     </div>
              </div>
 
+             <div>
+                <h1>Gerenciar Professores</h1>
+             </div>
+
              <Footer />
             </div>
    
