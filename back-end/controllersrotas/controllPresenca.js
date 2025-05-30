@@ -24,21 +24,6 @@ const viewP = async (req, res) => {
 };
 
 
-const viewInformacaoP = async (req,res) =>{
-  try{
-    const {idProfessor} = req.body;
-    console.log('Corpo da requisição:', req.body);
-
-    console.log(idProfessor)
-    const safeidProfessor = idProfessor ?? null;
-    
-    const view = await viewProfessor(safeidProfessor)
-res.status(201).json({ mensagem: 'View criado com sucesso!!!', view });
-  }catch (err){
-    console.error('Erro ao criar view: ', err);
-    res.status(500).json({ mensagem: 'Erro ao criar view' });
-  }
-}
 
 
 const viewInformacaoP = async (req,res) =>{

@@ -75,7 +75,7 @@ export default function Portal() {
     setAnimado(true);
   };
 
-  useEffect(() => {
+  useEffect(() => { 
     const vindoDeRedirect = searchParams.get("redirect") === "true";
 
     if (vindoDeRedirect) {

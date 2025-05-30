@@ -121,7 +121,7 @@ export default function HomeAluno() {
                         />
                     </div>
 
-                    {/* Ícone de logout */}
+                
                     <div className='absolute top-4 left-3.5 cursor-pointer'>
                         <img
                             src="./logout.svg"
