@@ -25,7 +25,7 @@ async function readAll(table, where = null) {
     const [rows] = await connection.execute(sql);
     return rows;
   } finally {
-    connection.release();
+    connection.release(); 
   }
 }
 
