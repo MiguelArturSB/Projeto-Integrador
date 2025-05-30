@@ -227,7 +227,7 @@ export default function Portal() {
     <>
       {animado && (
         <div className=" slide-in-left bg-sky-800 z-50 fixed w-[100%] h-[100vh]">
-          <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
+           <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
             <p className=" text-black font-bold">Carregando <b>...</b></p>
           </div>
         </div>
