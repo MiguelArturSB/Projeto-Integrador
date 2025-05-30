@@ -6,7 +6,7 @@ import { useState } from 'react';
 //adicionei isso
 import { useEffect } from 'react'
 import { jwtDecode } from "jwt-decode";
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from 'next/navigation';
 
 export default function HomeAluno() {
     const [showProfileModal, setShowProfileModal] = useState(false);
@@ -14,12 +14,19 @@ export default function HomeAluno() {
 
     //adicionei isso
     const backendUrl = `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3001`;
+
+    const [animado, setAnimado] = useState(false)
+
     const [token, setToken] = useState(null);
     const [decoded, setDecoded] = useState(null);
     const [showWelcome, setShowWelcome] = useState(true);
     const [presencas, setPresencas] = useState([]);
     const [erro, setErro] = useState('');
 
+
+    const animacao = () => {
+        setAnimado(true);
+    };
 
     const handleSubmit = async (token, decoded) => {
         try {
@@ -83,15 +90,27 @@ export default function HomeAluno() {
 
     const handleLogout = () => {
         console.log("Usuário deslogado");
-        toggleLogoutModal(); 
-        router.push('/'); 
+        animacao();
+        toggleLogoutModal();
+        const timeout = setTimeout(() => {
+            router.push('/?sucesso=ok');
+        }, 1950)
     };
 
     return (
         <>
+
+      {animado && (
+        <div className=" slide-in-left bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
+          <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
+            <p className=" text-black font-bold">Saindo <b className='ponto1'>.</b> <b className='ponto2'>.</b> <b className='ponto3'>.</b> </p>
+          </div>
+        </div>
+      )}
+
             <header className="bg-[#054068]">
                 <div className='flex flex-col items-center justify-center text-4xl shadow-xl/30 shadow-blue-900 relative py-4'>
-                   
+
                     <div className='absolute top-4 right-4 cursor-pointer'>
                         <img
                             src="./usericon.svg"
@@ -123,7 +142,7 @@ export default function HomeAluno() {
                 </div>
             </header>
 
-          
+
             {showProfileModal && (
                 <div
                     id="profile-modal"
@@ -161,19 +180,19 @@ export default function HomeAluno() {
                                 <div>
                                     <h1 className='text-lg md:text-xl text-[#054068] font-bold mb-1'>Registro do Aluno (RA):</h1>
                                     {presencas.length > 0 && (
-                                    <p className='bg-blue-50 w-full rounded-lg text-gray-700 p-3 text-sm md:text-base'>
-                                        {presencas[0].RA_aluno}
-                                    </p>
-                                )}
+                                        <p className='bg-blue-50 w-full rounded-lg text-gray-700 p-3 text-sm md:text-base'>
+                                            {presencas[0].RA_aluno}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div>
                                     <h1 className='text-lg md:text-xl text-[#054068] font-bold mb-1'>Turma:</h1>
                                     {presencas.length > 0 && (
-                                    <p className='bg-blue-50 w-full rounded-lg text-gray-700 p-3 text-sm md:text-base'>
-                                        {presencas[0].turma}
-                                    </p>
-                                )}
+                                        <p className='bg-blue-50 w-full rounded-lg text-gray-700 p-3 text-sm md:text-base'>
+                                            {presencas[0].turma}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -208,10 +227,10 @@ export default function HomeAluno() {
                                 <h3 className="mb-5 text-lg font-normal text-gray-700">
                                     Tem certeza que deseja sair do seu perfil?
                                 </h3>
-                                <button 
-                                
-                                    onClick={handleLogout} 
-                                    type="button" 
+                                <button
+
+                                    onClick={handleLogout}
+                                    type="button"
                                     className="text-white bg-[#17577c] hover:bg-[#054068] font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center cursor-pointer"
                                 >
                                     Sim, sair
