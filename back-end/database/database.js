@@ -139,25 +139,6 @@ async function viewProfessor(idProfessor) {
   }
 }
 
-
-
-async function viewProfessor(idProfessor) {
-  const connection = await getConnection();
-  try {
-    const sql = `SELECT nome_professor,cpf_professor,turma_professor
-                  FROM total_aluno
-                  WHERE ID_professor = ?`;
-
-    const [result] = await connection.execute(sql, [idProfessor]);
-    return result;
-  } catch (err) {
-    console.error('Erro ao ler registros: ', err);
-    throw err;
-  } finally {
-    connection.release();
-  }
-}
-
 // Marca falta para o aluno em uma matéria específica (soma 4 faltas)
 async function faltaAluno(materia, id = null) {
   const connection = await getConnection();
