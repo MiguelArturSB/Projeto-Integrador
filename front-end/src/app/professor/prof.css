@@ -1,3 +1,7 @@
+body{
+  background-color: #c9e8ff;;
+}
+
 .shadow_nim{
     box-shadow: 4px 8px 10px rgba(201, 9, 9, 0.5);
 }
@@ -41,6 +45,28 @@
     slide-in-left-indoembora 0.7s ease 4.5s forwards;
 }
 
+/* e o que ja ta ativo */
+@keyframes slide-in-left-aocontrario {
+  100% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+
+.slide-in-volta{
+  animation: 
+    slide-in-left-aocontrario 0.7s ease .5s forwards;
+}
+
+/* ------------- */
+
+
+
 
   @keyframes slideIn {
     0% {
@@ -71,11 +97,7 @@
          max-width: 100%;
      }
  }
-p{
-    user-select: none;
-    visibility: hidden;
-    opacity: 0;
-}
+
 .p_adm{
     white-space: nowrap;
     overflow: hidden;

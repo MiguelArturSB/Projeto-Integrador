@@ -110,11 +110,49 @@ async function viewPresenca(turma_professor, turma_aluno, materia) {
 async function viewAluno(idAluno) {
   const connection = await getConnection();
   try {
-    const sql = `SELECT nome_aluno,materia,faltas,total_faltas, percentual_frequencia
+    const sql = `SELECT nome_aluno,RA_aluno,turma,materia,faltas,total_faltas,total_aulas_turma,percentual_frequencia
                   FROM total_aluno
                   WHERE ID_aluno = ?`;
     const [result] = await connection.execute(sql, [idAluno]);
     return result;
+  } finally {
+    connection.release();
+  }
+}
+
+
+
+async function viewProfessor(idProfessor) {
+  const connection = await getConnection();
+  try {
+    const sql = `SELECT nome_professor,cpf_professor,turma_professor
+                  FROM total_aluno
+                  WHERE ID_professor = ?`;
+
+    const [result] = await connection.execute(sql, [idProfessor]);
+    return result;
+  } catch (err) {
+    console.error('Erro ao ler registros: ', err);
+    throw err;
+  } finally {
+    connection.release();
+  }
+}
+
+
+
+async function viewProfessor(idProfessor) {
+  const connection = await getConnection();
+  try {
+    const sql = `SELECT nome_professor,cpf_professor,turma_professor
+                  FROM total_aluno
+                  WHERE ID_professor = ?`;
+
+    const [result] = await connection.execute(sql, [idProfessor]);
+    return result;
+  } catch (err) {
+    console.error('Erro ao ler registros: ', err);
+    throw err;
   } finally {
     connection.release();
   }
@@ -159,15 +197,7 @@ const atualizarAulasDadasProfessor = async (materia, idAluno) => {
   }
 };
 
-export {
-  readAll,
-  read,
-  create,
-  update,
-  deleteRecord,
-  compare,
-  viewPresenca,
-  faltaAluno,
-  atualizarAulasDadasProfessor,
-  viewAluno
-};
+
+
+
+export { readAll, read, create, update, deleteRecord, compare, viewPresenca, faltaAluno, atualizarAulasDadasProfessor, viewAluno,viewProfessor };

@@ -65,7 +65,8 @@ const loginProfessorController = async (req, res) => {
             {
                 id: Professore.id,
                 tipo: Professore.tipo,
-                turma_professor: Professore.turma_professor,
+                ID_professor: Professore.ID_professor,
+    turma_professor: Professore.turma_professor,
                 materia: Professore.materia
             }, 
             JWT_SECRET, 

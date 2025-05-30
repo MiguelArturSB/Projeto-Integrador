@@ -4,13 +4,35 @@ import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
 import './prof.css';
+import HeaderProfessor from '../components/HeaderProfessor/headerprof';
+import Footer from '../components/Footer/page.jsx'
+
+import { useSearchParams } from "next/navigation";
+
+
 
 export default function ProfessorTable() {
+  const searchParams = useSearchParams();
+  const [mostrarMensagem, setMostrarMensagem] = useState(false);
+
   const router = useRouter();
   const [alunos, setAlunos] = useState([]);
   const [token, setToken] = useState(null);
   const [decoded, setDecoded] = useState(null);
   const [animado, setAnimado] = useState(false)
+
+
+  useEffect(() => {
+    const vindoDeRedirect = searchParams.get("redirect") === "true";
+
+    if (vindoDeRedirect) {
+      setMostrarMensagem(true);
+      const url = new URL(window.location.href);
+      url.searchParams.delete("redirect");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [searchParams]);
+
 
   const backendUrl = `http://${typeof window !== "undefined" ? window.location.hostname : "localhost"
     }:3001`;
@@ -43,10 +65,10 @@ export default function ProfessorTable() {
   const comfirmaPresenca = async () => {
     setAnimado(true)
 
-    
-      const timeout = setTimeout(() => {
-        router.push('../')
-      }, 4200)
+
+    const timeout = setTimeout(() => {
+      router.push('../?redirect=true')
+    }, 1950)
 
 
 
@@ -59,8 +81,8 @@ export default function ProfessorTable() {
         return;
       }
 
-      let presencasRegistradasComSucesso = 0;
       let errosAoRegistrarPresenca = 0;
+      let presencasRegistradasComSucesso = 0;
       let idAlunoParaMarcarAula = null;
 
       for (const aluno of alunosPresentes) {
@@ -173,7 +195,7 @@ export default function ProfessorTable() {
       if (data && Array.isArray(data.view)) {
         const alunosComPresencaInicial = data.view.map((aluno) => ({
           ...aluno,
-          presente: false,
+          presente: true,
         }));
         setAlunos(alunosComPresencaInicial);
       } else {
@@ -191,14 +213,25 @@ export default function ProfessorTable() {
 
   return (
     <>
+      <HeaderProfessor />
       {animado && (
-        <div className=" slide-in-left bg-sky-800 z-50 fixed w-[100%] h-[100vh]">
+        <div className="slide-in-left bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
           <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
-            <p className="p_adm text-black font-bold">Presenças enviada!!</p>
+            <p className=" text-black font-bold">Presenças enviada!!</p>
           </div>
         </div>
       )}
-      <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-300 flex items-center justify-center p-8">
+
+      {mostrarMensagem && (
+        <div className=" slide-in-volta bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
+          <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
+            <p className=" text-black font-bold">Carregando <b className='ponto1'>.</b> <b className='ponto2'>.</b> <b className='ponto3'>.</b> </p>
+          </div>
+        </div>
+      )}
+
+
+      <div className="min-h-screen bg-gradient-to-br  flex items-center justify-center p-8">
         <div className="bg-white shadow-2xl rounded-3xl w-full max-w-6xl p-6 relative overflow-hidden">
           <h1 className=" font-bold text-gray-800 mb-6 border-b pb-4 text-xl sm:text-4xl ">
             Painel da Presença
@@ -215,9 +248,9 @@ export default function ProfessorTable() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-[280px] table-fixed rounded-xl overflow-hidden shadow-md sm:min-w-full  sm:table-auto ">
+            <table className="w-[100%] table-fixed rounded-xl overflow-hidden shadow-md sm:min-w-full  sm:table-auto ">
               <thead>
-                <tr className="bg-gradient-to-r from-slate-700 to-slate-900 text-white text-left text-sm  sm:text-lg ">
+                <tr className=" bg-[#1d577b] text-white text-left text-sm  sm:text-lg ">
                   <th className=" px-6   font-semibold text-[0.7rem] sm:text-sm">
                     Nome
                   </th>
@@ -236,7 +269,7 @@ export default function ProfessorTable() {
                 {alunos.map((aluno) => (
                   <tr
                     key={aluno.ID_aluno}
-                    className="odd:bg-white even:bg-slate-100 hover:bg-slate-200 transition-all"
+                    className="odd:bg-white even:bg-blue-50 hover:bg-slate-200 transition-all"
                   >
                     <td className="py-1 px-6 text-gray-700 text-xs sm:text-sm sm:py-4">
                       {aluno.nome_aluno}
@@ -252,7 +285,7 @@ export default function ProfessorTable() {
                         onClick={() => togglePresence(aluno.ID_aluno)}
                         className={`w-8 h-8 cursor-pointer rounded-full border-5 transition-colors duration-300 ${aluno.presente
                           ? "bg-green-500 border-green-700"
-                          : "bg-gray-400 border-gray-600"
+                          : "bg-red-500 border-red-700"
                           }`}
                         title={aluno.presente ? "Presente" : "Ausente"}
                       ></button>
@@ -273,6 +306,7 @@ export default function ProfessorTable() {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

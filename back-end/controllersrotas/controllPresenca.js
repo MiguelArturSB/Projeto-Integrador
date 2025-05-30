@@ -1,9 +1,11 @@
 // Importa funções do banco de dados
-import { viewPresenca, faltaAluno, atualizarAulasDadasProfessor } from '../database/database.js';
+import { viewPresenca, faltaAluno, atualizarAulasDadasProfessor,viewProfessor } from '../database/database.js';
 
 // Cria a view de presença com base nos filtros recebidos
 const viewP = async (req, res) => {
   try {
+    console.log('Recebido no backend:', req.body);  // <-- log para debug
+
     const { turmaProfessor, turma, materia } = req.body;
 
     // Garante que os valores não sejam undefined
@@ -21,14 +23,48 @@ const viewP = async (req, res) => {
   }
 };
 
+
+const viewInformacaoP = async (req,res) =>{
+  try{
+    const {idProfessor} = req.body;
+    console.log('Corpo da requisição:', req.body);
+
+    console.log(idProfessor)
+    const safeidProfessor = idProfessor ?? null;
+    
+    const view = await viewProfessor(safeidProfessor)
+res.status(201).json({ mensagem: 'View criado com sucesso!!!', view });
+  }catch (err){
+    console.error('Erro ao criar view: ', err);
+    res.status(500).json({ mensagem: 'Erro ao criar view' });
+  }
+}
+
+
+const viewInformacaoP = async (req,res) =>{
+  try{
+    const {idProfessor} = req.body;
+    console.log('Corpo da requisição:', req.body);
+
+    console.log(idProfessor)
+    const safeidProfessor = idProfessor ?? null;
+    
+    const view = await viewProfessor(safeidProfessor)
+res.status(201).json({ mensagem: 'View criado com sucesso!!!', view });
+  }catch (err){
+    console.error('Erro ao criar view: ', err);
+    res.status(500).json({ mensagem: 'Erro ao criar view' });
+  }
+}
+
 // Marca falta para um aluno em uma determinada matéria
 const marcaFalta = async (req, res) => {
   try {
     const { materia, id } = req.body;
 
-    await faltaAluno(materia, id);
-
-    res.status(201).json({ mensagem: 'Falta dada com sucesso!!!' });
+    const falta = await faltaAluno( materia,id);
+    
+    res.status(201).json({ mensagem: 'falta dada com sucesso!!!',falta });
   } catch (err) {
     console.error('Erro ao dar falta: ', err);
     res.status(500).json({ mensagem: 'Erro ao dar falta' });
@@ -59,5 +95,8 @@ const marcaAula = async (req, res) => {
   }
 };
 
-// Exporta os controllers
-export { viewP, marcaFalta, marcaAula };
+
+
+
+
+export {viewP,marcaFalta,marcaAula,viewInformacaoP};

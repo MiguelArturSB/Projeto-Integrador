@@ -1,74 +1,86 @@
 'use client'
 
-import './header.css'
-import { useState } from 'react';
+import './headerprof.css'
 
-//adicionei isso
-import { useEffect } from 'react'
-import { jwtDecode } from "jwt-decode";
 import { useRouter } from 'next/navigation';
 
+import { useState, useEffect } from 'react'
+import { jwtDecode } from "jwt-decode";
+
 export default function HomeAluno() {
-    const [showProfileModal, setShowProfileModal] = useState(false);
-    const [showLogoutModal, setShowLogoutModal] = useState(false);
-
-    //adicionei isso
     const backendUrl = `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3001`;
-
-    const [animado, setAnimado] = useState(false)
 
     const [token, setToken] = useState(null);
     const [decoded, setDecoded] = useState(null);
     const [showWelcome, setShowWelcome] = useState(true);
-    const [presencas, setPresencas] = useState([]);
+    const [professor, setPresencas] = useState([]);
     const [erro, setErro] = useState('');
+
+
+    const [showProfileModal, setShowProfileModal] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const router = useRouter();
+    const [animado, setAnimado] = useState(false)
+
+
+
+
+
 
 
     const animacao = () => {
         setAnimado(true);
     };
 
-    const handleSubmit = async (token, decoded) => {
+    const toggleProfileModal = () => {
+        setShowProfileModal(!showProfileModal);
+    };
+
+    const toggleLogoutModal = () => {
+        setShowLogoutModal(!showLogoutModal);
+    };
+
+
+    const info = async (token, decoded) => {
         try {
             const payload = {
-                idAluno: decoded?.idAluno,
+                idProfessor: decoded?.ID_professor,
             };
-
-            const response = await fetch(`${backendUrl}/aluno/viewA`, {
+            const response = await fetch(`${backendUrl}/presenca/viewInfo`, {
                 method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(payload),
             });
-
             const data = await response.json();
 
             console.log('Resposta recebida do backend:', data);
 
             if (response.ok) {
-                console.log("Requisição bem-sucedida. Dados das presenças:");
+                console.log("Requisição bem-sucedida. Dados do professor:");
                 console.log(data.view);
                 setPresencas(data.view || []);
             } else {
                 console.error(" Erro na resposta do servidor:", data.mensagem);
                 setErro(data.mensagem || "Erro ao enviar dados.");
             }
+
         } catch (error) {
             console.error(" Erro na requisição:", error);
             document.getElementById('mensagemErro').textContent = "Erro na conexão com o servidor.";
         }
     };
+
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
-
         if (storedToken) {
             const decodedToken = jwtDecode(storedToken);
 
             setToken(storedToken);
             setDecoded(decodedToken);
-            handleSubmit(storedToken, decodedToken);
+            info(storedToken, decodedToken);
         }
 
         window.scrollTo(0, 0);
@@ -78,15 +90,7 @@ export default function HomeAluno() {
 
 
 
-    const router = useRouter();
 
-    const toggleProfileModal = () => {
-        setShowProfileModal(!showProfileModal);
-    };
-
-    const toggleLogoutModal = () => {
-        setShowLogoutModal(!showLogoutModal);
-    };
 
     const handleLogout = () => {
         console.log("Usuário deslogado");
@@ -100,16 +104,16 @@ export default function HomeAluno() {
     return (
         <>
 
-      {animado && (
-        <div className=" slide-in-left bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
-          <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
-            <p className=" text-black font-bold">Saindo <b className='ponto1'>.</b> <b className='ponto2'>.</b> <b className='ponto3'>.</b> </p>
-          </div>
-        </div>
-      )}
+            {animado && (
+                <div className=" slide-in-left bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
+                    <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
+                        <p className=" text-black font-bold">Saindo <b className='ponto1'>.</b> <b className='ponto2'>.</b> <b className='ponto3'>.</b> </p>
+                    </div>
+                </div>
+            )}
 
-            <header className="bg-[#054068]">
-                <div className='flex flex-col items-center justify-center text-4xl shadow-xl/30 shadow-blue-900 relative py-4'>
+            <header className="bg-[#054068] z-40 relative">
+                <div className='flex flex-col items-center justify-center  text-4xl shadow-xl/30 shadow-blue-900 relative py-4'>
 
                     <div className='absolute top-4 right-4 cursor-pointer'>
                         <img
@@ -121,7 +125,7 @@ export default function HomeAluno() {
                         />
                     </div>
 
-                    {/* Ícone de logout */}
+
                     <div className='absolute top-4 left-3.5 cursor-pointer'>
                         <img
                             src="./logout.svg"
@@ -134,10 +138,10 @@ export default function HomeAluno() {
 
                     <img src='./logo2.png' width={200} className='mt-2' alt="Logo" />
                     <h1 className='text-white font-bold text-shadow-2xs text-shadow-black text-center mt-2'>
-                        Seja Bem-vindo ao Portal de frequência do Aluno!
+                        Seja Bem-vindo ao Portal de frequência do Professor!
                     </h1>
                     <h4 className='text-blue-50 text-[20px] mt-2 mb-2 text-center font-bold'>
-                        Verifique suas faltas e presenças em tempo real!
+                        Atualize faltas e presenças diariamente!
                     </h4>
                 </div>
             </header>
@@ -169,28 +173,28 @@ export default function HomeAluno() {
 
                             <div className="p-4 space-y-4">
                                 <div>
-                                    <h1 className='text-lg md:text-xl text-[#054068] font-bold mb-1'>Nome do Aluno:</h1>
-                                    {presencas.length > 0 && (
+                                    <h1 className='text-lg md:text-xl text-[#054068] font-bold mb-1'>Nome do Professor:</h1>
+                                    {professor.length > 0 && (
                                         <p className='bg-blue-50 w-full rounded-lg text-gray-700 p-3 text-sm md:text-base'>
-                                            {presencas[0].nome_aluno}
+                                            {professor[0].nome_professor}
                                         </p>
                                     )}
                                 </div>
 
                                 <div>
-                                    <h1 className='text-lg md:text-xl text-[#054068] font-bold mb-1'>Registro do Aluno (RA):</h1>
-                                    {presencas.length > 0 && (
+                                    <h1 className='text-lg md:text-xl text-[#054068] font-bold mb-1'>CPF de login:</h1>
+                                    {professor.length > 0 && (
                                         <p className='bg-blue-50 w-full rounded-lg text-gray-700 p-3 text-sm md:text-base'>
-                                            {presencas[0].RA_aluno}
+                                            {professor[0].cpf_professor}
                                         </p>
                                     )}
                                 </div>
 
                                 <div>
                                     <h1 className='text-lg md:text-xl text-[#054068] font-bold mb-1'>Turma:</h1>
-                                    {presencas.length > 0 && (
+                                    {professor.length > 0 && (
                                         <p className='bg-blue-50 w-full rounded-lg text-gray-700 p-3 text-sm md:text-base'>
-                                            {presencas[0].turma}
+                                            {professor[0].turma_professor}
                                         </p>
                                     )}
                                 </div>
