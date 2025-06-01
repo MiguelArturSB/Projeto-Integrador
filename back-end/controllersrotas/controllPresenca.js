@@ -1,5 +1,5 @@
 // Importa funções do banco de dados
-import { viewPresenca, faltaAluno, atualizarAulasDadasProfessor,viewProfessor } from '../database/database.js';
+import { viewPresenca, faltaAluno, atualizarAulasDadasProfessor,viewProfessor,creatHistorico  } from '../database/database.js';
 
 // Cria a view de presença com base nos filtros recebidos
 const viewP = async (req, res) => {
@@ -39,6 +39,47 @@ const marcaFalta = async (req, res) => {
   }
 };
 
+
+
+const viewInformacaoP = async (req,res) =>{
+  try{
+    const {idProfessor} = req.body;
+    console.log('Corpo da requisição:', req.body);
+
+    console.log(idProfessor)
+    const safeidProfessor = idProfessor ?? null;
+    
+    const view = await viewProfessor(safeidProfessor)
+res.status(201).json({ mensagem: 'View criado com sucesso!!!', view });
+  }catch (err){
+    console.error('Erro ao criar view: ', err);
+    res.status(500).json({ mensagem: 'Erro ao criar view' });
+  }
+}
+
+
+
+const marcaHistorico = async (req, res) => {
+  try {
+    const { ID_professor, ID_aluno, materia } = req.body;
+
+    // Verifica se algum campo está undefined
+    if (ID_professor === undefined || ID_aluno === undefined || materia === undefined) {
+      return res.status(400).json({ mensagem: 'ID_professor, ID_aluno e materia são obrigatórios' });
+    }
+
+    const faltaHistorico = await creatHistorico(ID_professor, ID_aluno, materia);
+
+    res.status(201).json({ mensagem: 'Falta dada com sucesso!!!', faltaHistorico });
+  } catch (err) {
+    console.error('Erro ao dar falta: ', err);
+    res.status(500).json({ mensagem: 'Erro ao dar falta' });
+  }
+};
+
+
+
+
 // Atualiza o número de aulas dadas por um professor em uma matéria
 const marcaAula = async (req, res) => {
   const { idAluno, materia } = req.body;
@@ -67,4 +108,4 @@ const marcaAula = async (req, res) => {
 
 
 
-export {viewP,marcaFalta,marcaAula,viewInformacaoP};
+export {viewP,marcaFalta,marcaAula,viewInformacaoP,marcaHistorico};

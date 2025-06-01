@@ -1,11 +1,13 @@
 import express from "express";
-import { viewP,marcaFalta,marcaAula,viewInformacaoP} from "../controllersrotas/controllPresenca.js"
+import { viewP,marcaFalta,marcaAula,viewInformacaoP,marcaHistorico} from "../controllersrotas/controllPresenca.js"
 import authMiddleware  from "../middlewares/authMiddleware.js";
 
 const rota = express.Router();
 
 // Rota para visualizar presenças, protegida por autenticação
 rota.post('/viewP', authMiddleware, viewP);
+
+rota.post('/marcarhistorico',authMiddleware,marcaHistorico);
 
 rota.post('/viewInfo',authMiddleware,viewInformacaoP);
 

@@ -25,7 +25,7 @@ async function readAll(table, where = null) {
     const [rows] = await connection.execute(sql);
     return rows;
   } finally {
-    connection.release(); 
+    connection.release();
   }
 }
 
@@ -120,6 +120,34 @@ async function viewAluno(idAluno) {
   }
 }
 
+async function creatHistorico(ID_professor, ID_aluno, materia) {
+  const connection = await getConnection();
+  try {
+    const sql = `INSERT INTO historico_aluno (ID_professor, ID_aluno, materia) VALUES (?, ?, ?)`;
+    const [result] = await connection.execute(sql, [ID_professor, ID_aluno, materia]);
+    return result;
+  } finally {
+    connection.release();
+  }
+}
+
+
+async function viewHistoricaAluno(idAluno) {
+  const connection = await getConnection();
+  try {
+    const sql = `SELECT * FROM vw_historico_completo
+                  WHERE ID_aluno = ?;`;
+
+    const [result] = await connection.execute(sql, [idAluno]);
+    return result;
+  } catch (err) {
+    console.error('Erro ao ler registros: ', err);
+    throw err;
+  } finally {
+    connection.release();
+  }
+}
+
 
 
 async function viewProfessor(idProfessor) {
@@ -181,4 +209,4 @@ const atualizarAulasDadasProfessor = async (materia, idAluno) => {
 
 
 
-export { readAll, read, create, update, deleteRecord, compare, viewPresenca, faltaAluno, atualizarAulasDadasProfessor, viewAluno,viewProfessor };
+export { readAll, read, create, update, deleteRecord, compare, viewPresenca, faltaAluno, atualizarAulasDadasProfessor, viewAluno, viewProfessor, creatHistorico,viewHistoricaAluno };
