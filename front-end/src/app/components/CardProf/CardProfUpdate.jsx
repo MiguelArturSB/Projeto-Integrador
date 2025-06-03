@@ -1,12 +1,11 @@
 'use client'
 
-export default function Card() {
+export default function CardProf() {
     const cardData = [
-
         {
-            icon: '+',
-            titulo: 'Cadastrar novo aluno',
-            descricao: 'Clique para adicionar um novo aluno'
+            icon: '%',
+            titulo: 'Editar professor',
+            descricao: 'Clique para editar um professsor do sistema'
         }
     ];
 

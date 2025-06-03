@@ -1,16 +1,19 @@
 'use client'
 
-export default function Card() {
+export default function CardProf() {
     const cardData = [
 
+   
         {
             icon: '+',
-            titulo: 'Cadastrar novo aluno',
-            descricao: 'Clique para adicionar um novo aluno'
+            titulo: 'Cadastrar novo professor',
+            descricao: 'Clique para adicionar um novo professor'
         }
     ];
 
     return (
+
+
         <div className="card-container">
             {cardData.map((card, index) => (
                 <div 

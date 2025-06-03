@@ -17,7 +17,6 @@ export default function Portal() {
   const searchParams = useSearchParams();
   const [mostrarMensagem, setMostrarMensagem] = useState(false);
   const [outraMensagem, setOutraMensagem] = useState(false);
-
   const backendUrl = `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3001`;
   const [activeForm, setActiveForm] = useState(null);
   const [animado, setAnimado] = useState(false)
