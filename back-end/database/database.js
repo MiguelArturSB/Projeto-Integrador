@@ -92,14 +92,15 @@ async function compare(senha, hash) {
   }
 }
 
+//mudei view
 // Visualiza presença dos alunos numa turma, professor e matéria específica
-async function viewPresenca(turma_professor, turma_aluno, materia) {
+async function viewPresenca( turma_aluno, materia) {
   const connection = await getConnection();
   try {
-    const sql = `SELECT ID_aluno, nome_aluno, RA_aluno, percentual_frequencia
-                  FROM freq_turma
-                  WHERE turma_professor = ? AND turma = ? AND materia = ?`;
-    const [result] = await connection.execute(sql, [turma_professor, turma_aluno, materia]);
+    const sql = ` SELECT * FROM freq_turma 
+                  WHERE turma = ? AND materia = ?;
+ `;
+    const [result] = await connection.execute(sql, [turma_aluno, materia]);
     return result;
   } finally {
     connection.release();

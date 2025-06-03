@@ -1,20 +1,20 @@
 // Importa funções do banco de dados
 import { viewPresenca, faltaAluno, atualizarAulasDadasProfessor,viewProfessor,creatHistorico  } from '../database/database.js';
 
+//mudei controller e view
 // Cria a view de presença com base nos filtros recebidos
 const viewP = async (req, res) => {
   try {
     console.log('Recebido no backend:', req.body);  // <-- log para debug
 
-    const { turmaProfessor, turma, materia } = req.body;
+    const { turma, materia } = req.body;
 
     // Garante que os valores não sejam undefined
-    const safeTurmaProfessor = turmaProfessor ?? null;
     const safeTurma = turma ?? null;
     const safeMateria = materia ?? null;
 
     // Busca a view de presença no banco
-    const view = await viewPresenca(safeTurmaProfessor, safeTurma, safeMateria);
+    const view = await viewPresenca( safeTurma, safeMateria);
 
     res.status(201).json({ mensagem: 'View criado com sucesso!!!', view });
   } catch (err) {

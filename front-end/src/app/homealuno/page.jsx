@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react'
 import { jwtDecode } from "jwt-decode";
 import { useSearchParams } from "next/navigation";
 
-
+import GraficoPizza from '../components/graficos/graficoAluno.jsx';
 
 
 export default function HomeAluno() {
@@ -136,6 +136,12 @@ export default function HomeAluno() {
                     )}
                 </div>
             </div>
+
+            <div className="flex justify-center my-6">
+                <GraficoPizza />
+            </div>
+
+
 
             <div className='grid grid-cols-1 md:grid-cols-6 items-center justify-items-center p-4'>
                 <div className='bg-white w-full md:w-350 it rounded-2xl shadow-md col-span-1 md:col-span-6'>
