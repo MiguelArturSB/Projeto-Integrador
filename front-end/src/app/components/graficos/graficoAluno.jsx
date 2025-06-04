@@ -89,8 +89,8 @@ const series = [parseFloat(percentual_faltas), parseFloat(percentual_presencas)]
 
 
 return (
-  <div className="max-w-sm w-full bg-white rounded-lg shadow-sm dark:bg-gray-800 p-4 md:p-6">
-    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Presenças</h2>
+  <div className="max-w-sm w-full bg-none rounded-lg  p-4 md:p-6">
+    <h2 className="text-xl text-center font-bold text-sky-900 dark:text-white mb-4">Presenças</h2>
 
     {erro ? (
       <p className="text-red-500">{erro}</p>

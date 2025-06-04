@@ -14,14 +14,14 @@ const ModalBuscaProfessor = ({ isOpen, onClose, onSelectProfessor, professores }
   );
 
   return (
-    <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 overflow-hidden">
+    <div className="fixed inset-0  bg-[rgba(0,0,0,0.5)] backdrop-blur-sm flex items-center justify-center z-50 overflow-hidden">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[80vh] flex flex-col mx-4">
 
         <div className="flex justify-between items-center p-3">
           <h2 className="text-lg font-semibold text-[#054068]">Buscar Professor</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-lg"
+            className="text-gray-500 hover:text-black text-lg cursor-pointer"
           >
             ✕
           </button>
@@ -78,7 +78,6 @@ const ModalBuscaProfessor = ({ isOpen, onClose, onSelectProfessor, professores }
           )}
         </div>
 
-        {/* footer do modal */}
         <div className="p-2 flex justify-end">
           <button
             onClick={onClose}
