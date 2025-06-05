@@ -204,9 +204,7 @@ export default function ProfessorTable() {
       )}
 
 
-            <div className="flex justify-center my-6">
-                <GraficoPizza />
-            </div>
+            
 
 
 
@@ -254,16 +252,23 @@ export default function ProfessorTable() {
             </table>
           </div>
 
-          <div className=" mt-[2%] flex justify-end ">
-            <button
-              onClick={comfirmaPresenca}
-              className="px-6 py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-full font-bold shadow-lg transition-transform transform hover:scale-105"
-            >
-              Confirmar Presença
-            </button>
-          </div>
-        </div>
+
+            {/* <div className="flex justify-center"> */}
+              <div className="flex justify-center my-6">
+                <GraficoPizza />
+              </div>
+                  <div className=" mt-[2%] flex justify-end ">
+                    <button
+                      onClick={comfirmaPresenca}
+                      className="px-6 py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-full font-bold shadow-lg transition-transform transform hover:scale-105"
+                      >
+                      Confirmar Presença
+                    </button>
+                  </div>
+            {/* </div> */}
       </div>
+
+        </div>
       <Footer />
     </>
   );

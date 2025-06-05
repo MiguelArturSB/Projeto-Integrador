@@ -118,7 +118,8 @@ export default function HomeAluno() {
 
             <Header />
 
-            <div className='flex justify-center p-10'>
+        <div className='flex justify-center gap-15'>
+            <div className='mt-30 p-10'>
                 <div className=' bg-blue-50 rounded-3xl w-125 shadow-2xl text-gray-600 '>
                     <h4 className=' flex justify-center font-bold mt-2'>Você possui</h4>
                     {presencas.length > 0 && (
@@ -140,7 +141,7 @@ export default function HomeAluno() {
             <div className="flex justify-center my-6">
                 <GraficoPizza />
             </div>
-
+        </div>
 
 
             <div className='grid grid-cols-1 md:grid-cols-6 items-center justify-items-center p-4'>

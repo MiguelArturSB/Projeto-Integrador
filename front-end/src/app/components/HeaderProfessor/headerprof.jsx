@@ -161,7 +161,7 @@ export default function HomeAluno() {
                                 </h3>
                                 <button
                                     type="button"
-                                    className="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm w-8 h-8 flex justify-center items-center"
+                                    className="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm w-8 h-8 flex justify-center items-center cursor-pointer"
                                     onClick={toggleProfileModal}
                                 >
                                     <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -215,7 +215,7 @@ export default function HomeAluno() {
                         <div className="relative bg-white rounded-lg shadow-sm">
                             <button
                                 type="button"
-                                className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm w-8 h-8 flex justify-center items-center"
+                                className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm w-8 h-8 flex justify-center items-center cursor-pointer"
                                 onClick={toggleLogoutModal}
                             >
                                 <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -242,7 +242,7 @@ export default function HomeAluno() {
                                 <button
                                     onClick={toggleLogoutModal}
                                     type="button"
-                                    className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100"
+                                    className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100 cursor-pointer"
                                 >
                                     Não, cancelar
                                 </button>

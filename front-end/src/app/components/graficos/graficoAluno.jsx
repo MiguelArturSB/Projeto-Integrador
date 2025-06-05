@@ -60,7 +60,7 @@ const options = {
     height: 420,
   },
   labels: labels, 
-  colors: ['#DC2626', '#16BDCA'],
+  colors: ['#054068', '#b6dffa'],
   legend: {
     position: 'bottom',
     fontFamily: 'Inter, sans-serif',

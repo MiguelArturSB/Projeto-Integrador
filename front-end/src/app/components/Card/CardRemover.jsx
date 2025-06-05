@@ -4,9 +4,11 @@ import { useState } from 'react';
 
 export default function Card() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+  
     const [turma, setTurma] = useState('');
     const [ra, setRa] = useState('');
     const [nome, setNome] = useState('');
+
     
     const cardData = [
         {

@@ -78,14 +78,7 @@ const ModalBuscaProfessor = ({ isOpen, onClose, onSelectProfessor, professores }
           )}
         </div>
 
-        <div className="p-2 flex justify-end">
-          <button
-            onClick={onClose}
-            className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-800 text-sm"
-          >
-            Fechar
-          </button>
-        </div>
+        
       </div>
     </div>
   );

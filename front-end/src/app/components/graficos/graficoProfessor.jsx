@@ -63,7 +63,7 @@ const options = {
     height: 420,
   },
   labels: labels, 
-  colors: ['#DC2626', '#16BDCA'],
+  colors: ['#054068', '#b6dffa'],
   legend: {
     position: 'bottom',
     fontFamily: 'Inter, sans-serif',
@@ -97,8 +97,8 @@ if (alunos > 0 && total_aulas > 0) {
 
 
 return (
-  <div className="max-w-sm w-full bg-white rounded-lg shadow-sm dark:bg-gray-800 p-4 md:p-6">
-    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Presenças</h2>
+  <div className="max-w-sm w-full bg-none rounded-lg p-4 md:p-6">
+    <h2 className="text-xl text-center font-bold text-gray-900 dark:text-white mb-4">Média da sala</h2>
 
     {erro ? (
       <p className="text-red-500">{erro}</p>
