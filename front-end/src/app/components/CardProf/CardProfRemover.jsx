@@ -1,55 +1,32 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-export default function CardUpdate() {
+export default function CardProf() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [turma, setTurma] = useState('');
-    const [ra, setRa] = useState('');
+    const [cpf, setCpf] = useState('');
     const [nome, setNome] = useState('');
-    const [frequencia, setFrequencia] = useState('');
+    const [disciplina, setDisciplina] = useState('');
     
     const cardData = [
         {
-            icon: '%',
-            titulo: 'Editar aluno',
-            descricao: 'Clique para editar os dados de um aluno'
+            icon: '-',
+            titulo: 'Remover professor',
+            descricao: 'Clique para remover um professor do sistema'
         }
     ];
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
-
-        if (!isModalOpen) {
-            setTurma('');
-            setRa('');
-            setNome('');
-            setFrequencia('');
-        }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        console.log('Dados atualizados do aluno:', { 
-            nome, 
-            ra, 
-            turma,
-            frequencia 
-        });
-
+        console.log('Professor a ser removido:', { nome, cpf, disciplina, turma });
 
         toggleModal();
-    };
-
-
-    const carregarDadosAluno = (aluno) => {
-        if (aluno) {
-            setNome(aluno.nome);
-            setRa(aluno.ra);
-            setTurma(aluno.turma);
-            setFrequencia(aluno.frequencia);
-        }
     };
 
     return (
@@ -75,16 +52,16 @@ export default function CardUpdate() {
             </div>
 
             <div 
-                id="edit-modal" 
+                id="remove-modal-prof" 
                 tabIndex="-1" 
                 aria-hidden={!isModalOpen} 
-                className={`${isModalOpen ? 'flex' : 'hidden'} fixed inset-0 z-50 items-center justify-center w-full h-full bg-[rgba(0,0,0,0.5)] backdrop-blur-sm bg-opacity-50 overflow-y-auto overflow-x-hidden`}
+                className={`${isModalOpen ? 'flex' : 'hidden'} fixed inset-0 z-50 items-center justify-center w-fullh-full bg-[rgba(0,0,0,0.5)] backdrop-blur-sm bg-opacity-50 overflow-y-auto overflow-x-hidden`}
             >
                 <div className="relative w-full max-w-md p-4 max-h-full">
                     <div className="w-96 relative bg-white rounded-lg shadow dark:bg-gray-700">
                         <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                Editar Aluno
+                                Remover Professor
                             </h3>
                             <button 
                                 type="button" 
@@ -109,33 +86,33 @@ export default function CardUpdate() {
                                         value={nome}
                                         onChange={(e) => setNome(e.target.value)}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="Digite o nome do aluno" 
+                                        placeholder="Digite o nome do professor" 
                                         required 
                                     />
                                 </div>
-                                <div className="col-span-2 sm:col-span-1">
-                                    <label htmlFor="RA" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Registro do Aluno (R.A)</label>
+                                <div className="col-span-2">
+                                    <label htmlFor="cpf" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">CPF</label>
                                     <input 
                                         type="text" 
-                                        name="RA" 
-                                        id="RA" 
-                                        value={ra}
-                                        onChange={(e) => setRa(e.target.value)}
+                                        name="cpf" 
+                                        id="cpf" 
+                                        value={cpf}
+                                        onChange={(e) => setCpf(e.target.value)}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="Número do R.A" 
+                                        placeholder="Digite o CPF do professor" 
                                         required 
                                     />
                                 </div>
-                                <div className="col-span-2 sm:col-span-1">
-                                    <label htmlFor="frequencia" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Frequência</label>
+                                <div className="col-span-2">
+                                    <label htmlFor="disciplina" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Disciplina</label>
                                     <input 
-                                        type="number" 
-                                        name="frequencia" 
-                                        id="frequencia" 
-                                        value={frequencia}
-                                        onChange={(e) => setFrequencia(e.target.value)}
+                                        type="text" 
+                                        name="disciplina" 
+                                        id="disciplina" 
+                                        value={disciplina}
+                                        onChange={(e) => setDisciplina(e.target.value)}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="Frequência do aluno" 
+                                        placeholder="Digite a disciplina lecionada" 
                                         required 
                                     />
                                 </div>
@@ -157,17 +134,17 @@ export default function CardUpdate() {
                             </div>
                             <div className="mb-4">
                                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                                    Edite as informações do aluno conforme necessário.
+                                    Confirme as informações do professor antes de remover. Esta ação não pode ser desfeita.
                                 </p>
                             </div>
                             <button 
                                 type="submit" 
-                                className="text-white inline-flex items-center bg-[#1f557b] cursor-pointer hover:bg-[#0e3754]  focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                                className="text-white inline-flex items-center bg-cyan-900 cursor-pointer hover:bg-red-700 transition-all focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800"
                             >
                                 <svg className="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
+                                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"></path>
                                 </svg>
-                                Salvar alterações
+                                Confirmar remoção
                             </button>
                         </form>
                     </div>

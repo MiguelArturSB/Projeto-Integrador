@@ -2,18 +2,18 @@
 
 import { useState, useEffect } from 'react';
 
-export default function CardUpdate() {
+export default function CardProfUpdate() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [turma, setTurma] = useState('');
-    const [ra, setRa] = useState('');
     const [nome, setNome] = useState('');
-    const [frequencia, setFrequencia] = useState('');
+    const [cpf, setCpf] = useState('');
+    const [disciplina, setDisciplina] = useState('');
+    const [turma, setTurma] = useState('');
     
     const cardData = [
         {
             icon: '%',
-            titulo: 'Editar aluno',
-            descricao: 'Clique para editar os dados de um aluno'
+            titulo: 'Editar professor',
+            descricao: 'Clique para editar os dados de um professor'
         }
     ];
 
@@ -21,34 +21,34 @@ export default function CardUpdate() {
         setIsModalOpen(!isModalOpen);
 
         if (!isModalOpen) {
-            setTurma('');
-            setRa('');
             setNome('');
-            setFrequencia('');
+            setCpf('');
+            setDisciplina('');
+            setTurma('');
         }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        console.log('Dados atualizados do aluno:', { 
+        console.log('Dados atualizados do professor:', { 
             nome, 
-            ra, 
-            turma,
-            frequencia 
+            cpf, 
+            disciplina,
+            turma 
         });
 
-
+        
         toggleModal();
     };
 
 
-    const carregarDadosAluno = (aluno) => {
-        if (aluno) {
-            setNome(aluno.nome);
-            setRa(aluno.ra);
-            setTurma(aluno.turma);
-            setFrequencia(aluno.frequencia);
+    const carregarDadosProfessor = (professor) => {
+        if (professor) {
+            setNome(professor.nome);
+            setCpf(professor.cpf);
+            setDisciplina(professor.disciplina);
+            setTurma(professor.turma);
         }
     };
 
@@ -75,7 +75,7 @@ export default function CardUpdate() {
             </div>
 
             <div 
-                id="edit-modal" 
+                id="edit-prof-modal" 
                 tabIndex="-1" 
                 aria-hidden={!isModalOpen} 
                 className={`${isModalOpen ? 'flex' : 'hidden'} fixed inset-0 z-50 items-center justify-center w-full h-full bg-[rgba(0,0,0,0.5)] backdrop-blur-sm bg-opacity-50 overflow-y-auto overflow-x-hidden`}
@@ -84,7 +84,7 @@ export default function CardUpdate() {
                     <div className="w-96 relative bg-white rounded-lg shadow dark:bg-gray-700">
                         <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                Editar Aluno
+                                Editar Professor
                             </h3>
                             <button 
                                 type="button" 
@@ -109,35 +109,39 @@ export default function CardUpdate() {
                                         value={nome}
                                         onChange={(e) => setNome(e.target.value)}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="Digite o nome do aluno" 
+                                        placeholder="Digite o nome do professor" 
                                         required 
                                     />
                                 </div>
                                 <div className="col-span-2 sm:col-span-1">
-                                    <label htmlFor="RA" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Registro do Aluno (R.A)</label>
+                                    <label htmlFor="cpf" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">CPF</label>
                                     <input 
                                         type="text" 
-                                        name="RA" 
-                                        id="RA" 
-                                        value={ra}
-                                        onChange={(e) => setRa(e.target.value)}
+                                        name="cpf" 
+                                        id="cpf" 
+                                        value={cpf}
+                                        onChange={(e) => setCpf(e.target.value)}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="Número do R.A" 
+                                        placeholder="000.000.000-00" 
                                         required 
                                     />
                                 </div>
                                 <div className="col-span-2 sm:col-span-1">
-                                    <label htmlFor="frequencia" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Frequência</label>
-                                    <input 
-                                        type="number" 
-                                        name="frequencia" 
-                                        id="frequencia" 
-                                        value={frequencia}
-                                        onChange={(e) => setFrequencia(e.target.value)}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="Frequência do aluno" 
-                                        required 
-                                    />
+                                    <label htmlFor="disciplina" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Disciplina</label>
+                                    <select 
+                                        id="disciplina" 
+                                        value={disciplina}
+                                        onChange={(e) => setDisciplina(e.target.value)}
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        required
+                                    >
+                                        <option value="" disabled>Selecione a disciplina</option>
+                                        <option value="LER">LER</option>
+                                        <option value="ARI">ARI</option>
+                                        <option value="LOPAL">LOPAL</option>
+                                        <option value="PBE">PBE</option>
+                                        <option value="SOP">SOP</option>
+                                    </select>
                                 </div>
                                 <div className="col-span-2">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Turma</label>
@@ -157,7 +161,7 @@ export default function CardUpdate() {
                             </div>
                             <div className="mb-4">
                                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                                    Edite as informações do aluno conforme necessário.
+                                    Edite as informações do professor conforme necessário.
                                 </p>
                             </div>
                             <button 

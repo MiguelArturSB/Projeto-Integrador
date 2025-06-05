@@ -7,6 +7,9 @@ import './prof.css';
 import HeaderProfessor from '../components/HeaderProfessor/headerprof';
 import Footer from '../components/Footer/page.jsx';
 
+
+import GraficoPizza from '../components/graficos/graficoProfessor.jsx';
+
 export default function ProfessorTable() {
   const searchParams = useSearchParams();
   const [mostrarMensagem, setMostrarMensagem] = useState(false);
@@ -199,6 +202,13 @@ export default function ProfessorTable() {
           </div>
         </div>
       )}
+
+
+            <div className="flex justify-center my-6">
+                <GraficoPizza />
+            </div>
+
+
 
       <div className="min-h-screen bg-gradient-to-br flex items-center justify-center p-8">
         <div className="bg-white shadow-2xl rounded-3xl w-full max-w-6xl p-6 relative overflow-hidden">
