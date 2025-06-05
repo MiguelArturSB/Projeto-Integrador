@@ -210,10 +210,12 @@ export default function Portal() {
           localStorage.setItem('token', data.token);
 
           // Feedback ou redirecionamento pra saber que deu certo
-          const timeout = setTimeout(() => {
-            animacao();
-            router.push('/coordenador');
-          }, 4200)
+             // Feedback ou redirecionamento pra saber que deu certo
+             animacao();
+             const timeout = setTimeout(() => {
+               router.push('/coordenador');
+             }, 1950)
+   
 
 
 
