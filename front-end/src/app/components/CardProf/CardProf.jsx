@@ -81,6 +81,17 @@ export default function CardProf() {
                                         required 
                                     />
                                 </div>
+                                <div className="col-span-2">
+                                    <label htmlFor="senha" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Senha</label>
+                                    <input 
+                                        type="text" 
+                                        name="senha" 
+                                        id="senha" 
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+                                        placeholder="Digite a senha do professor" 
+                                        required 
+                                    />
+                                </div>
                                 
                                 <div className="col-span-2">
                                     <label htmlFor="cpf" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">CPF</label>
@@ -95,7 +106,7 @@ export default function CardProf() {
                                 </div>
                             
 
-                                <div className="col-span-2">
+                                <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="disciplina" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Disciplina</label>
                                     <select 
                                         id="" 
@@ -112,7 +123,7 @@ export default function CardProf() {
                                     </select>
                                 </div>
                                 
-                                <div className="col-span-2">
+                                <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Turma</label>
                                     <select 
                                         id="turma" 

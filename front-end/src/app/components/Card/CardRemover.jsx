@@ -4,11 +4,10 @@ import { useState } from 'react';
 
 export default function Card() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-  
+    const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [turma, setTurma] = useState('');
     const [ra, setRa] = useState('');
     const [nome, setNome] = useState('');
-
     
     const cardData = [
         {
@@ -25,9 +24,19 @@ export default function Card() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        console.log('Aluno a ser removido:', { nome, ra, turma });
+        setIsModalOpen(false);
+        
 
-        toggleModal();
+        setIsConfirmationOpen(true);
+        
+
+        setTurma('');
+        setRa('');
+        setNome('');
+    };
+
+    const closeConfirmation = () => {
+        setIsConfirmationOpen(false);
     };
 
     return (
@@ -52,16 +61,15 @@ export default function Card() {
                 ))}
             </div>
 
- 
+   
             <div 
                 id="remove-modal" 
                 tabIndex="-1" 
                 aria-hidden={!isModalOpen} 
-                className={`${isModalOpen ? 'flex' : 'hidden'} fixed inset-0 z-50 items-center justify-center w-fullh-full bg-[rgba(0,0,0,0.5)] backdrop-blur-sm bg-opacity-50 overflow-y-auto overflow-x-hidden`}
+                className={`${isModalOpen ? 'flex' : 'hidden'} fixed inset-0 z-50 items-center justify-center w-full h-full bg-[rgba(0,0,0,0.5)] backdrop-blur-sm bg-opacity-50 overflow-y-auto overflow-x-hidden`}
             >
                 <div className="relative w-full max-w-md p-4 max-h-full">
                     <div className="w-96 relative bg-white rounded-lg shadow dark:bg-gray-700">
-                 
                         <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                 Remover Aluno
@@ -77,49 +85,42 @@ export default function Card() {
                                 <span className="sr-only">Fechar modal</span>
                             </button>
                         </div>
-                   
-                        <form className="p-4 md:p-5" onSubmit={handleSubmit}>
+                        <form className="p-4 md:p-5" >
                             <div className="grid gap-4 mb-4 grid-cols-2">
-                                <div className="col-span-2">
-                                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nome</label>
+                                <div className="col-span-2 ">
+                                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Insira o R.A do aluno</label>
+                                    <div className='flex justify-center gap-3'>
                                     <input 
                                         type="text" 
-                                        name="name" 
-                                        id="name" 
-                                        value={nome}
-                                        onChange={(e) => setNome(e.target.value)}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="Digite o nome do aluno" 
-                                        required 
-                                    />
-                                </div>
-                                <div className="col-span-2 sm:col-span-1">
-                                    <label htmlFor="RA" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Registro do Aluno (R.A)</label>
-                                    <input 
-                                        type="text" 
-                                        name="RA" 
-                                        id="RA" 
+                                        name="ra" 
+                                        id="ra" 
                                         value={ra}
                                         onChange={(e) => setRa(e.target.value)}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="Número do R.A" 
+                                        placeholder="000.000.000" 
                                         required 
                                     />
+                                    <button className='bg-blue-950 rounded-lg text-white hover:text-gray-500 transition-all p-2 cursor-pointer'>Buscar</button>
+                                    </div>
                                 </div>
+
+                                <div className="col-span-2 sm:col-span-1">
+                                    <label htmlFor="nome" className="block mb-2 text-sm font-medium text-gray-900">Nome do aluno</label>
+                                    <h1 className='bg-gray-50 text-gray-400 text-sm rounded-lg w-full p-2.5'>Fulano da silva</h1>
+                                </div>
+
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Turma</label>
-                                    <select 
-                                        id="turma" 
-                                        value={turma}
-                                        onChange={(e) => setTurma(e.target.value)}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                        required
-                                    >
-                                        <option value="" disabled>Selecione a turma</option>
-                                        <option value="2MD">2MD</option>
-                                        <option value="2TD">2TD</option>
-                                        <option value="2ND">2ND</option>
-                                    </select>
+                                    <input 
+                                    type="text" 
+                                    name="turma" 
+                                    id="turma" 
+                                    value={turma}
+                                    readOnly
+                                    className="bg-gray-50 text-gray-900 text-sm rounded-lg w-full p-2.5 focus:outline-none" 
+                                    placeholder="2MD" 
+                                    required 
+                                    />
                                 </div>
                             </div>
                             <div className="mb-4">
@@ -140,6 +141,33 @@ export default function Card() {
                     </div>
                 </div>
             </div>
+
+     
+            {isConfirmationOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">
+                    <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 p-6 max-w-sm w-full">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                Sucesso!
+                            </h3>
+                        </div>
+                        <div className="flex items-center mb-4">
+                            <svg className="w-8 h-8 text-blue-900 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <p className="text-gray-700 dark:text-gray-300">
+                                Aluno removido com sucesso!
+                            </p>
+                        </div>
+                        <button
+                            onClick={closeConfirmation}
+                            className="w-full mt-4 px-4 py-2 bg-[#1f557b] hover:bg-[#0e3754] text-white rounded-lg cursor-pointer"
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

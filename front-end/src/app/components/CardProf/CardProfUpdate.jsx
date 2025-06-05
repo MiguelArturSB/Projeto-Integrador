@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 export default function CardProfUpdate() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [nome, setNome] = useState('');
+    const [senha, setSenha] = useState('');
     const [cpf, setCpf] = useState('');
     const [disciplina, setDisciplina] = useState('');
     const [turma, setTurma] = useState('');
@@ -30,6 +31,7 @@ export default function CardProfUpdate() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        alert('dsad'); 
 
         console.log('Dados atualizados do professor:', { 
             nome, 
@@ -38,7 +40,6 @@ export default function CardProfUpdate() {
             turma 
         });
 
-        
         toggleModal();
     };
 
@@ -51,6 +52,7 @@ export default function CardProfUpdate() {
             setTurma(professor.turma);
         }
     };
+
 
     return (
         <>
@@ -101,6 +103,27 @@ export default function CardProfUpdate() {
                         <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
                                 <div className="col-span-2">
+                                    <label htmlFor="cpf" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">CPF</label>
+                                    <div className='flex justify-center gap-3'>
+                                    <input 
+                                        type="text" 
+                                        name="cpf" 
+                                        id="cpf" 
+                                        value={cpf}
+                                        onChange={(e) => setCpf(e.target.value)}
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+                                        placeholder="000.000.000-00" 
+                                        required 
+                                    />
+                                   <button 
+  type="button"
+  className='bg-blue-950 rounded-lg text-white hover:text-gray-500 transition-all p-2 cursor-pointer'>
+  Buscar
+</button>
+
+                                    </div>
+                                </div>
+                                <div className="col-span-2">
                                     <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nome</label>
                                     <input 
                                         type="text" 
@@ -113,19 +136,22 @@ export default function CardProfUpdate() {
                                         required 
                                     />
                                 </div>
-                                <div className="col-span-2 sm:col-span-1">
-                                    <label htmlFor="cpf" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">CPF</label>
+
+                                <div className="col-span-2">
+                                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Senha</label>
                                     <input 
                                         type="text" 
-                                        name="cpf" 
-                                        id="cpf" 
-                                        value={cpf}
-                                        onChange={(e) => setCpf(e.target.value)}
+                                        name="senha" 
+                                        id="senha" 
+                                        value={senha}
+                                        onChange={(e) => setSenha(e.target.value)}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="000.000.000-00" 
+                                        placeholder="********" 
                                         required 
                                     />
                                 </div>
+
+
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="disciplina" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Disciplina</label>
                                     <select 
@@ -143,7 +169,7 @@ export default function CardProfUpdate() {
                                         <option value="SOP">SOP</option>
                                     </select>
                                 </div>
-                                <div className="col-span-2">
+                                <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Turma</label>
                                     <select 
                                         id="turma" 

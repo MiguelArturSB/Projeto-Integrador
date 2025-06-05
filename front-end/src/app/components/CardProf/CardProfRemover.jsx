@@ -78,20 +78,8 @@ export default function CardProf() {
                         <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
                                 <div className="col-span-2">
-                                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nome</label>
-                                    <input 
-                                        type="text" 
-                                        name="name" 
-                                        id="name" 
-                                        value={nome}
-                                        onChange={(e) => setNome(e.target.value)}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="Digite o nome do professor" 
-                                        required 
-                                    />
-                                </div>
-                                <div className="col-span-2">
                                     <label htmlFor="cpf" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">CPF</label>
+                                    <div className='flex justify-center gap-3'>
                                     <input 
                                         type="text" 
                                         name="cpf" 
@@ -102,10 +90,27 @@ export default function CardProf() {
                                         placeholder="Digite o CPF do professor" 
                                         required 
                                     />
+                                    <button className='bg-blue-950 rounded-lg text-white hover:text-gray-500 transition-all p-2 cursor-pointer'>Buscar</button>
+                                    </div>
                                 </div>
                                 <div className="col-span-2">
+                                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nome</label>
+                                    <h1 className='bg-gray-50 text-gray-400 text-sm rounded-lg  w-full p-2.5 border border-gray-300 '>Fulano da silva</h1>
+                                    {/* <input 
+                                        type="text" 
+                                        name="name" 
+                                        id="name" 
+                                        value={nome}
+                                        onChange={(e) => setNome(e.target.value)}
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+                                        placeholder="Digite o nome do professor" 
+                                        required 
+                                    /> */}
+                                </div>
+                                <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="disciplina" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Disciplina</label>
-                                    <input 
+                                    <h1 className='bg-gray-50 text-gray-400 text-sm rounded-lg  w-full p-2.5 border border-gray-300 '>LER</h1>
+                                    {/* <input 
                                         type="text" 
                                         name="disciplina" 
                                         id="disciplina" 
@@ -114,11 +119,12 @@ export default function CardProf() {
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
                                         placeholder="Digite a disciplina lecionada" 
                                         required 
-                                    />
+                                    /> */}
                                 </div>
-                                <div className="col-span-2">
+                                <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Turma</label>
-                                    <select 
+                                    <h1 className='bg-gray-50 text-gray-400 text-sm rounded-lg  w-full p-2.5 border border-gray-300 '>2md</h1>
+                                    {/* <select 
                                         id="turma" 
                                         value={turma}
                                         onChange={(e) => setTurma(e.target.value)}
@@ -129,7 +135,7 @@ export default function CardProf() {
                                         <option value="2MD">2MD</option>
                                         <option value="2TD">2TD</option>
                                         <option value="2ND">2ND</option>
-                                    </select>
+                                    </select> */}
                                 </div>
                             </div>
                             <div className="mb-4">

@@ -8,6 +8,7 @@ export default function CardUpdate() {
     const [ra, setRa] = useState('');
     const [nome, setNome] = useState('');
     const [frequencia, setFrequencia] = useState('');
+    const [senha, setSenha] = useState('');
     
     const cardData = [
         {
@@ -100,6 +101,23 @@ export default function CardUpdate() {
                        
                         <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
+                                <div className="col-span-2 ">
+                                    <label htmlFor="RA" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Registro do Aluno (R.A)</label>
+                                    <div className='flex justify-center gap-3'>
+                                    <input 
+                                        type="text" 
+                                        name="RA" 
+                                        id="RA" 
+                                        value={ra}
+                                        onChange={(e) => setRa(e.target.value)}
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
+                                        placeholder="Número do R.A" 
+                                        required 
+                                    />
+                                    <button className='bg-blue-950 rounded-lg text-white hover:text-gray-500 transition-all p-2 cursor-pointer'>Buscar</button>
+                                    </div>
+                                </div>
+
                                 <div className="col-span-2">
                                     <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nome</label>
                                     <input 
@@ -113,16 +131,16 @@ export default function CardUpdate() {
                                         required 
                                     />
                                 </div>
-                                <div className="col-span-2 sm:col-span-1">
-                                    <label htmlFor="RA" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Registro do Aluno (R.A)</label>
+                                <div className="col-span-2">
+                                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Senha</label>
                                     <input 
                                         type="text" 
-                                        name="RA" 
-                                        id="RA" 
-                                        value={ra}
-                                        onChange={(e) => setRa(e.target.value)}
+                                        name="senha" 
+                                        id="senha" 
+                                        value={senha}
+                                        onChange={(e) => setSenha(e.target.value)}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="Número do R.A" 
+                                        placeholder="*********" 
                                         required 
                                     />
                                 </div>
@@ -138,8 +156,9 @@ export default function CardUpdate() {
                                         placeholder="Frequência do aluno" 
                                         required 
                                     />
+
                                 </div>
-                                <div className="col-span-2">
+                                <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Turma</label>
                                     <select 
                                         id="turma" 
@@ -148,7 +167,6 @@ export default function CardUpdate() {
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                         required
                                     >
-                                        <option value="" disabled>Selecione a turma</option>
                                         <option value="2MD">2MD</option>
                                         <option value="2TD">2TD</option>
                                         <option value="2ND">2ND</option>
