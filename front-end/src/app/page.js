@@ -152,7 +152,7 @@ export default function Portal() {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            cpf_professor: formData.cpf.replace(/\D/g, ''), // remove tudo que não for número
+            cpf_professor: formData.cpf.replace(/\D/g, ''), // remove tudo que não for número legal
             senha_professor: formData.senha
           })
         });
@@ -163,7 +163,7 @@ export default function Portal() {
           // Salva o token no localStorage para depois pra poder logar
           localStorage.setItem('token', data.token);
 
-          // Feedback ou redirecionamento pra saber que deu certo
+          // Feedback ou redirecionamento pra saber que deu certo copiei 
           animacao();
           const timeout = setTimeout(() => {
             router.push('/professor?redirect=true');
@@ -209,7 +209,7 @@ export default function Portal() {
           localStorage.setItem('token', data.token);
 
           // Feedback ou redirecionamento pra saber que deu certo
-             // Feedback ou redirecionamento pra saber que deu certo
+             // Feedback ou redirecionamento pra saber que deu certo prigiça
              animacao();
              const timeout = setTimeout(() => {
                router.push('/coordenador?redirect=true');

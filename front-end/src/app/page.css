@@ -81,7 +81,7 @@
 .slide-in-left {
   animation:
     slide-in-left 0.7s ease forwards,
-    slide-in-left-indoembora 0.7s ease 4.2s forwards;
+    slide-in-left-indoembora 0.7s ease 10.2s forwards;
 }
 
 
@@ -159,14 +159,18 @@
   animation: sumio_aparece .5s .3s forwards,
     sumio_aparece .5s 1.2s forwards,
     sumio_aparece.5s 2.1s forwards,
-    sumio_aparece .5s 3s forwards;
+    sumio_aparece .5s 3s forwards,
+    sumio_aparece .5s 3.9s forwards,
+    sumio_aparece .5s 4.8s forwards;
 }
 
 .ponto2 {
   animation: sumio_aparece .5s .6s forwards,
     sumio_aparece .5s 1.5s forwards,
     sumio_aparece.5s 2.4s forwards,
-    sumio_aparece .5s 3.3s forwards;
+    sumio_aparece .5s 3.3s forwards,
+    sumio_aparece .5s 4.2s forwards,
+    sumio_aparece .5s 5.1s forwards;
 }
 
 .ponto3 {
@@ -174,7 +178,9 @@
     sumio_aparece .5s .9s forwards,
     sumio_aparece .5s 1.8s forwards,
     sumio_aparece.5s 2.7s forwards,
-    sumio_aparece .5s 3.6s forwards;
+    sumio_aparece .5s 3.6s forwards,
+    sumio_aparece .5s 4.5s forwards,
+    sumio_aparece .5s 5.4s forwards;
 }
 
 

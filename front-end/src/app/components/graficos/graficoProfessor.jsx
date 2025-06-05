@@ -57,62 +57,64 @@ export default function GraficoPizza() {
 
   const labels = ['Faltas (%)', 'Presenças (%)'];
 
-const options = {
-  chart: {
-    type: 'pie',
-    height: 420,
-  },
-  labels: labels, 
-  colors: ['#054068', '#b6dffa'],
-  legend: {
-    position: 'bottom',
-    fontFamily: 'Inter, sans-serif',
-  },
-  dataLabels: {
-    enabled: true,
-    style: {
+  const options = {
+    chart: {
+      type: 'pie',
+      height: 420,
+    },
+    labels: labels,
+    colors: ['#054068', '#b6dffa'],
+    legend: {
+      position: 'bottom',
       fontFamily: 'Inter, sans-serif',
     },
-    formatter: function (val) {
-      return `${val.toFixed(1)}%`;
+    dataLabels: {
+      enabled: true,
+      style: {
+        fontFamily: 'Inter, sans-serif',
+      },
+      formatter: function (val) {
+        return `${val.toFixed(1)}%`;
+      },
     },
-  },
-};
+  };
 
-const alunos = presencas[0]?.total_alunos || 0;
-const total_faltas = presencas[0]?.total_faltas_turma || 0;
-const total_aulas = presencas[0]?.qntd_aula || 0;
+  const alunos = presencas[0]?.total_alunos || 0;
+  const total_faltas = presencas[0]?.total_faltas_turma || 0;
+  const total_aulas = presencas[0]?.qntd_aula || 0;
 
-let percentual_faltas = 0;
-let percentual_presencas = 0;
-let series = [];
+  let percentual_faltas = 0;
+  let percentual_presencas = 0;
+  let series = [];
 
-if (alunos > 0 && total_aulas > 0) {
-  percentual_faltas = ((total_faltas / (alunos * total_aulas)) * 100).toFixed(1);
-  percentual_presencas = (100 - percentual_faltas).toFixed(1);
-  series = [parseFloat(percentual_faltas), parseFloat(percentual_presencas)];
-}
+  if (alunos > 0 && total_aulas > 0) {
+    percentual_faltas = ((total_faltas / alunos)).toFixed(1);
+    percentual_presencas = ((total_aulas -percentual_faltas)).toFixed(1)
+
+    // percentual_presencas = (100 - (percentual_faltas - total_aulas)).toFixed(1);
+    series = [parseFloat(percentual_faltas), parseFloat(percentual_presencas)];
+  }
 
 
 
 
-return (
-  <div className="max-w-sm w-full bg-none rounded-lg p-4 md:p-6">
-    <h2 className="text-xl text-center font-bold text-gray-900 dark:text-white mb-4">Média da sala</h2>
+  return (
+    <div className="max-w-sm w-full bg-none rounded-lg p-4 md:p-6">
+      <h2 className="text-xl text-center font-bold text-gray-900 dark:text-white mb-4">Média da sala</h2>
 
-    {erro ? (
-      <p className="text-red-500">{erro}</p>
-    ) : total_aulas === 0 ? ( 
-      <p className="text-gray-400 dark:text-gray-300">Carregando dados...</p>
-    ) : (
-      <Chart 
-        options={options} 
-        series={series} 
-        type="pie"  
-        height={350} 
-      />
-    )}
-  </div>
-);
+      {erro ? (
+        <p className="text-red-500">{erro}</p>
+      ) : total_aulas === 0 ? (
+        <p className="text-gray-400 dark:text-gray-300">Carregando dados...</p>
+      ) : (
+        <Chart
+          options={options}
+          series={series}
+          type="pie"
+          height={350}
+        />
+      )}
+    </div>
+  );
 
 }
