@@ -9,11 +9,16 @@ import {
   atualizarAlunoController, 
   atualizarProfessorController, 
   excluirAlunoController, 
-  excluirProfessorController 
+  excluirProfessorController,
+  listarTudoController
+
 } from '../controllersrotas/controllCoordenador.js';
 import authMiddleware from "../middlewares/authMiddleware.js";
 
 const rota = express.Router();
+
+//lista a view de tudo
+rota.get('/listar',authMiddleware,listarTudoController);
 
 // Listagem (GET) não precisa de autenticação
 rota.get('/alunos', listarAlunosController);

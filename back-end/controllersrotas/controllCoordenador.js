@@ -1,8 +1,10 @@
 // Importa funções de manipulação de dados e dependências necessárias
+import { readAllView } from '../database/database.js'
+
 import { 
     listarAlunos, listarProfessores, alunoDetalhado, professorDetalhado, 
     criarAluno, criarProfessor, atualizarAluno, atualizarProfessor, 
-    excluirAluno, excluirProfessor 
+    excluirAluno, excluirProfessor
 } from '../configs/configCoordenador.js'
 
 import { fileURLToPath } from 'url'
@@ -23,6 +25,19 @@ const listarAlunosController = async (req, res) => {
         res.status(500).json({ mensagem: 'Erro ao listar alunos' })
     }
 }
+
+// Controller para listar tudo para os graficos
+const listarTudoController = async (req, res) => {
+    try {
+        const listar = await readAllView()
+        res.status(200).send(listar)
+    } catch (err) {
+        console.error('Erro ao listar professores:', err)
+        res.status(500).json({ mensagem: 'Erro ao listar professores' })
+    }
+}
+
+
 
 // Controller para listar todos os professores
 const listarProfessoresController = async (req, res) => {
@@ -199,5 +214,6 @@ export {
     atualizarAlunoController,
     atualizarProfessorController,
     excluirAlunoController,
-    excluirProfessorController 
+    excluirProfessorController ,
+    listarTudoController
 }

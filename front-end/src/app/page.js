@@ -212,7 +212,7 @@ export default function Portal() {
              // Feedback ou redirecionamento pra saber que deu certo
              animacao();
              const timeout = setTimeout(() => {
-               router.push('/coordenador');
+               router.push('/coordenador?redirect=true');
              }, 1950)
    
 

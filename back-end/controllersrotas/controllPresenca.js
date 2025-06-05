@@ -2,6 +2,9 @@
 import { viewPresenca, faltaAluno, atualizarAulasDadasProfessor,viewProfessor,creatHistorico  } from '../database/database.js';
 
 //mudei controller e view
+
+
+//mudei controller e view
 // Cria a view de presença com base nos filtros recebidos
 const viewP = async (req, res) => {
   try {

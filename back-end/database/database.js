@@ -92,6 +92,7 @@ async function compare(senha, hash) {
   }
 }
 
+
 //mudei view
 // Visualiza presença dos alunos numa turma, professor e matéria específica
 async function viewPresenca( turma_aluno, materia) {
@@ -120,6 +121,19 @@ async function viewAluno(idAluno) {
     connection.release();
   }
 }
+
+
+async function readAllView() {
+  const connection = await getConnection();
+  try {
+    let sql = `SELECT * FROM database_prof_tereza_costa.freq_turma;`;
+    const [rows] = await connection.execute(sql);
+    return rows;
+  } finally {
+    connection.release();
+  }
+}
+
 
 async function creatHistorico(ID_professor, ID_aluno, materia) {
   const connection = await getConnection();
@@ -210,4 +224,4 @@ const atualizarAulasDadasProfessor = async (materia, idAluno) => {
 
 
 
-export { readAll, read, create, update, deleteRecord, compare, viewPresenca, faltaAluno, atualizarAulasDadasProfessor, viewAluno, viewProfessor, creatHistorico,viewHistoricaAluno };
+export { readAll, read, create, update, deleteRecord, compare, viewPresenca, faltaAluno, atualizarAulasDadasProfessor, viewAluno, viewProfessor, creatHistorico, viewHistoricaAluno,readAllView };

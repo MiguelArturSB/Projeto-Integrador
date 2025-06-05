@@ -1,0 +1,132 @@
+
+@keyframes slide-in-left {
+  0% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-left-indoembora {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+}
+
+.slide-in-left {
+  animation:
+    slide-in-left 0.7s ease forwards,
+    slide-in-left-indoembora 0.7s ease 3.2s forwards;
+}
+
+
+/* e o que ja ta ativo */
+@keyframes slide-in-left-aocontrario {
+  100% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+
+.slide-in-volta {
+  animation:
+    slide-in-left-aocontrario 0.7s ease .5s forwards;
+}
+
+/* ------------- */
+
+@keyframes slideIn {
+  0% {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  100% {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+@keyframes mark {
+  50% {
+    border-right-color: transparent;
+  }
+}
+
+@keyframes write {
+  0% {
+    width: 0;
+  }
+}
+
+@keyframes write {
+  0% {
+    max-width: 0;
+  }
+
+  100% {
+    max-width: 100%;
+  }
+}
+
+.p_adm {
+  white-space: nowrap;
+  overflow: hidden;
+  animation:
+    mark .5s step-end infinite 1s,
+    write 1s steps(22, end) 1s forwards,
+    slideIn .1s forwards 2s;
+}
+
+
+.ponto1 {
+  animation: sumio_aparece .5s .3s forwards,
+    sumio_aparece .5s 1.2s forwards,
+    sumio_aparece.5s 2.1s forwards,
+    sumio_aparece .5s 3s forwards;
+}
+
+.ponto2 {
+  animation: sumio_aparece .5s .6s forwards,
+    sumio_aparece .5s 1.5s forwards,
+    sumio_aparece.5s 2.4s forwards,
+    sumio_aparece .5s 3.3s forwards;
+}
+
+.ponto3 {
+  animation:
+    sumio_aparece .5s .9s forwards,
+    sumio_aparece .5s 1.8s forwards,
+    sumio_aparece.5s 2.7s forwards,
+    sumio_aparece .5s 3.6s forwards;
+}
+
+
+
+@keyframes sumio_aparece {
+  0% {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  100% {
+    visibility: visible;
+    opacity: 1;
+  }
+}

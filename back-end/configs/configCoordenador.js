@@ -1,5 +1,15 @@
 // Importa funções de manipulação do banco de dados
-import { readAll, read, create, update, deleteRecord } from '../database/database.js';
+import { readAll, read, create, update, deleteRecord,readAllView } from '../database/database.js';
+
+
+
+
+
+
+
+
+
+
 
 // Lista todos os alunos
 const listarAlunos = async () => {
@@ -112,5 +122,6 @@ export {
     atualizarAluno,
     atualizarProfessor,
     excluirAluno,
-    excluirProfessor
+    excluirProfessor,
+    
 }

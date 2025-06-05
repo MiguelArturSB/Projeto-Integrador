@@ -1,14 +1,19 @@
 'use client'
 
+
+import './headerCoordenador.css';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'; 
 
 export default function HeaderCoordenador() {
+const [animado, setAnimado] = useState(false)
 
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const router = useRouter();
 
- 
+     const animacao = () => {
+        setAnimado(true);
+    };
 
     const toggleLogoutModal = () => {
         setShowLogoutModal(!showLogoutModal);
@@ -16,11 +21,26 @@ export default function HeaderCoordenador() {
 
     const handleLogout = () => {
         console.log("Usuário deslogado");
-        toggleLogoutModal(); 
-        router.push('/'); 
+        animacao();
+        toggleLogoutModal();
+        const timeout = setTimeout(() => {
+            router.push('/?sucesso=ok');
+        }, 1950)
     };
 
+
+
     return (
+
+
+<> 
+            {animado && (
+                <div className=" slide-in-left bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
+                    <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
+                        <p className=" text-black font-bold">Saindo <b className='ponto1'>.</b> <b className='ponto2'>.</b> <b className='ponto3'>.</b> </p>
+                    </div>
+                </div>
+            )}
         <div className='bg-amber-400'>
             <header className="bg-[#054068]">
                 <div className='flex flex-col items-center justify-center text-4xl shadow-xl/30 shadow-blue-900 relative py-4'>
@@ -95,5 +115,8 @@ export default function HeaderCoordenador() {
                 </div>
             )}
         </div>
+
+        </>
+       
     );
 }
