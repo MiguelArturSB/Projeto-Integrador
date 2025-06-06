@@ -2,6 +2,7 @@
 
 import Header from '../components/Header/header.jsx'
 import Footer from '../components/Footer/page.jsx'
+import ModalHistorico from '../components/Modal/ModalHistorico.jsx';
 import './alun.css'
 import { useState, useEffect } from 'react'
 import { jwtDecode } from "jwt-decode";
@@ -15,7 +16,7 @@ export default function HomeAluno() {
 
     const searchParams = useSearchParams();
     const [mostrarMensagem, setMostrarMensagem] = useState(false);
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [token, setToken] = useState(null);
     const [decoded, setDecoded] = useState(null);
     const [showWelcome, setShowWelcome] = useState(true);
@@ -25,6 +26,15 @@ export default function HomeAluno() {
     const handleCloseWelcome = () => {
         setShowWelcome(false);
     };
+
+    const handleOpenModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
 
 
     useEffect(() => {
@@ -118,30 +128,39 @@ export default function HomeAluno() {
 
             <Header />
 
-        <div className='flex justify-center gap-15'>
-            <div className='mt-30 p-10'>
-                <div className=' bg-blue-50 rounded-3xl w-125 shadow-2xl text-gray-600 '>
-                    <h4 className=' flex justify-center font-bold mt-2'>Você possui</h4>
-                    {presencas.length > 0 && (
-                        <h1 className='flex justify-center font-extrabold text-4xl text-[#1d577b]'>
-                            {presencas[0].total_faltas}
-                        </h1>
-                    )}
-                    <h4 className=' flex justify-center font-bold mb-2'>faltas no semestre atual</h4>
-                    {presencas.length > 0 && (
-
-
-                        <h1 className='w-full flex justify-center rounded-b-3xl bg-[#1d577b] text-white font-bold p-2 cursor-pointer'>
-                            de {presencas[0].total_aulas_turma} aulas no semestre
-                        </h1>
-                    )}
-                </div>
-            </div>
-
-            <div className="flex justify-center my-6">
-                <GraficoPizza />
-            </div>
+            <div className='flex justify-center gap-15'>
+    <div className='mt-25 p-10 flex flex-col items-center'> 
+        <div className='bg-blue-50 rounded-3xl w-125 shadow-2xl text-gray-600'>
+            <h4 className='flex justify-center font-bold mt-2'>Você possui</h4>
+            {presencas.length > 0 && (
+                <h1 className='flex justify-center font-extrabold text-4xl text-[#1d577b]'>
+                    {presencas[0].total_faltas}
+                </h1>
+            )}
+            <h4 className='flex justify-center font-bold mb-2'>faltas no semestre atual</h4>
+            {presencas.length > 0 && (
+                <h1 className='w-full flex justify-center rounded-b-3xl bg-[#1d577b] text-white font-bold p-2 cursor-pointer'>
+                    de {presencas[0].total_aulas_turma} aulas no semestre
+                </h1>
+            )}
         </div>
+        <button 
+        onClick={handleOpenModal}
+        className='mt-10 p-4 border-3 shadow-inner shadow-gray-400  border-[#054068] bg-blue-50 hover:bg-gray-300 transition-all rounded-full cursor-pointer  w-[150px]'> 
+            Verificar faltas
+        </button>
+    </div>
+
+    <div className="flex justify-center my-6">
+        <GraficoPizza />
+    </div>
+</div>
+
+            <ModalHistorico 
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                presencas={presencas}
+            />
 
 
             <div className='grid grid-cols-1 md:grid-cols-6 items-center justify-items-center p-4'>
