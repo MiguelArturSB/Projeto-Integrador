@@ -2,10 +2,10 @@
 
 import HeaderCoordenador from "../components/headerCoordenador/page";
 import Footer from "../components/Footer/page";
-import Card from "../components/Card/Card";
+import Card from "../components/Card/CardCriar";
 import CardUpdate from '../components/Card/CardUpdate';
 import CardRemover from '../components/Card/CardRemover';
-import CardProf from '../components/CardProf/CardProf';
+import CardProf from '../components/CardProf/CardProfCriar';
 import CardProfRemover from '../components/CardProf/CardProfRemover';
 import CardProfUpdate from '../components/CardProf/CardProfUpdate';
 import ModalBuscaAluno from "../components/Modal/ModalGetAlunos";
