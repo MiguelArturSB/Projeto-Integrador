@@ -32,7 +32,7 @@ export default function Card() {
             let presencasRegistradasComSucesso = 0;
             let idAlunoParaMarcarAula = null;
 
-            // Registrar presença
+
             for (const aluno of alunosPresentes) {
                 try {
                     const response = await fetch(`${backendUrl}/presenca/registrar`, {
