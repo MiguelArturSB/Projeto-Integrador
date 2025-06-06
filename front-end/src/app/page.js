@@ -189,7 +189,7 @@ export default function Portal() {
 
     }
 
-    if (activeForm === 'coordenacao') {
+    if (activeForm === 'coordenador') {
       try {
         const response = await fetch(`${backendUrl}/login/coordenador`, {
           method: 'POST',
@@ -209,7 +209,7 @@ export default function Portal() {
           localStorage.setItem('token', data.token);
 
           // Feedback ou redirecionamento pra saber que deu certo
-             // Feedback ou redirecionamento pra saber que deu certo prigiça
+             // Feedback ou redirecionamento pra saber que deu certo 
              animacao();
              const timeout = setTimeout(() => {
                router.push('/coordenador?redirect=true');
@@ -278,11 +278,12 @@ export default function Portal() {
 
 
 
-      <div className="overflow-y-hidden h-screen bg-[url('/background-sm.jpg')] md:bg-[url('/background.jpg')] bg-cover bg-center bg-no-repeat flex flex-col">
+      <div className="overflow-y-hidden h-screen bg-[url('/background-sm.jpg')] md:bg-[url('/background.jpg')] bg-cover bg-center bg-no-repeat  flex flex-col">
         <div className="pr-8 flex justify-end items-center">
+
           <div className="flex items-center gap-4 w-[100%] md:w-auto">
             <img
-              className="w-22 md:w-40 mx-38 sm:mx-10 md:mx-0"
+              className="w-22 md:w-40 mx-38 sm:mx-10 md:mx-0 "
               src="./logo2.png"
               alt="Logo"
             />
@@ -292,9 +293,9 @@ export default function Portal() {
               <span className="hidden sm:block">Prof. Tereza Costa</span>
             </h2>
           </div>
-        </div>
 
-        <div className={`flex flex-col items-center justify-center text-[#1f557b] font-bold text-6xl titulo transition-opacity duration-700 ${activeForm ? 'fade-out' : 'fade-in'}`}>
+      </div>
+        <div className={`flex flex-col items-center justify-center text-[#1f557b] font-bold text-6xl  titulo transition-opacity duration-700 ${activeForm ? 'fade-out' : 'fade-in'}`}>
           <h1 className='text-3xl md:text-[49px] lg:text-[50px]'>Olá, seja bem vindo!</h1>
           <h4 className='hidden md:block text-[18px]'>Controle acadêmico de presença de forma prática e segura.</h4>
         </div>
@@ -306,7 +307,7 @@ export default function Portal() {
 
           {!activeForm ? (
             <div className="flex gap-10 flex-col sm:flex-col md:flex-row">
-              {['aluno', 'professor', 'coordenacao'].map(type => (
+              {['aluno', 'professor', 'coordenador'].map(type => (
                 <button
                   key={type}
                   onClick={() => handleButtonClick(type)}
@@ -323,11 +324,11 @@ export default function Portal() {
                 <h3 className="text-xl font-bold text-gray-800">
                   {activeForm === 'aluno' && 'Login do Aluno'}
                   {activeForm === 'professor' && 'Login do Professor'}
-                  {activeForm === 'coordenacao' && 'Login da Coordenação'}
+                  {activeForm === 'coordenador' && 'Login da Coordenação'}
                 </h3>
                 <button
                   onClick={handleCloseForm}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 hover:text-gray-700 cursor-pointer"
                 >
                   ✕
                 </button>

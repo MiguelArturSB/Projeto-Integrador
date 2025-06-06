@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 
 export default function CardUpdate() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [turma, setTurma] = useState('');
     const [ra, setRa] = useState('');
     const [nome, setNome] = useState('');
@@ -31,18 +32,20 @@ export default function CardUpdate() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
+        setIsModalOpen(false);
+        setIsConfirmationOpen(true);
+        
         console.log('Dados atualizados do aluno:', { 
             nome, 
             ra, 
             turma,
             frequencia 
         });
-
-
-        toggleModal();
     };
 
+    const closeConfirmation = () => {
+        setIsConfirmationOpen(false);
+    };
 
     const carregarDadosAluno = (aluno) => {
         if (aluno) {
@@ -191,6 +194,33 @@ export default function CardUpdate() {
                     </div>
                 </div>
             </div>
+
+            {/* Popup de confirmação de edição */}
+            {isConfirmationOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">
+                    <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 p-6 max-w-sm w-full">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                Sucesso!
+                            </h3>
+                        </div>
+                        <div className="flex items-center mb-4">
+                            <svg className="w-8 h-8 text-blue-900 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <p className="text-gray-700 dark:text-gray-300">
+                                Dados do aluno atualizados com sucesso!
+                            </p>
+                        </div>
+                        <button
+                            onClick={closeConfirmation}
+                            className="w-full mt-4 px-4 py-2 bg-[#1f557b] hover:bg-[#0e3754] text-white rounded-lg cursor-pointer"
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
