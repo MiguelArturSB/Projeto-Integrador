@@ -1,68 +1,21 @@
+// components/graficos/graficoProfessor.jsx
+
 'use client'
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import dynamic from 'next/dynamic';
-import { jwtDecode } from "jwt-decode";
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const backendUrl = `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3001`;
+// O componente agora recebe 'data' como uma propriedade (prop)
+export default function GraficoPizza({ data }) {
 
-export default function GraficoPizza() {
-  const [presencas, setAlunos] = useState([]);
-  const [erro, setErro] = useState(null);
-
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-
-    if (storedToken) {
-      const decoded = jwtDecode(storedToken);
-      view(storedToken, decoded);
-    }
-
-    window.scrollTo(0, 0);
-  }, []);
-
-  const view = async (token, decoded) => {
-    try {
-      const response = await fetch(`${backendUrl}/presenca/viewP`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          turma: decoded?.turma_professor,
-          materia: decoded?.materia,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data && Array.isArray(data.view)) {
-        const alunosComPresencaInicial = data.view.map((aluno) => ({
-          ...aluno,
-          presente: true,
-        }));
-
-        setAlunos(alunosComPresencaInicial);
-      } else {
-        console.warn("A resposta da API não continha um array 'view' válido:", data);
-        setAlunos([]);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar presenças (ProfessorTable):", error);
-      setAlunos([]);
-    }
-  };
-
-  const labels = ['Faltas (%)', 'Presenças (%)'];
-
+  // As opções do gráfico continuam as mesmas
   const options = {
     chart: {
       type: 'pie',
       height: 350,
     },
-    labels: labels, 
+    labels: ['Faltas (%)', 'Presenças (%)'],
     colors: ['#054068', '#b6dffa'],
     legend: {
       position: 'bottom',
@@ -75,12 +28,10 @@ export default function GraficoPizza() {
         }
       }
     },
-    // EFEITO DE HOVER NA POSIÇÃO CORRETA
     states: {
       hover: {
         filter: {
-          colors: ['#054068', '#b6dffa'],
-          type: 'darck',
+          type: 'dark',
           value: 0.15,
         }
       }
@@ -96,35 +47,32 @@ export default function GraficoPizza() {
     },
   };
 
-  const alunos = presencas[0]?.total_alunos || 0;
-  const total_faltas = presencas[0]?.total_faltas_turma || 0;
-  const total_aulas = presencas[0]?.qntd_aula || 0;
+  // Agora usamos os dados recebidos via props
+  const alunos = data?.total_alunos || 0;
+  const total_faltas = data?.total_faltas_turma || 0;
+  const total_aulas = data?.qntd_aula || 0;
   
   let percentual_faltas = 0;
   let percentual_presencas = 0;
-  let series = [];
+  let series = [0, 100]; // Valor padrão para evitar erros
   
   const totalPossibilidades = alunos * total_aulas;
   
   if (alunos > 0 && total_aulas > 0 && totalPossibilidades > 0) {
-    percentual_faltas = ((total_faltas / totalPossibilidades) * 100).toFixed(1);
-    percentual_presencas = (100 - percentual_faltas).toFixed(1);
+    percentual_faltas = (total_faltas / totalPossibilidades) * 100;
+    percentual_presencas = 100 - percentual_faltas;
   
-    series = [parseFloat(percentual_faltas), parseFloat(percentual_presencas)];
+    // Arredonda para uma casa decimal para a exibição
+    series = [parseFloat(percentual_faltas.toFixed(1)), parseFloat(percentual_presencas.toFixed(1))];
   }
-  
-
-
-
 
   return (
     <div className="max-w-sm w-full bg-none rounded-lg p-4 md:p-6">
       <h2 className="text-xl text-center font-bold text-gray-900 dark:text-white mb-4">Média da sala</h2>
 
-      {erro ? (
-        <p className="text-red-500">{erro}</p>
-      ) : total_aulas === 0 ? (
-        <p className="text-gray-400 dark:text-gray-300">Carregando dados...</p>
+      {/* A lógica de carregamento agora é mais simples */}
+      {!data || total_aulas === 0 ? (
+        <p className="text-center text-gray-400 dark:text-gray-300">Aguardando dados da chamada...</p>
       ) : (
         <Chart
           options={options}
@@ -135,5 +83,4 @@ export default function GraficoPizza() {
       )}
     </div>
   );
-
 }

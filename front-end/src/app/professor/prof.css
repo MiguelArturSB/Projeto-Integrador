@@ -41,7 +41,7 @@ body {
 .slide-in-left {
   animation:
     slide-in-left 0.4s ease 0s forwards,
-    slide-in-left-indoembora 0.3s ease .4s forwards;
+    slide-in-left-indoembora 0.3s ease .2s forwards;
 }
 
 @keyframes slide-in-left-aocontrario {
