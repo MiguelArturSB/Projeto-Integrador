@@ -19,6 +19,8 @@ export default function ProfessorTable() {
   const [decoded, setDecoded] = useState(null);
   const [animado, setAnimado] = useState(false);
 
+  const [profssor, setProfessorInfo] = useState([]);
+
   useEffect(() => {
     const vindoDeRedirect = searchParams.get("redirect") === "true";
     if (vindoDeRedirect) {
@@ -159,7 +161,7 @@ export default function ProfessorTable() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          turmaProfessor: decoded?.turma_professor,
+          // turmaProfessor: decoded?.turma_professor,
           turma: decoded?.turma_professor,
           materia: decoded?.materia,
         }),
@@ -174,6 +176,11 @@ export default function ProfessorTable() {
         }));
 
         setAlunos(alunosComPresencaInicial);
+        setProfessorInfo(data.view[0]); 
+      
+
+        
+        console.log('eita',alunosComPresencaInicial)
       } else {
         console.warn("A resposta da API não continha um array 'view' válido:", data);
         setAlunos([]);
@@ -218,6 +225,15 @@ export default function ProfessorTable() {
             <div className="bg-sky-100 text-sky-800 px-3 py-3 rounded-full font-medium shadow-inner text-sm sm:text-xl sm:px-6 ">
               Turma: <span className="font-semibold">{decoded?.turma_professor}</span>
             </div>
+
+            <div className="bg-sky-100 text-sky-800 px-3 py-3 rounded-full font-medium shadow-inner text-sm sm:text-xl sm:px-6 ">
+              Quantidade de aulas: <span className="font-semibold">{profssor?.qntd_aula}</span>
+            </div>
+
+            <div className="bg-emerald-100 text-emerald-800 px-3 py-3 rounded-full font-medium shadow-inner text-sm sm:text-xl sm:px-6">
+              Aulas Marcadas: <span className="font-semibold">{profssor?.aulas_dadas}</span>
+            </div>
+
             <div className="bg-emerald-100 text-emerald-800 px-3 py-3 rounded-full font-medium shadow-inner text-sm sm:text-xl sm:px-6">
               Matéria: <span className="font-semibold">{decoded?.materia}</span>
             </div>
