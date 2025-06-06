@@ -23,13 +23,8 @@ export default function Card() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
         setIsModalOpen(false);
-        
-
         setIsConfirmationOpen(true);
-        
-
         setTurma('');
         setRa('');
         setNome('');
@@ -61,7 +56,7 @@ export default function Card() {
                 ))}
             </div>
 
-   
+      
             <div 
                 id="remove-modal" 
                 tabIndex="-1" 
@@ -85,7 +80,7 @@ export default function Card() {
                                 <span className="sr-only">Fechar modal</span>
                             </button>
                         </div>
-                        <form className="p-4 md:p-5" >
+                        <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
                                 <div className="col-span-2 ">
                                     <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Insira o R.A do aluno</label>
@@ -100,7 +95,12 @@ export default function Card() {
                                         placeholder="000.000.000" 
                                         required 
                                     />
-                                    <button className='bg-blue-950 rounded-lg text-white hover:text-gray-500 transition-all p-2 cursor-pointer'>Buscar</button>
+                                    <button 
+                                        type="button" 
+                                        className='bg-blue-950 rounded-lg text-white hover:text-gray-500 transition-all p-2 cursor-pointer'
+                                    >
+                                        Buscar
+                                    </button>
                                     </div>
                                 </div>
 
@@ -142,7 +142,7 @@ export default function Card() {
                 </div>
             </div>
 
-     
+   
             {isConfirmationOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">
                     <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 p-6 max-w-sm w-full">

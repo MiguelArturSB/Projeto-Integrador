@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 export default function CardProf() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    
     const [turma, setTurma] = useState('');
     const [disciplina, setDisciplina] = useState('');
 
