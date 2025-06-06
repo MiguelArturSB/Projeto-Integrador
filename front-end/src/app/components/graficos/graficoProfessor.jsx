@@ -60,13 +60,30 @@ export default function GraficoPizza() {
   const options = {
     chart: {
       type: 'pie',
-      height: 420,
+      height: 350,
     },
-    labels: labels,
+    labels: labels, 
     colors: ['#054068', '#b6dffa'],
     legend: {
       position: 'bottom',
       fontFamily: 'Inter, sans-serif',
+    },
+    tooltip: {
+      y: {
+        formatter: function (val) {
+          return `${val.toFixed(1)}%`;
+        }
+      }
+    },
+    // EFEITO DE HOVER NA POSIÇÃO CORRETA
+    states: {
+      hover: {
+        filter: {
+          colors: ['#054068', '#b6dffa'],
+          type: 'darck',
+          value: 0.15,
+        }
+      }
     },
     dataLabels: {
       enabled: true,
@@ -82,18 +99,20 @@ export default function GraficoPizza() {
   const alunos = presencas[0]?.total_alunos || 0;
   const total_faltas = presencas[0]?.total_faltas_turma || 0;
   const total_aulas = presencas[0]?.qntd_aula || 0;
-
+  
   let percentual_faltas = 0;
   let percentual_presencas = 0;
   let series = [];
-
-  if (alunos > 0 && total_aulas > 0) {
-    percentual_faltas = ((total_faltas / alunos)).toFixed(1);
-    percentual_presencas = ((total_aulas -percentual_faltas)).toFixed(1)
-
-    // percentual_presencas = (100 - (percentual_faltas - total_aulas)).toFixed(1);
+  
+  const totalPossibilidades = alunos * total_aulas;
+  
+  if (alunos > 0 && total_aulas > 0 && totalPossibilidades > 0) {
+    percentual_faltas = ((total_faltas / totalPossibilidades) * 100).toFixed(1);
+    percentual_presencas = (100 - percentual_faltas).toFixed(1);
+  
     series = [parseFloat(percentual_faltas), parseFloat(percentual_presencas)];
   }
+  
 
 
 

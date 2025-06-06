@@ -65,6 +65,22 @@ const options = {
     position: 'bottom',
     fontFamily: 'Inter, sans-serif',
   },
+  tooltip: {
+    y: {
+      formatter: function (val) {
+        return `${val.toFixed(1)}%`;
+      }
+    }
+  },
+  states: {
+    hover: {
+      filter: {
+        colors: ['#054068', '#b6dffa'],
+        type: 'darck',
+        value: 0.15,
+      }
+    }
+  },
   dataLabels: {
     enabled: true,
     style: {
@@ -89,7 +105,7 @@ const series = [parseFloat(percentual_faltas), parseFloat(percentual_presencas)]
 
 
 return (
-  <div className="max-w-sm w-full bg-none rounded-lg  p-4 md:p-6">
+  <div className="max-w-sm w-full bg-none rounded-lg  p-4 md:p-6 ">
     <h2 className="text-xl text-center font-bold text-sky-900 dark:text-white mb-4">Presenças</h2>
 
     {erro ? (

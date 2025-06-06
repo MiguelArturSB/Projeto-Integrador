@@ -1,23 +1,22 @@
-body{
-  background-color: #c9e8ff;;
+body {
+  background-color: #c9e8ff;
 }
 
-.shadow_nim{
-    box-shadow: 4px 8px 10px rgba(201, 9, 9, 0.5);
+.shadow_nim {
+  box-shadow: 4px 8px 10px rgba(201, 9, 9, 0.5);
 }
 
 .scrol {
-    overflow-y: scroll;           
-    scrollbar-width: none;       
-    -ms-overflow-style: none;    
-  }
-  
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
 
-  .scrol::-webkit-scrollbar {
-    display: none;
-  }
+.scrol::-webkit-scrollbar {
+  display: none;
+}
 
-  @keyframes slide-in-left {
+@keyframes slide-in-left {
   0% {
     transform: translateX(-100%);
     opacity: 1;
@@ -28,7 +27,7 @@ body{
   }
 }
 
-  @keyframes slide-in-left-indoembora {
+@keyframes slide-in-left-indoembora {
   0% {
     transform: translateX(0);
     opacity: 1;
@@ -39,13 +38,12 @@ body{
   }
 }
 
-.slide-in-left{
-  animation: 
-    slide-in-left 0.7s ease forwards,
-    slide-in-left-indoembora 0.7s ease 4.5s forwards;
+.slide-in-left {
+  animation:
+    slide-in-left 0.4s ease 0s forwards,
+    slide-in-left-indoembora 0.3s ease .4s forwards;
 }
 
-/* e o que ja ta ativo */
 @keyframes slide-in-left-aocontrario {
   100% {
     transform: translateX(-100%);
@@ -57,52 +55,42 @@ body{
   }
 }
 
-
-.slide-in-volta{
-  animation: 
+.slide-in-volta {
+  animation:
     slide-in-left-aocontrario 0.7s ease .5s forwards;
 }
 
-/* ------------- */
+@keyframes slideIn {
+  0% {
+    visibility: hidden;
+    opacity: 0;
+  }
+  100% {
+    visibility: visible;
+    opacity: 1;
+  }
+}
 
+@keyframes mark {
+  50% {
+    border-right-color: transparent;
+  }
+}
 
+@keyframes write {
+  0% {
+    max-width: 0;
+  }
+  100% {
+    max-width: 100%;
+  }
+}
 
-
-  @keyframes slideIn {
-    0% {
-          visibility: hidden;
-           opacity: 0;
-        }
-     100% {
-         visibility: visible;
-         opacity: 1;
-         }
-     }        
- 
- @keyframes mark{
-     50%{
-         border-right-color: transparent;
-     }
- }
- @keyframes write {
-     0%{
-         width: 0;
-     }
- }
- @keyframes write {
-     0% {
-         max-width: 0;
-     }
-     100% {
-         max-width: 100%;
-     }
- }
-
-.p_adm{
-    white-space: nowrap;
-    overflow: hidden;
-    animation: 
-    mark .5s step-end infinite 1s, 
-        write 1s steps(22,end) 2s forwards,
-        slideIn .1s forwards 2s ;
+.p_adm {
+  white-space: nowrap;
+  overflow: hidden;
+  animation:
+    mark .5s step-end infinite 1s,
+    write 1s steps(22, end) 2s forwards,
+    slideIn .1s forwards 2s;
 }

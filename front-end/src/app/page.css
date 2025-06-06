@@ -105,6 +105,7 @@
 
 
 .slide-in-volta {
+
   animation:
     slide-in-left-aocontrario 0.7s ease .5s forwards;
 }

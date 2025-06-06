@@ -28,6 +28,13 @@ export default function GraficoPizza({ dadosDaTurma, titulo }) {
       position: 'bottom',
       fontFamily: 'Inter, sans-serif',
     },
+    tooltip: {
+      y: {
+        formatter: function (val) {
+          return `${val.toFixed(1)}%`;
+        }
+      }
+    },
     // EFEITO DE HOVER NA POSIÇÃO CORRETA
     states: {
       hover: {
