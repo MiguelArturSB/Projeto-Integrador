@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 export default function CardProf() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [turma, setTurma] = useState('');
     const [cpf, setCpf] = useState('');
     const [nome, setNome] = useState('');
@@ -19,14 +20,32 @@ export default function CardProf() {
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
+
+        if (!isModalOpen) {
+            setTurma('');
+            setCpf('');
+            setNome('');
+            setDisciplina('');
+        }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
+        
         console.log('Professor a ser removido:', { nome, cpf, disciplina, turma });
+        
+        setIsModalOpen(false);
+        setIsConfirmationOpen(true);
+        
+  
+        setTurma('');
+        setCpf('');
+        setNome('');
+        setDisciplina('');
+    };
 
-        toggleModal();
+    const closeConfirmation = () => {
+        setIsConfirmationOpen(false);
     };
 
     return (
@@ -55,7 +74,7 @@ export default function CardProf() {
                 id="remove-modal-prof" 
                 tabIndex="-1" 
                 aria-hidden={!isModalOpen} 
-                className={`${isModalOpen ? 'flex' : 'hidden'} fixed inset-0 z-50 items-center justify-center w-fullh-full bg-[rgba(0,0,0,0.5)] backdrop-blur-sm bg-opacity-50 overflow-y-auto overflow-x-hidden`}
+                className={`${isModalOpen ? 'flex' : 'hidden'} fixed inset-0 z-50 items-center justify-center w-full h-full bg-[rgba(0,0,0,0.5)] backdrop-blur-sm bg-opacity-50 overflow-y-auto overflow-x-hidden`}
             >
                 <div className="relative w-full max-w-md p-4 max-h-full">
                     <div className="w-96 relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -90,52 +109,25 @@ export default function CardProf() {
                                         placeholder="Digite o CPF do professor" 
                                         required 
                                     />
-                                    <button className='bg-blue-950 rounded-lg text-white hover:text-gray-500 transition-all p-2 cursor-pointer'>Buscar</button>
+                                    <button 
+                                        type="button"
+                                        className='bg-blue-950 rounded-lg text-white hover:text-gray-500 transition-all p-2 cursor-pointer'
+                                    >
+                                        Buscar
+                                    </button>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
                                     <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nome</label>
-                                    <h1 className='bg-gray-50 text-gray-400 text-sm rounded-lg  w-full p-2.5 border border-gray-300 '>Fulano da silva</h1>
-                                    {/* <input 
-                                        type="text" 
-                                        name="name" 
-                                        id="name" 
-                                        value={nome}
-                                        onChange={(e) => setNome(e.target.value)}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="Digite o nome do professor" 
-                                        required 
-                                    /> */}
+                                    <h1 className='bg-gray-50 text-gray-400 text-sm rounded-lg w-full p-2.5 border border-gray-300'>Fulano da silva</h1>
                                 </div>
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="disciplina" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Disciplina</label>
-                                    <h1 className='bg-gray-50 text-gray-400 text-sm rounded-lg  w-full p-2.5 border border-gray-300 '>LER</h1>
-                                    {/* <input 
-                                        type="text" 
-                                        name="disciplina" 
-                                        id="disciplina" 
-                                        value={disciplina}
-                                        onChange={(e) => setDisciplina(e.target.value)}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="Digite a disciplina lecionada" 
-                                        required 
-                                    /> */}
+                                    <h1 className='bg-gray-50 text-gray-400 text-sm rounded-lg w-full p-2.5 border border-gray-300'>LER</h1>
                                 </div>
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Turma</label>
-                                    <h1 className='bg-gray-50 text-gray-400 text-sm rounded-lg  w-full p-2.5 border border-gray-300 '>2md</h1>
-                                    {/* <select 
-                                        id="turma" 
-                                        value={turma}
-                                        onChange={(e) => setTurma(e.target.value)}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                        required
-                                    >
-                                        <option value="" disabled>Selecione a turma</option>
-                                        <option value="2MD">2MD</option>
-                                        <option value="2TD">2TD</option>
-                                        <option value="2ND">2ND</option>
-                                    </select> */}
+                                    <h1 className='bg-gray-50 text-gray-400 text-sm rounded-lg w-full p-2.5 border border-gray-300'>2MD</h1>
                                 </div>
                             </div>
                             <div className="mb-4">
@@ -156,6 +148,33 @@ export default function CardProf() {
                     </div>
                 </div>
             </div>
+
+
+            {isConfirmationOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">
+                    <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 p-6 max-w-sm w-full">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                Sucesso!
+                            </h3>
+                        </div>
+                        <div className="flex items-center mb-4">
+                            <svg className="w-8 h-8 text-blue-900 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <p className="text-gray-700 dark:text-gray-300">
+                                Professor removido com sucesso!
+                            </p>
+                        </div>
+                        <button
+                            onClick={closeConfirmation}
+                            className="w-full mt-4 px-4 py-2 bg-[#1f557b] hover:bg-[#0e3754] text-white rounded-lg cursor-pointer"
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

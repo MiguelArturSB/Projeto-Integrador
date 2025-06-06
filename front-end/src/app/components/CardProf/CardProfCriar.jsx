@@ -4,10 +4,15 @@ import { useState } from 'react'
 
 export default function CardProf() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+    const [formData, setFormData] = useState({
+        nome: '',
+        senha: '',
+        cpf: '',
+        disciplina: '',
+        turma: ''
+    });
     
-    const [turma, setTurma] = useState('');
-    const [disciplina, setDisciplina] = useState('');
-
     const cardData = [
         {
             icon: '+',
@@ -18,6 +23,46 @@ export default function CardProf() {
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
+
+        if (!isModalOpen) {
+            setFormData({
+                nome: '',
+                senha: '',
+                cpf: '',
+                disciplina: '',
+                turma: ''
+            });
+        }
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        console.log('Dados do professor:', formData);
+        
+        setIsModalOpen(false);
+        setIsConfirmationOpen(true);
+        
+
+        setFormData({
+            nome: '',
+            senha: '',
+            cpf: '',
+            disciplina: '',
+            turma: ''
+        });
+    };
+
+    const closeConfirmation = () => {
+        setIsConfirmationOpen(false);
     };
 
     return (
@@ -42,7 +87,6 @@ export default function CardProf() {
                 ))}
             </div>
 
-   
             <div 
                 id="professor-modal" 
                 tabIndex="-1" 
@@ -51,7 +95,6 @@ export default function CardProf() {
             >
                 <div className="relative w-full max-w-md p-4 max-h-full">
                     <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-   
                         <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                 Cadastrar Novo Professor
@@ -68,8 +111,7 @@ export default function CardProf() {
                             </button>
                         </div>
                         
-    
-                        <form className="p-4 md:p-5">
+                        <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
                                 <div className="col-span-2">
                                     <label htmlFor="nome" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nome</label>
@@ -77,6 +119,8 @@ export default function CardProf() {
                                         type="text" 
                                         name="nome" 
                                         id="nome" 
+                                        value={formData.nome}
+                                        onChange={handleChange}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
                                         placeholder="Digite o nome do professor" 
                                         required 
@@ -88,6 +132,8 @@ export default function CardProf() {
                                         type="text" 
                                         name="senha" 
                                         id="senha" 
+                                        value={formData.senha}
+                                        onChange={handleChange}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
                                         placeholder="Digite a senha do professor" 
                                         required 
@@ -100,20 +146,22 @@ export default function CardProf() {
                                         type="text" 
                                         name="cpf" 
                                         id="cpf" 
+                                        value={formData.cpf}
+                                        onChange={handleChange}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
                                         placeholder="Digite o CPF do professor" 
                                         required 
                                     />
                                 </div>
                             
-
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="disciplina" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Disciplina</label>
                                     <select 
-                                        id="" 
-                                        value={disciplina}
-                                        onChange={(e) => setDisciplina(e.target.value)}
+                                        name="disciplina"
+                                        value={formData.disciplina}
+                                        onChange={handleChange}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        required
                                     >
                                         <option value="" disabled>Selecione a disciplina lecionada</option>
                                         <option value="LER">LER</option>
@@ -127,10 +175,11 @@ export default function CardProf() {
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Turma</label>
                                     <select 
-                                        id="turma" 
-                                        value={turma}
-                                        onChange={(e) => setTurma(e.target.value)}
+                                        name="turma"
+                                        value={formData.turma}
+                                        onChange={handleChange}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        required
                                     >
                                         <option value="" disabled>Selecione a turma</option>
                                         <option value="2MD">2MD</option>
@@ -153,6 +202,33 @@ export default function CardProf() {
                     </div>
                 </div>
             </div>
+
+
+            {isConfirmationOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">
+                    <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 p-6 max-w-sm w-full">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                Sucesso!
+                            </h3>
+                        </div>
+                        <div className="flex items-center mb-4">
+                            <svg className="w-8 h-8 text-blue-900 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <p className="text-gray-700 dark:text-gray-300">
+                                Professor cadastrado com sucesso!
+                            </p>
+                        </div>
+                        <button
+                            onClick={closeConfirmation}
+                            className="w-full mt-4 px-4 py-2 bg-[#1f557b] hover:bg-[#0e3754] text-white rounded-lg cursor-pointer"
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
