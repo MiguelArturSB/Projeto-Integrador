@@ -195,7 +195,7 @@ export default function CardUpdate() {
                 </div>
             </div>
 
-            {/* Popup de confirmação de edição */}
+     
             {isConfirmationOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">
                     <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 p-6 max-w-sm w-full">

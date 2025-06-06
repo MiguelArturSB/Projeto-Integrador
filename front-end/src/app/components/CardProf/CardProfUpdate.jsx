@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 
 export default function CardProfUpdate() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [nome, setNome] = useState('');
     const [senha, setSenha] = useState('');
     const [cpf, setCpf] = useState('');
@@ -23,6 +24,7 @@ export default function CardProfUpdate() {
 
         if (!isModalOpen) {
             setNome('');
+            setSenha('');
             setCpf('');
             setDisciplina('');
             setTurma('');
@@ -31,18 +33,20 @@ export default function CardProfUpdate() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        alert('dsad'); 
-
+        setIsModalOpen(false);
+        setIsConfirmationOpen(true);
+        
         console.log('Dados atualizados do professor:', { 
             nome, 
             cpf, 
             disciplina,
             turma 
         });
-
-        toggleModal();
     };
 
+    const closeConfirmation = () => {
+        setIsConfirmationOpen(false);
+    };
 
     const carregarDadosProfessor = (professor) => {
         if (professor) {
@@ -52,7 +56,6 @@ export default function CardProfUpdate() {
             setTurma(professor.turma);
         }
     };
-
 
     return (
         <>
@@ -115,12 +118,12 @@ export default function CardProfUpdate() {
                                         placeholder="000.000.000-00" 
                                         required 
                                     />
-                                   <button 
-  type="button"
-  className='bg-blue-950 rounded-lg text-white hover:text-gray-500 transition-all p-2 cursor-pointer'>
-  Buscar
-</button>
-
+                                    <button 
+                                        type="button"
+                                        className='bg-blue-950 rounded-lg text-white hover:text-gray-500 transition-all p-2 cursor-pointer'
+                                    >
+                                        Buscar
+                                    </button>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
@@ -203,6 +206,33 @@ export default function CardProfUpdate() {
                     </div>
                 </div>
             </div>
+
+      
+            {isConfirmationOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">
+                    <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 p-6 max-w-sm w-full">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                Sucesso!
+                            </h3>
+                        </div>
+                        <div className="flex items-center mb-4">
+                            <svg className="w-8 h-8 text-blue-900 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <p className="text-gray-700 dark:text-gray-300">
+                                Dados do professor atualizados com sucesso!
+                            </p>
+                        </div>
+                        <button
+                            onClick={closeConfirmation}
+                            className="w-full mt-4 px-4 py-2 bg-[#1f557b] hover:bg-[#0e3754] text-white rounded-lg cursor-pointer"
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

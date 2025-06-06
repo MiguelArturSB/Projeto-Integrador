@@ -230,7 +230,7 @@ export default function Coordenador() {
                     onClick={() => setModalAberto(true)}
                     className="cursor-pointer font-bold bg-[#1f557b] hover:bg-[#0e3754] transition-all duration-300 border-2 border-solid border-blue-200 mt-4 text-white hover:text-gray-500 text-[12px] text-center p-3 rounded-full h-11"
                 >
-                    Buscar Aluno...
+                    Buscar Aluno
                 </button>
             </div>
 
@@ -303,9 +303,9 @@ export default function Coordenador() {
                 <div className="flex justify-center mb-10">
                     <button
                         onClick={() => setModalProfessorAberto(true)}
-                        className=" cursor-pointer font-medium bg-[#1f557b] hover:bg-[#0e3754] transition-all duration-300  text-white hover:text-gray-500 text-[12px] text-center p-3  rounded-full h-11"
+                        className=" cursor-pointer font-bold bg-[#1f557b] hover:bg-[#0e3754] transition-all duration-300  text-white hover:text-gray-500 text-[12px] text-center p-3  rounded-full h-11"
                     >
-                        Buscar Professor...
+                        Buscar Professor
                     </button>
                 </div>
 
