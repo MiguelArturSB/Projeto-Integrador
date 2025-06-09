@@ -138,13 +138,28 @@ async function readAllView() {
 async function creatHistorico(ID_professor, ID_aluno, materia) {
   const connection = await getConnection();
   try {
-    const sql = `INSERT INTO historico_aluno (ID_professor, ID_aluno, materia) VALUES (?, ?, ?)`;
-    const [result] = await connection.execute(sql, [ID_professor, ID_aluno, materia]);
+    const sql = `
+      INSERT INTO historico_aluno (ID_professor, ID_aluno, materia, data_falta)
+      VALUES (?, ?, ?, ?)
+    `;
+
+    // Gera a data atual no formato 'YYYY-MM-DD'
+    const hoje = new Date();
+    const dataFormatada = hoje.toISOString().split('T')[0];
+
+    const [result] = await connection.execute(sql, [
+      ID_professor,
+      ID_aluno,
+      materia,
+      dataFormatada
+    ]);
+
     return result;
   } finally {
     connection.release();
   }
 }
+
 
 
 async function viewHistoricaAluno(idAluno) {

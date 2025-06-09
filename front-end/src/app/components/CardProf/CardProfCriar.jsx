@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 
-export default function CardProfessor() {
+// ⭐ ALTERADO: O componente agora aceita a prop 'onUpdate'
+export default function CardProfCriar({ onUpdate }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [erro, setErro] = useState(null);
@@ -78,11 +79,17 @@ export default function CardProfessor() {
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("Erro ao cadastrar professor:", errorData);
+                // Pode adicionar um feedback de erro para o usuário aqui
                 return;
             }
 
             const data = await response.json();
             console.log("Professor cadastrado com sucesso:", data);
+
+            // ⭐ PONTO CHAVE: Chamar a função de atualização do Pai após o sucesso.
+            if (onUpdate) {
+                onUpdate();
+            }
 
             setIsModalOpen(false);
             setIsConfirmationOpen(true);

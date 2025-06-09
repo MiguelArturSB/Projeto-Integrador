@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 
-export default function Card() {
+// ⭐ ALTERADO: A função agora aceita a prop { onUpdate } vinda do componente Pai.
+export default function Card({ onUpdate }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [erro, setErro] = useState(null);
@@ -54,7 +55,6 @@ export default function Card() {
             return;
         }
 
-        // Mapeia para o formato esperado pelo backend
         const dadosFormatados = {
             nome_aluno: formData.name,
             RA_aluno: formData.RA,
@@ -75,11 +75,19 @@ export default function Card() {
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("Erro ao cadastrar aluno:", errorData);
+                // Opcional: mostrar uma mensagem de erro para o usuário
                 return;
             }
 
             const data = await response.json();
             console.log("Aluno cadastrado com sucesso:", data);
+
+            //  PONTO CHAVE: Chame a função de atualização do Pai.
+            // Isso irá disparar a função 'buscarDadosCoordenador' no componente Pai,
+            // que por sua vez recarrega a lista de todos os alunos. super legal de mais
+            if (onUpdate) {
+                onUpdate();
+            }
 
             setIsModalOpen(false);
             setIsConfirmationOpen(true);

@@ -36,31 +36,19 @@ export default function Coordenador() {
     const [erro, setErro] = useState(null);
     const [carregando, setCarregando] = useState(true);
 
-    useEffect(() => {
-        const vindoDeRedirect = searchParams.get("redirect") === "true";
-
-        if (vindoDeRedirect) {
-            setMostrarMensagem(true);
-            const url = new URL(window.location.href);
-            url.searchParams.delete("redirect");
-            window.history.replaceState({}, "", url.toString());
-        }
-    }, [searchParams]);
-
-    useEffect(() => {
-        const storedToken = localStorage.getItem("token");
-        if (storedToken) {
-            buscarDadosCoordenador(storedToken);
-        } else {
-            setErro("Sessão expirada ou inválida. Por favor, faça login novamente.");    
-            setCarregando(false);
-        }
-        window.scrollTo(0, 0);
-    }, []);
-
-    const buscarDadosCoordenador = async (token) => {
+    // ⭐ ALTERADO: A função agora é autossuficiente, buscando o token internamente.
+    // Isso permite que ela seja passada como uma função simples para os componentes filhos.
+    const buscarDadosCoordenador = async () => {
+        console.log("Iniciando a busca de dados atualizados...");
         setCarregando(true);    
         setErro(null);
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+            setErro("Sessão expirada ou inválida. Por favor, faça login novamente.");    
+            setCarregando(false);
+            return;
+        }
 
         try {
             const response = await fetch(`${backendUrl}/coordenador/listar`, {
@@ -83,6 +71,23 @@ export default function Coordenador() {
             setCarregando(false);    
         }
     };
+
+    useEffect(() => {
+        const vindoDeRedirect = searchParams.get("redirect") === "true";
+
+        if (vindoDeRedirect) {
+            setMostrarMensagem(true);
+            const url = new URL(window.location.href);
+            url.searchParams.delete("redirect");
+            window.history.replaceState({}, "", url.toString());
+        }
+    }, [searchParams]);
+
+    useEffect(() => {
+        // ⭐ ALTERADO: A chamada inicial agora usa a nova função autossuficiente.
+        buscarDadosCoordenador();
+        window.scrollTo(0, 0);
+    }, []);
 
     const processarDados = (dados) => {
         if (!dados || dados.length === 0) {
@@ -227,9 +232,10 @@ export default function Coordenador() {
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-10 mb-8 px-4">
-                    <Card />
-                    <CardRemover />
-                    <CardUpdate />
+                    {/* ⭐ ALTERADO: Passando a função de atualização para os componentes filhos */}
+                    <Card onUpdate={buscarDadosCoordenador} />
+                    <CardRemover onUpdate={buscarDadosCoordenador} />
+                    <CardUpdate onUpdate={buscarDadosCoordenador} />
                 </div>
                 
                 <h1 className="text-2xl md:text-3xl text-center text-[#054068] font-semibold mt-8 md:mt-12 mb-4">Detalhes por Turma</h1>
@@ -304,9 +310,10 @@ export default function Coordenador() {
                     </div>
 
                     <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-10 px-4">
-                        <CardProf />
-                        <CardProfRemover />
-                        <CardProfUpdate />
+                        {/*  ALTERADO: Passando a função de atualização para os componentes filhos bora atualiza ai fiada */}
+                        <CardProf onUpdate={buscarDadosCoordenador} />
+                        <CardProfRemover onUpdate={buscarDadosCoordenador} />
+                        <CardProfUpdate onUpdate={buscarDadosCoordenador} />
                     </div>
 
                     {turmasProfessores.length === 0 ? (
