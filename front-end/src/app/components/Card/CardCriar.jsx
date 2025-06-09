@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Card() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+    const [erro, setErro] = useState(null);
+    const [carregando, setCarregando] = useState(true);
     const [formData, setFormData] = useState({
         name: '',
         senha: '',
@@ -22,49 +24,6 @@ export default function Card() {
         }
     ];
 
-    const criarAluno = async () => {
-        setTimeout(() => router.push('../?redirect=true'), 1950);
-
-        if (token && decoded && alunos.length > 0) {
-            const alunosPresentes = alunos.filter((aluno) => aluno.presente);
-            const alunosFaltantes = alunos.filter((aluno) => !aluno.presente);
-
-            let presencasRegistradasComSucesso = 0;
-            let idAlunoParaMarcarAula = null;
-
-            // Registrar presença
-            for (const aluno of alunosPresentes) {
-                try {
-                    const response = await fetch(`${backendUrl}/presenca/registrar`, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({
-                            materia: decoded?.materia,
-                            id: aluno.ID_aluno,
-                        }),
-                    });
-
-                    if (response.ok) {
-                        presencasRegistradasComSucesso++;
-                        if (!idAlunoParaMarcarAula) {
-                            idAlunoParaMarcarAula = aluno.ID_aluno;
-                        }
-                    } else {
-                        const errorData = await response.json();
-                        console.error(`Erro ao registrar presença do aluno ${aluno.nome_aluno}:`, errorData);
-                    }
-                } catch (error) {
-                    console.error(`Erro ao registrar presença de ${aluno.nome_aluno}:`, error);
-                }
-            }
-        } else {
-            console.warn("Token não encontrado ou lista de alunos vazia.");
-        }
-    };
-
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
     };
@@ -77,22 +36,65 @@ export default function Card() {
         }));
     };
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        const storedToken = localStorage.getItem("token");
+        if (!storedToken) {
+            setErro("Sessão expirada ou inválida. Por favor, faça login novamente.");
+        }
+        setCarregando(false);
+        window.scrollTo(0, 0);
+    }, []);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log('Dados do formulário:', formData);
+        const token = localStorage.getItem("token");
+        if (!token) {
+            setErro("Token não encontrado. Faça login novamente.");
+            return;
+        }
 
-        setIsModalOpen(false);
+        // Mapeia para o formato esperado pelo backend
+        const dadosFormatados = {
+            nome_aluno: formData.name,
+            RA_aluno: formData.RA,
+            senha_aluno: formData.senha,
+            turma: formData.turma
+        };
 
-        setIsConfirmationOpen(true);
+        try {
+            const response = await fetch(`${backendUrl}/coordenador/aluno`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(dadosFormatados),
+            });
 
-        setFormData({
-            name: '',
-            senha: '',
-            RA: '',
-            turma: ''
-        });
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Erro ao cadastrar aluno:", errorData);
+                return;
+            }
+
+            const data = await response.json();
+            console.log("Aluno cadastrado com sucesso:", data);
+
+            setIsModalOpen(false);
+            setIsConfirmationOpen(true);
+
+            setFormData({
+                name: '',
+                senha: '',
+                RA: '',
+                turma: ''
+            });
+        } catch (error) {
+            console.error("Erro na requisição ao cadastrar aluno:", error);
+        }
     };
+
 
     const closeConfirmation = () => {
         setIsConfirmationOpen(false);
@@ -179,6 +181,7 @@ export default function Card() {
                                         id="RA"
                                         value={formData.RA}
                                         onChange={handleChange}
+                                        maxLength={9}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                         placeholder="Número do R.A"
                                         required
@@ -207,7 +210,6 @@ export default function Card() {
                     </div>
                 </div>
             </div>
-
 
             {isConfirmationOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">

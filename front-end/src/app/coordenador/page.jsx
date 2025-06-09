@@ -57,20 +57,6 @@ export default function Coordenador() {
         if (storedToken) {
             buscarDadosCoordenador(storedToken);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         } else {
             setErro("Sessão expirada ou inválida. Por favor, faça login novamente.");    
             setCarregando(false);
