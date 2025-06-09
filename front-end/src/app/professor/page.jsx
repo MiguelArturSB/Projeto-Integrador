@@ -17,7 +17,7 @@ export default function ProfessorTable() {
   const [token, setToken] = useState(null);
   const [decoded, setDecoded] = useState(null);
   const [animado, setAnimado] = useState(false);
-  const [profssor, setProfessorInfo] = useState(null);
+  const [professorInfo, setProfessorInfo] = useState(null); 
   const [botaoDesativado, setBotaoDesativado] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -69,7 +69,6 @@ export default function ProfessorTable() {
     setAnimado(true);
 
     if (token && decoded && alunos.length > 0) {
-      // ... (toda a sua lógica de fetch continua a mesma)
       const alunosPresentes = alunos.filter((aluno) => aluno.presente);
       const alunosFaltantes = alunos.filter((aluno) => !aluno.presente);
       const requests = [];
@@ -109,7 +108,6 @@ export default function ProfessorTable() {
         setAnimado(false);
       }, 4000); 
 
-
     } else {
       setAnimado(false);
       setBotaoDesativado(false);
@@ -138,25 +136,24 @@ export default function ProfessorTable() {
     }
   };
 
-
   return (
     <>
       <HeaderProfessor />
       
       {showConfirmModal && (
-        <div id="confirm-presence-modal" tabIndex="-1" className="fixed inset-0 z-50 flex items-center justify-center w-full h-full p-4 bg-[rgba(0,0,0,0.5)] backdrop-blur-sm overflow-y-auto">
-  
-          <div className="relative w-full max-w-md max-h-full">
-            <div className="relative bg-white rounded-lg shadow-sm">
-              <button type="button" className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm w-8 h-8 flex justify-center items-center cursor-pointer" onClick={toggleConfirmModal}>
-                <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" /></svg>
-                <span className="sr-only">Fechar</span>
-              </button>
-              <div className="p-4 md:p-5 text-center">
-                <svg className="mx-auto mb-4 text-gray-400 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-                <h3 className="mb-5 text-lg font-normal text-gray-700">Tem certeza que deseja enviar as presenças? <br/> Esta ação não poderá ser desfeita.</h3>
-                <button onClick={handleConfirmAndSend} type="button" className="text-white bg-[#17577c] hover:bg-[#054068] font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center cursor-pointer">Sim, confirmar</button>
-                <button onClick={toggleConfirmModal} type="button" className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 focus:z-10 focus:ring-4 focus:ring-gray-100 cursor-pointer">Não, cancelar</button>
+        <div id="confirm-presence-modal" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">
+          <div className="relative w-full max-w-md bg-white rounded-lg shadow-lg">
+            <button type="button" className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm w-8 h-8 flex justify-center items-center" onClick={toggleConfirmModal}>
+              <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" /></svg>
+              <span className="sr-only">Fechar</span>
+            </button>
+            <div className="p-6 text-center">
+              <svg className="mx-auto mb-4 text-gray-400 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+              <h3 className="mb-5 text-base sm:text-lg font-normal text-gray-700">Tem certeza que deseja enviar as presenças? <br/> Esta ação não poderá ser desfeita.</h3>
+           
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-center gap-3">
+                <button onClick={toggleConfirmModal} type="button" className="w-full sm:w-auto py-2.5 px-5 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100">Não, cancelar</button>
+                <button onClick={handleConfirmAndSend} type="button" className="w-full sm:w-auto text-white bg-[#17577c] hover:bg-[#054068] font-medium rounded-lg text-sm px-5 py-2.5">Sim, confirmar</button>
               </div>
             </div>
           </div>
@@ -164,64 +161,78 @@ export default function ProfessorTable() {
       )}
 
       {animado && (
-        <div className="slide-in-loop bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
-          <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
-            <p className=" text-black font-bold">Presenças enviadas!!</p>
-          </div>
+        <div className="slide-in-loop bg-sky-800 z-[9999] fixed inset-0 flex justify-center items-center">
+          <p className="text-black text-3xl sm:text-4xl font-bold">Presenças enviadas!!</p>
         </div>
       )}
 
       {mostrarMensagem && (
-        <div className="slide-in-volta bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
-          <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
-            <p className=" text-black font-bold">Carregando <b>.</b><b>.</b><b>.</b></p>
-          </div>
+        <div className="slide-in-volta bg-sky-800 z-[9999] fixed inset-0 flex justify-center items-center">
+          <p className="text-black text-3xl sm:text-4xl font-bold">Carregando <b>.</b><b>.</b><b>.</b></p>
         </div>
       )}
 
-      <div className="min-h-screen bg-gradient-to-br flex items-center justify-center p-8">
-        <div className="bg-white shadow-2xl rounded-3xl w-full max-w-6xl p-6 relative overflow-hidden">
-          <h1 className="font-bold text-gray-800 mb-6 border-b pb-4 text-xl sm:text-4xl">Painel da Presença</h1>
-          <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
-            <div className="bg-sky-100 text-sky-800 px-3 py-3 rounded-full font-medium shadow-inner text-sm sm:text-base sm:px-6">Turma: <span className="font-semibold">{decoded?.turma_professor}</span></div>
-            <div className="bg-sky-100 text-sky-800 px-3 py-3 rounded-full font-medium shadow-inner text-sm sm:text-base sm:px-6">Quantidade de aulas: <span className="font-semibold">{profssor?.qntd_aula}</span></div>
-            <div className="bg-emerald-100 text-emerald-800 px-3 py-3 rounded-full font-medium shadow-inner text-sm sm:text-base sm:px-6">Aulas Marcadas: <span className="font-semibold">{profssor?.aulas_dadas}</span></div>
-            <div className="bg-emerald-100 text-emerald-800 px-3 py-3 rounded-full font-medium shadow-inner text-sm sm:text-base sm:px-6">Matéria: <span className="font-semibold">{decoded?.materia}</span></div>
+
+      <main className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8">
+        <div className="bg-white shadow-2xl rounded-3xl w-full max-w-7xl p-4 sm:p-6 lg:p-8">
+          <h1 className="font-bold text-gray-800 mb-6 border-b pb-4 text-2xl sm:text-3xl lg:text-4xl">Painel de Presença</h1>
+          
+
+          <div className="flex flex-col sm:flex-row sm:flex-wrap justify-between items-center mb-6 gap-3 sm:gap-4">
+            <div className="bg-sky-100 text-sky-800 px-4 py-2 rounded-full font-medium shadow-inner text-sm w-full sm:w-auto text-center">Turma: <span className="font-semibold">{decoded?.turma_professor}</span></div>
+            <div className="bg-sky-100 text-sky-800 px-4 py-2 rounded-full font-medium shadow-inner text-sm w-full sm:w-auto text-center">Aulas Totais: <span className="font-semibold">{professorInfo?.qntd_aula}</span></div>
+            <div className="bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full font-medium shadow-inner text-sm w-full sm:w-auto text-center">Aulas Marcadas: <span className="font-semibold">{professorInfo?.aulas_dadas}</span></div>
+            <div className="bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full font-medium shadow-inner text-sm w-full sm:w-auto text-center">Matéria: <span className="font-semibold">{decoded?.materia}</span></div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full table-auto rounded-xl overflow-hidden shadow-md">
-              <thead>
-                <tr className="bg-[#1d577b] text-white text-left text-sm sm:text-base">
-                  <th className="py-4 px-6 font-semibold text-xs sm:text-sm">Nome</th>
-                  <th className="py-4 px-6 font-semibold hidden sm:table-cell text-xs sm:text-sm">RA</th>
-                  <th className="py-4 px-6 font-semibold text-xs sm:text-sm">Frequência</th>
-                  <th className="py-4 px-6 font-semibold text-xs sm:text-sm">Presente</th>
+
+          <div className="overflow-x-auto rounded-xl shadow-md ">
+            <table className="w-full text-sm text-left text-gray-700">
+              <thead className="text-xs text-white uppercase bg-[#1d577b]">
+                <tr>
+                  <th scope="col" className="px-4 py-3 sm:px-6">Nome</th>
+
+                  <th scope="col" className="px-4 py-3 sm:px-6 hidden sm:table-cell">RA</th>
+                  <th scope="col" className="px-4 py-3 sm:px-6">Frequência</th>
+                  <th scope="col" className="px-4 py-3 sm:px-6 text-center">Presença</th>
                 </tr>
               </thead>
               <tbody>
                 {alunos.map((aluno) => (
-                  <tr key={aluno.ID_aluno} className="odd:bg-white even:bg-blue-50 hover:bg-slate-200 transition-colors">
-                    <td className="py-3 px-6 text-gray-700 text-xs sm:text-sm">{aluno.nome_aluno}</td>
-                    <td className="py-3 px-6 text-gray-700 hidden sm:table-cell text-xs sm:text-sm">{aluno.RA_aluno}</td>
-                    <td className="py-3 px-6 text-gray-700 text-xs sm:text-sm">{aluno?.percentual_frequencia}%</td>
-                    <td className="py-3 px-6">
-                      <button onClick={() => togglePresence(aluno.ID_aluno)} className={`w-8 h-8 cursor-pointer rounded-full border-2 transition-colors duration-300 ${aluno.presente ? "bg-green-500 border-green-700" : "bg-red-500 border-red-700"}`} title={aluno.presente ? "Presente" : "Ausente"}></button>
+                  <tr key={aluno.ID_aluno} className="bg-white odd:bg-white even:bg-blue-50 hover:bg-slate-100 transition-colors">
+                    <td className="px-4 py-3 sm:px-6 font-medium text-gray-900 whitespace-nowrap">{aluno.nome_aluno}</td>
+                    <td className="px-4 py-3 sm:px-6 hidden sm:table-cell">{aluno.RA_aluno}</td>
+                    <td className="px-4 py-3 sm:px-6">{aluno?.percentual_frequencia}%</td>
+                    <td className="px-4 py-3 sm:px-6 text-center">
+                      <button 
+                        onClick={() => togglePresence(aluno.ID_aluno)} 
+                        className={`w-7 h-7 sm:w-8 sm:h-8 cursor-pointer rounded-full border-2 transition-all duration-300 transform hover:scale-110 ${aluno.presente ? "bg-green-500 border-green-700" : "bg-red-500 border-red-700"}`} 
+                        title={aluno.presente ? "Marcar como Ausente" : "Marcar como Presente"}
+                        aria-label={`Marcar presença para ${aluno.nome_aluno}`}
+                      ></button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+
           <div className="flex justify-center my-6">
-            <GraficoPizza data={profssor} key={profssor?.aulas_dadas || 0} />
+            <GraficoPizza data={professorInfo} key={professorInfo?.aulas_dadas || 0} />
           </div>
-          <div className="mt-4 flex justify-end">
-            <button onClick={toggleConfirmModal} disabled={botaoDesativado} className={`px-6 py-3 rounded-full font-bold text-white shadow-lg transition-transform transform ${botaoDesativado ? "bg-gray-400 cursor-not-allowed" : "bg-sky-600 hover:bg-sky-700 hover:scale-105"}`}>
+
+
+          <div className="mt-4 flex justify-center sm:justify-end">
+            <button 
+              onClick={toggleConfirmModal} 
+              disabled={botaoDesativado} 
+              className={`w-full sm:w-auto px-8 py-3 rounded-full font-bold text-white shadow-lg transition-all transform ${botaoDesativado ? "bg-gray-400 cursor-not-allowed" : "bg-[#1d577b] hover:bg-sky-700 hover:scale-105 active:scale-100 cursor-pointer"}`}
+            >
               Confirmar Presença
             </button>
           </div>
         </div>
-      </div>
+      </main>
       <Footer />
     </>
   );

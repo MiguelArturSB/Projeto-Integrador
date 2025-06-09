@@ -1,40 +1,40 @@
-
 'use client'
 
 export default function ModalHistorico({ isOpen, onClose, presencas }) {
-    if (!isOpen) return null;
+    if (!isOpen) {
+        return null;
+    }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-[rgba(0,0,0,0.5)]">
-            <div className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-lg shadow dark:bg-gray-700 overflow-hidden">
+        <div
+            className="fixed inset-0 bg-[rgba(0,0,0,0.5)] backdrop-blur-sm z-50 flex justify-center items-center p-4"
+            onClick={onClose} 
+        >
+            <div
+                className="bg-white rounded-lg shadow-2xl w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl max-h-[90vh] flex flex-col mx-2"
+                onClick={(e) => e.stopPropagation()} 
+            >
+                <div className="flex justify-between items-center p-4 border-b">
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-[#054068]">
+                        Histórico de Faltas
+                    </h2>
+                </div>
 
-
-                <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                    <h3 className="text-xl font-medium text-gray-900 dark:text-white">
-                        Histórico Completo de Faltas
-                    </h3>
-                    <button 
-                        type="button" 
-                        className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                        onClick={onClose}
-                    >
-                        <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                        </svg>
-                        <span className="sr-only">Fechar modal</span>
-                    </button>
+                <div className="max-h-60 md:max-h-100 overflow-auto">
+                    {[1, 2, 3, 4, 5].map((item) => (
+                        <div key={item} className="flex flex-col items-center justify-center bg-blue-100 w-auto mx-3 my-2 sm:my-3 rounded-2xl">
+                            <h1 className="text-xl sm:text-2xl m-1 font-semibold text-[#1d577b]">24/07</h1>
+                            <hr className="border-t m-1 border-b-blue-950 w-full" />
+                            <h2 className="font-semibold text-sm sm:text-base text-[#1d577b]">Faltou na matéria:</h2>
+                            <p className="text-sm sm:text-base">LEV</p>
+                        </div>
+                    ))}
                 </div>
                 
-
-                <div className='flex items-center justify-center bg-blue-50  h-[300px] my-4'>
-                    <h1 >oi</h1>
-                </div>
-
-        
-                <div className="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-                    <button 
+                <div className="flex justify-end p-3 sm:p-4 border-t">
+                    <button
                         onClick={onClose}
-                        className="text-white bg-blue-950 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                        className="bg-[#1d577b] text-white font-bold py-1 px-4 sm:py-2 sm:px-6 rounded-lg hover:bg-[#15435f] transition-colors cursor-pointer text-sm sm:text-base"
                     >
                         Fechar
                     </button>
