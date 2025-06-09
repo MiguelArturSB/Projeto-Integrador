@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-// ⭐ ALTERADO: A função agora aceita a prop { onUpdate } vinda do componente Pai.
+// O componente continua recebendo a prop 'onUpdate'
 export default function Card({ onUpdate }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
@@ -29,12 +29,42 @@ export default function Card({ onUpdate }) {
         setIsModalOpen(!isModalOpen);
     };
 
+    // Função para formatar o RA com pontos
+    const formatRA = (value) => {
+        const numericValue = value.replace(/\D/g, '');
+        const truncatedValue = numericValue.slice(0, 9);
+        return truncatedValue.replace(/(\d{3})(?=\d)/g, '$1.');
+    };
+
+    // ⭐ NOVO: Função para formatar o nome, permitindo apenas letras, acentos e espaços
+    const formatName = (value) => {
+        // Remove qualquer caractere que não seja uma letra (a-z, A-Z), 
+        // um caractere acentuado (à-ü, À-Ü) ou um espaço em branco (\s).
+        return value.replace(/[^a-zA-Z\sà-üÀ-Ü]/g, '');
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+
+        // ⭐ ALTERADO: Adicionada uma nova condição para o campo 'name'
+        if (name === 'RA') {
+            const formattedRA = formatRA(value);
+            setFormData(prev => ({
+                ...prev,
+                [name]: formattedRA
+            }));
+        } else if (name === 'name') {
+            const formattedName = formatName(value);
+            setFormData(prev => ({
+                ...prev,
+                [name]: formattedName
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     };
 
     useEffect(() => {
@@ -55,9 +85,11 @@ export default function Card({ onUpdate }) {
             return;
         }
 
+        const raNumerico = formData.RA.replace(/\./g, '');
+
         const dadosFormatados = {
-            nome_aluno: formData.name,
-            RA_aluno: formData.RA,
+            nome_aluno: formData.name, // O nome já está limpo pela formatação
+            RA_aluno: raNumerico,
             senha_aluno: formData.senha,
             turma: formData.turma
         };
@@ -75,16 +107,12 @@ export default function Card({ onUpdate }) {
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("Erro ao cadastrar aluno:", errorData);
-                // Opcional: mostrar uma mensagem de erro para o usuário
                 return;
             }
 
             const data = await response.json();
             console.log("Aluno cadastrado com sucesso:", data);
 
-            //  PONTO CHAVE: Chame a função de atualização do Pai.
-            // Isso irá disparar a função 'buscarDadosCoordenador' no componente Pai,
-            // que por sua vez recarrega a lista de todos os alunos. super legal de mais
             if (onUpdate) {
                 onUpdate();
             }
@@ -162,6 +190,7 @@ export default function Card({ onUpdate }) {
                                         name="name"
                                         id="name"
                                         value={formData.name}
+                                        maxLength={40}
                                         onChange={handleChange}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                         placeholder="Digite o nome do aluno"
@@ -175,6 +204,7 @@ export default function Card({ onUpdate }) {
                                         name="senha"
                                         id="senha"
                                         value={formData.senha}
+                                        maxLength={40}
                                         onChange={handleChange}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                         placeholder="Digite a senha do aluno"
@@ -189,9 +219,9 @@ export default function Card({ onUpdate }) {
                                         id="RA"
                                         value={formData.RA}
                                         onChange={handleChange}
-                                        maxLength={9}
+                                        maxLength={11}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                        placeholder="Número do R.A"
+                                        placeholder="123.456.789"
                                         required
                                     />
                                 </div>
@@ -202,6 +232,7 @@ export default function Card({ onUpdate }) {
                                         name="turma"
                                         id="turma"
                                         value={formData.turma}
+                                        maxLength={5}
                                         onChange={handleChange}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                         placeholder='Insira a turma do aluno'

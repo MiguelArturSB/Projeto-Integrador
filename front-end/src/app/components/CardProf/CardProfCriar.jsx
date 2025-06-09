@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-// ⭐ ALTERADO: O componente agora aceita a prop 'onUpdate'
+// O componente continua recebendo a prop 'onUpdate'
 export default function CardProfCriar({ onUpdate }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
@@ -30,12 +30,48 @@ export default function CardProfCriar({ onUpdate }) {
         setIsModalOpen(!isModalOpen);
     };
 
+    const formatCPF = (value) => {
+        const numericValue = value.replace(/\D/g, '');
+        const truncatedValue = numericValue.slice(0, 11);
+      
+        if (truncatedValue.length > 9) {
+          return truncatedValue.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        } else if (truncatedValue.length > 6) {
+          return truncatedValue.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+        } else if (truncatedValue.length > 3) {
+          return truncatedValue.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+        }
+      
+        return truncatedValue;
+    };
+    
+    // ⭐ NOVO: Função para formatar o nome, permitindo apenas letras, acentos e espaços
+    const formatName = (value) => {
+        return value.replace(/[^a-zA-Z\sà-üÀ-Ü]/g, '');
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+
+        // ⭐ ALTERADO: Adicionada a lógica para formatar o nome
+        if (name === 'cpf') {
+            const formattedCPF = formatCPF(value);
+            setFormData(prev => ({
+                ...prev,
+                [name]: formattedCPF
+            }));
+        } else if (name === 'nome') {
+            const formattedName = formatName(value);
+            setFormData(prev => ({
+                ...prev,
+                [name]: formattedName
+            }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     };
 
     useEffect(() => {
@@ -56,11 +92,13 @@ export default function CardProfCriar({ onUpdate }) {
             return;
         }
 
+        const cpfNumerico = formData.cpf.replace(/\D/g, '');
+
         const professorFormatado = {
-            nome_professor: formData.nome,
+            nome_professor: formData.nome, // O nome já está formatado corretamente
             materia: formData.disciplina,
             turma_professor: formData.turma,
-            cpf_professor: formData.cpf,
+            cpf_professor: cpfNumerico, 
             senha_professor: formData.senha,
             qntd_aula: 96,
             aulas_dadas: 0
@@ -79,14 +117,12 @@ export default function CardProfCriar({ onUpdate }) {
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error("Erro ao cadastrar professor:", errorData);
-                // Pode adicionar um feedback de erro para o usuário aqui
                 return;
             }
 
             const data = await response.json();
             console.log("Professor cadastrado com sucesso:", data);
 
-            // ⭐ PONTO CHAVE: Chamar a função de atualização do Pai após o sucesso.
             if (onUpdate) {
                 onUpdate();
             }
@@ -165,6 +201,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         name="nome"
                                         id="nome"
                                         value={formData.nome}
+                                        maxLength={40}
                                         onChange={handleChange}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                         placeholder="Digite o nome do professor"
@@ -178,6 +215,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         name="senha"
                                         id="senha"
                                         value={formData.senha}
+                                        maxLength={40}
                                         onChange={handleChange}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                         placeholder="Digite a senha do professor"
@@ -193,9 +231,9 @@ export default function CardProfCriar({ onUpdate }) {
                                         id="cpf"
                                         value={formData.cpf}
                                         onChange={handleChange}
-                                        maxLength={11}
+                                        maxLength={14}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                        placeholder="Digite o CPF do professor"
+                                        placeholder="000.000.000-00"
                                         required
                                     />
                                 </div>
@@ -232,9 +270,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         required
                                     />
                                 </div>
-
                             </div>
-
                             <button
                                 type="submit"
                                 className="text-white inline-flex items-center bg-[#1f557b] cursor-pointer hover:bg-[#0e3754] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
