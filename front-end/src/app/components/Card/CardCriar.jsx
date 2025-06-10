@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from 'react';
 
-
 export default function Card({ onUpdate }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
-    const [erro, setErro] = useState(null);
+    const [raError, setRaError] = useState(''); // Estado específico para o erro do RA
     const [carregando, setCarregando] = useState(true);
     const [formData, setFormData] = useState({
         name: '',
@@ -27,15 +26,16 @@ export default function Card({ onUpdate }) {
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
+        // Limpa o erro e o formulário ao abrir/fechar o modal
+        setRaError('');
+        setFormData({ name: '', senha: '', RA: '', turma: '' });
     };
-
 
     const formatRA = (value) => {
         const numericValue = value.replace(/\D/g, '');
         const truncatedValue = numericValue.slice(0, 9);
         return truncatedValue.replace(/(\d{3})(?=\d)/g, '$1.');
     };
-
 
     const formatName = (value) => {
         return value.replace(/[^a-zA-Z\sà-üÀ-Ü]/g, '');
@@ -44,31 +44,23 @@ export default function Card({ onUpdate }) {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-
+        // Limpa o erro específico do RA assim que o usuário começar a corrigi-lo
         if (name === 'RA') {
+            if (raError) setRaError('');
             const formattedRA = formatRA(value);
-            setFormData(prev => ({
-                ...prev,
-                [name]: formattedRA
-            }));
+            setFormData(prev => ({ ...prev, [name]: formattedRA }));
         } else if (name === 'name') {
             const formattedName = formatName(value);
-            setFormData(prev => ({
-                ...prev,
-                [name]: formattedName
-            }));
+            setFormData(prev => ({ ...prev, [name]: formattedName }));
         } else {
-            setFormData(prev => ({
-                ...prev,
-                [name]: value
-            }));
+            setFormData(prev => ({ ...prev, [name]: value }));
         }
     };
 
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
         if (!storedToken) {
-            setErro("Sessão expirada ou inválida. Por favor, faça login novamente.");
+            console.error("Sessão expirada ou inválida. Por favor, faça login novamente.");
         }
         setCarregando(false);
         window.scrollTo(0, 0);
@@ -79,14 +71,14 @@ export default function Card({ onUpdate }) {
 
         const token = localStorage.getItem("token");
         if (!token) {
-            setErro("Token não encontrado. Faça login novamente.");
+            console.error("Token não encontrado. Faça login novamente.");
             return;
         }
 
         const raNumerico = formData.RA.replace(/\./g, '');
 
         const dadosFormatados = {
-            nome_aluno: formData.name, 
+            nome_aluno: formData.name,
             RA_aluno: raNumerico,
             senha_aluno: formData.senha,
             turma: formData.turma
@@ -103,35 +95,47 @@ export default function Card({ onUpdate }) {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                console.error("Erro ao cadastrar aluno:", errorData);
+                let errorData = {}; 
+                try {
+
+                    errorData = await response.json();
+                } catch (jsonError) {
+                    console.warn("Não foi possível analisar o JSON da resposta de erro.", jsonError);
+
+                }
+    
+                console.log("Erro recebido do backend:", errorData); 
+    
+                if (response.status === 409) {
+                    // Usa a mensagem do backend, se existir, ou uma mensagem padrão.
+                    setRaError(errorData.message || "Este R.A. já está em uso.");
+                } else {
+                    const errorMessage = errorData.message || 'Ocorreu um problema no servidor. Tente novamente.';
+                    alert(`Erro: ${errorMessage}`);
+                }
                 return;
             }
 
+            // Sucesso
             const data = await response.json();
             console.log("Aluno cadastrado com sucesso:", data);
-
-            if (onUpdate) {
-                onUpdate();
-            }
 
             setIsModalOpen(false);
             setIsConfirmationOpen(true);
 
-            setFormData({
-                name: '',
-                senha: '',
-                RA: '',
-                turma: ''
-            });
+            setFormData({ name: '', senha: '', RA: '', turma: '' });
+
         } catch (error) {
             console.error("Erro na requisição ao cadastrar aluno:", error);
+            alert("Não foi possível conectar ao servidor. Verifique sua conexão.");
         }
     };
 
-
     const closeConfirmation = () => {
         setIsConfirmationOpen(false);
+        if (onUpdate) {
+            onUpdate();
+        }
     };
 
     return (
@@ -218,10 +222,17 @@ export default function Card({ onUpdate }) {
                                         value={formData.RA}
                                         onChange={handleChange}
                                         maxLength={11}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        className={`bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-600 dark:placeholder-gray-400 dark:text-white
+                                        ${raError
+                                                ? 'border-red-500 focus:ring-red-500 focus:border-red-500 dark:border-red-500'
+                                                : 'border-gray-300 focus:ring-primary-600 focus:border-primary-600 dark:border-gray-500 dark:focus:ring-primary-500 dark:focus:border-primary-500'
+                                            }`}
                                         placeholder="123.456.789"
                                         required
                                     />
+                                    {raError && (
+                                        <p className="mt-2 text-sm text-red-600 dark:text-red-500">{raError}</p>
+                                    )}
                                 </div>
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Turma</label>
@@ -233,7 +244,8 @@ export default function Card({ onUpdate }) {
                                         maxLength={5}
                                         onChange={handleChange}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                        placeholder='Insira a turma do aluno'
+                                        placeholder='Insira a turma'
+                                        required
                                     />
                                 </div>
                             </div>

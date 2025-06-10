@@ -81,9 +81,11 @@ const professorDetalhadoController = async (req, res) => {
 }
 
 // Cria um novo aluno (inclui hash da senha)
+// back-end/controllersrotas/controllCoordenador.js
+
 const criarAlunoController = async (req, res) => {
     try {
-        const { nome_aluno, turma, RA_aluno, senha_aluno } = req.body
+        const { nome_aluno, turma, RA_aluno, senha_aluno } = req.body;
 
         // Gera hash da senha
         const senhaHash = await bcrypt.hash(senha_aluno, 10);
@@ -93,15 +95,25 @@ const criarAlunoController = async (req, res) => {
             turma,
             RA_aluno,
             senha_aluno: senhaHash
+        };
+
+        const ID_aluno = await criarAluno(dadosAluno);
+        res.status(201).json({ message: 'Aluno criado com sucesso!', ID_aluno }); // 'message' é mais padrão que 'mensagem'
+
+    } catch (err) {
+        // Log do erro completo no servidor para depuração
+        console.error('Erro detalhado ao criar aluno: ', err);
+
+
+        if (err.code === 'ER_DUP_ENTRY') {
+            
+            return res.status(409).json({ message: 'RA do aluno já cadastrado' });
         }
 
-        const ID_aluno = await criarAluno(dadosAluno)
-        res.status(201).json({ mensagem: 'Usuário criado com sucesso!!!', ID_aluno })
-    } catch (err) {
-        console.error('Erro ao criar aluno: ', err)
-        res.status(500).json({ mensagem: 'Erro ao criar aluno' })
+        // Para todos os outros tipos de erro, envia um erro 500 genérico
+        res.status(500).json({ message: 'Erro interno no servidor ao tentar criar o aluno.' });
     }
-}
+};
 
 // Cria um novo professor (inclui hash da senha)
 const criarProfessorController = async (req, res) => {
@@ -126,6 +138,10 @@ const criarProfessorController = async (req, res) => {
         res.status(201).json({ mensagem: 'Usuário criado com sucesso!!!', ID_professor });
     } catch (err) {
         console.error('Erro ao criar professor: ', err);
+        if (err.code === 'ER_DUP_ENTRY') {
+            
+            return res.status(409).json({ message: 'CPF do professor já cadastrado' });
+        }
         res.status(500).json({ mensagem: 'Erro ao criar professor' });
     }
 };

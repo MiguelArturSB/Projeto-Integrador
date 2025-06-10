@@ -5,7 +5,8 @@ import { useState, useEffect } from 'react';
 export default function CardProfCriar({ onUpdate }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
-    const [erro, setErro] = useState(null);
+    // ADICIONADO: Estado específico para o erro do CPF
+    const [cpfError, setCpfError] = useState('');
     const [carregando, setCarregando] = useState(true);
     const [formData, setFormData] = useState({
         nome: '',
@@ -27,6 +28,9 @@ export default function CardProfCriar({ onUpdate }) {
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
+        // ADICIONADO: Limpa o erro e o formulário ao abrir/fechar o modal
+        setCpfError('');
+        setFormData({ nome: '', senha: '', cpf: '', disciplina: '', turma: '' });
     };
 
     const formatCPF = (value) => {
@@ -53,40 +57,34 @@ export default function CardProfCriar({ onUpdate }) {
         const { name, value } = e.target;
 
         if (name === 'cpf') {
+            // ADICIONADO: Limpa o erro ao corrigir o campo
+            if (cpfError) setCpfError('');
             const formattedCPF = formatCPF(value);
-            setFormData(prev => ({
-                ...prev,
-                [name]: formattedCPF
-            }));
+            setFormData(prev => ({ ...prev, [name]: formattedCPF }));
         } else if (name === 'nome') {
             const formattedName = formatName(value);
-            setFormData(prev => ({
-                ...prev,
-                [name]: formattedName
-            }));
+            setFormData(prev => ({ ...prev, [name]: formattedName }));
         } else {
-            setFormData(prev => ({
-                ...prev,
-                [name]: value
-            }));
+            setFormData(prev => ({ ...prev, [name]: value }));
         }
     };
 
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
         if (!storedToken) {
-            setErro("Sessão expirada ou inválida. Por favor, faça login novamente.");
+            console.log("Token de sessão não encontrado ao carregar o componente.");
         }
         setCarregando(false);
         window.scrollTo(0, 0);
     }, []);
 
+    // ATUALIZADO: Lógica de envio e tratamento de erro
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const token = localStorage.getItem("token");
         if (!token) {
-            setErro("Token não encontrado. Faça login novamente.");
+            alert("Sessão expirada. Por favor, faça login novamente.");
             return;
         }
 
@@ -113,17 +111,27 @@ export default function CardProfCriar({ onUpdate }) {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                console.error("Erro ao cadastrar professor:", errorData);
+                let errorData = {};
+                try {
+                    errorData = await response.json();
+                } catch (jsonError) {
+                    console.warn("Corpo da resposta de erro não é um JSON válido.");
+                }
+    
+                console.log("Resposta de erro controlada (ex: 409):", { status: response.status, body: errorData });
+    
+                if (response.status === 409) {
+                    setCpfError(errorData.message || "Este CPF já está em uso.");
+                } else {
+                    const errorMessage = errorData.message || 'Ocorreu um problema no servidor.';
+                    alert(`Erro: ${errorMessage}`);
+                }
                 return;
             }
 
+            // Sucesso
             const data = await response.json();
             console.log("Professor cadastrado com sucesso:", data);
-
-            if (onUpdate) {
-                onUpdate();
-            }
 
             setIsModalOpen(false);
             setIsConfirmationOpen(true);
@@ -136,12 +144,16 @@ export default function CardProfCriar({ onUpdate }) {
                 turma: ''
             });
         } catch (error) {
-            console.error("Erro na requisição ao cadastrar professor:", error);
+            console.error("Erro de rede ao tentar cadastrar professor:", error);
+            alert("Não foi possível conectar ao servidor. Verifique sua conexão.");
         }
     };
 
     const closeConfirmation = () => {
         setIsConfirmationOpen(false);
+        if (onUpdate) {
+            onUpdate();
+        }
     };
 
     return (
@@ -192,6 +204,7 @@ export default function CardProfCriar({ onUpdate }) {
 
                         <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
+                                {/* Campos de Nome e Senha (sem alterações) */}
                                 <div className="col-span-2">
                                     <label htmlFor="nome" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nome</label>
                                     <input
@@ -221,6 +234,7 @@ export default function CardProfCriar({ onUpdate }) {
                                     />
                                 </div>
 
+                                {/* ATUALIZADO: Campo de CPF com validação */}
                                 <div className="col-span-2">
                                     <label htmlFor="cpf" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">CPF</label>
                                     <input
@@ -230,12 +244,20 @@ export default function CardProfCriar({ onUpdate }) {
                                         value={formData.cpf}
                                         onChange={handleChange}
                                         maxLength={14}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        className={`bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-600 dark:placeholder-gray-400 dark:text-white
+                                        ${cpfError
+                                                ? 'border-red-500 focus:ring-red-500 focus:border-red-500 dark:border-red-500'
+                                                : 'border-gray-300 focus:ring-primary-600 focus:border-primary-600 dark:border-gray-500 dark:focus:ring-primary-500 dark:focus:border-primary-500'
+                                            }`}
                                         placeholder="000.000.000-00"
                                         required
                                     />
+                                    {cpfError && (
+                                        <p className="mt-2 text-sm text-red-600 dark:text-red-500">{cpfError}</p>
+                                    )}
                                 </div>
-
+                                
+                                {/* Campos de Disciplina e Turma (sem alterações) */}
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="disciplina" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Disciplina</label>
                                     <select
@@ -245,7 +267,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                         required
                                     >
-                                        <option value="" disabled>Selecione a disciplina lecionada</option>
+                                        <option value="" disabled>Selecione</option>
                                         <option value="LER">LER</option>
                                         <option value="ARI">ARI</option>
                                         <option value="LOPAL">LOPAL</option>
@@ -253,7 +275,6 @@ export default function CardProfCriar({ onUpdate }) {
                                         <option value="SOP">SOP</option>
                                     </select>
                                 </div>
-
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Turma</label>
                                     <input
@@ -264,7 +285,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         onChange={handleChange}
                                         maxLength={5}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                        placeholder="Digite o nome da turma"
+                                        placeholder="Ex: 2MD"
                                         required
                                     />
                                 </div>

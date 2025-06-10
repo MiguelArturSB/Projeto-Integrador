@@ -168,8 +168,25 @@ export default function Coordenador() {
     const toggleTurma = (turmaNome) => setTurmaAberta(turmaAberta === turmaNome ? null : turmaNome);
     const toggleTurmaProfessores = (turmaNome) => setTurmaAbertaProfessores(turmaAbertaProfessores === turmaNome ? null : turmaNome);
 
-    const todosAlunos = useMemo(() => turmasAlunos.flatMap(turma => turma.alunos), [turmasAlunos]);
-    const todosProfessores = useMemo(() => turmasProfessores.flatMap(turma => turma.professores), [turmasProfessores]);
+    // LINHA NOVA
+const todosAlunos = useMemo(() =>
+    turmasAlunos.flatMap(turma =>
+        turma.alunos.map(aluno => ({
+            ...aluno, 
+            turma: turma.nome 
+        }))
+    ), [turmasAlunos]
+);
+    // LINHA NOVA
+const todosProfessores = useMemo(() => 
+    turmasProfessores.flatMap(turma => 
+        turma.professores.map(professor => ({
+            ...professor,         
+            turma: turma.nome     
+        }))
+    ), 
+    [turmasProfessores]
+);
 
     if (carregando) {
         return (
