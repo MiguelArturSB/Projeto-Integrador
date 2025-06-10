@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 
-// O componente continua recebendo a prop 'onUpdate'
 export default function CardProfCriar({ onUpdate }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
@@ -45,7 +44,7 @@ export default function CardProfCriar({ onUpdate }) {
         return truncatedValue;
     };
     
-    // ⭐ NOVO: Função para formatar o nome, permitindo apenas letras, acentos e espaços
+ 
     const formatName = (value) => {
         return value.replace(/[^a-zA-Z\sà-üÀ-Ü]/g, '');
     };
@@ -53,7 +52,6 @@ export default function CardProfCriar({ onUpdate }) {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // ⭐ ALTERADO: Adicionada a lógica para formatar o nome
         if (name === 'cpf') {
             const formattedCPF = formatCPF(value);
             setFormData(prev => ({
@@ -95,7 +93,7 @@ export default function CardProfCriar({ onUpdate }) {
         const cpfNumerico = formData.cpf.replace(/\D/g, '');
 
         const professorFormatado = {
-            nome_professor: formData.nome, // O nome já está formatado corretamente
+            nome_professor: formData.nome,
             materia: formData.disciplina,
             turma_professor: formData.turma,
             cpf_professor: cpfNumerico, 

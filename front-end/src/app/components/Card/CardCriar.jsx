@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-// O componente continua recebendo a prop 'onUpdate'
+
 export default function Card({ onUpdate }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
@@ -29,24 +29,22 @@ export default function Card({ onUpdate }) {
         setIsModalOpen(!isModalOpen);
     };
 
-    // Função para formatar o RA com pontos
+
     const formatRA = (value) => {
         const numericValue = value.replace(/\D/g, '');
         const truncatedValue = numericValue.slice(0, 9);
         return truncatedValue.replace(/(\d{3})(?=\d)/g, '$1.');
     };
 
-    // ⭐ NOVO: Função para formatar o nome, permitindo apenas letras, acentos e espaços
+
     const formatName = (value) => {
-        // Remove qualquer caractere que não seja uma letra (a-z, A-Z), 
-        // um caractere acentuado (à-ü, À-Ü) ou um espaço em branco (\s).
         return value.replace(/[^a-zA-Z\sà-üÀ-Ü]/g, '');
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // ⭐ ALTERADO: Adicionada uma nova condição para o campo 'name'
+
         if (name === 'RA') {
             const formattedRA = formatRA(value);
             setFormData(prev => ({
@@ -88,7 +86,7 @@ export default function Card({ onUpdate }) {
         const raNumerico = formData.RA.replace(/\./g, '');
 
         const dadosFormatados = {
-            nome_aluno: formData.name, // O nome já está limpo pela formatação
+            nome_aluno: formData.name, 
             RA_aluno: raNumerico,
             senha_aluno: formData.senha,
             turma: formData.turma

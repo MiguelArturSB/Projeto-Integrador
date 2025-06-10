@@ -57,7 +57,7 @@ export default function GraficoPizza({ dadosDaTurma, titulo }) {
   };
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-md p-4 md:p-6">
+    <div className="w-full bg-white rounded-lg  p-4 md:p-6">
       <h2 className="text-xl text-center font-bold text-sky-900 mb-4">{titulo}</h2>
       {totalAulas === 0 ? ( 
         <div className="h-[350px] flex items-center justify-center">

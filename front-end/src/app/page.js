@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import './page.css';
 import { useRouter } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
-// import link from '/homealuno/page.js'
 import { useSearchParams } from "next/navigation";
 
 
@@ -42,15 +41,15 @@ export default function Portal() {
     let newValue = value;
 
     if (name === 'cpf') {
-      // Remove tudo que não for número
+  
       const numericValue = value.replace(/\D/g, '');
 
-      // Aplica a máscara de CPF: 000.000.000-00
+   
       newValue = numericValue
         .replace(/^(\d{3})(\d)/, '$1.$2')
         .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
         .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4')
-        .slice(0, 14); // Limita ao tamanho máximo com máscara
+        .slice(0, 14); 
     }
 
 
@@ -60,7 +59,7 @@ export default function Portal() {
       newValue = numericValue
         .replace(/^(\d{3})(\d)/, '$1.$2')
         .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
-        .slice(0, 11); // Limita a 11 caracteres (sem hífen)
+        .slice(0, 11); 
     }
 
 
@@ -116,10 +115,10 @@ export default function Portal() {
         const data = await response.json();
 
         if (response.ok) {
-          // Salva o token no localStorage para depois pra poder logar
+    
           localStorage.setItem('token', data.token);
 
-          // Feedback ou redirecionamento pra saber que deu certo
+  
           animacao();
           const timeout = setTimeout(() => {
             router.push('/homealuno?redirect=true');
@@ -152,7 +151,7 @@ export default function Portal() {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            cpf_professor: formData.cpf.replace(/\D/g, ''), // remove tudo que não for número legal
+            cpf_professor: formData.cpf.replace(/\D/g, ''), 
             senha_professor: formData.senha
           })
         });
@@ -160,10 +159,10 @@ export default function Portal() {
         const data = await response.json();
 
         if (response.ok) {
-          // Salva o token no localStorage para depois pra poder logar
+      
           localStorage.setItem('token', data.token);
 
-          // Feedback ou redirecionamento pra saber que deu certo copiei 
+    
           animacao();
           const timeout = setTimeout(() => {
             router.push('/professor?redirect=true');
@@ -205,11 +204,10 @@ export default function Portal() {
         const data = await response.json();
 
         if (response.ok) {
-          // Salva o token no localStorage para depois pra poder logar
+     
           localStorage.setItem('token', data.token);
 
-          // Feedback ou redirecionamento pra saber que deu certo
-             // Feedback ou redirecionamento pra saber que deu certo 
+  
              animacao();
              const timeout = setTimeout(() => {
                router.push('/coordenador?redirect=true');
@@ -278,12 +276,13 @@ export default function Portal() {
 
 
 
-      <div className="overflow-y-hidden h-screen bg-[url('/background-sm.jpg')] md:bg-[url('/background.jpg')] bg-cover bg-center bg-no-repeat  flex flex-col">
+      <div className="overflow-y-hidden h-screen bg-[url('/backsm.jpg')] md:bg-[url('/background.jpg')] bg-cover bg-center bg-no-repeat  flex flex-col">
         <div className="pr-8 flex justify-end items-center">
 
           <div className="flex items-center gap-4 w-[100%] md:w-auto">
             <img
-              className="w-22 md:w-40 mx-38 sm:mx-10 md:mx-0 "
+            
+              className="hidden md:block w-22 md:w-40 mx-38 sm:mx-10 md:mx-0 "
               src="./logo2.png"
               alt="Logo"
             />
@@ -296,13 +295,13 @@ export default function Portal() {
 
       </div>
         <div className={`flex flex-col items-center justify-center text-[#1f557b] font-bold text-6xl  titulo transition-opacity duration-700 ${activeForm ? 'fade-out' : 'fade-in'}`}>
-          <h1 className='text-3xl md:text-[49px] lg:text-[50px]'>Olá, seja bem vindo!</h1>
+          <h1 className='mt-30 md:mt-0 text-[18px] md:text-[49px] lg:text-[50px]'>Olá, seja bem vindo!</h1>
           <h4 className='hidden md:block text-[18px]'>Controle acadêmico de presença de forma prática e segura.</h4>
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center pb-20 sm:pb-32">
+        <div className="flex-1 flex flex-col items-center justify-center pb-20 sm:pb-65">
           <div className={`transition-opacity duration-700 ${activeForm ? 'fade-out' : 'fade-in'}`}>
-            <h1 className='m-5 text-[#1f557b] font-bold text-[16px] md:text-[18px]'>Escolha abaixo um perfil para acessar.</h1>
+            <h1 className='text-[#1f557b] font-bold text-[16px] md:text-[18px] mb-3'>Escolha abaixo um perfil para acessar.</h1>
           </div>
 
           {!activeForm ? (

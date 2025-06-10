@@ -14,11 +14,16 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "CEPROTEC",
   description: "Escola Técnica",
+  icons: {
+    icon: "/logo1.ico",
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+  
+    <html lang="pt-BR">
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
