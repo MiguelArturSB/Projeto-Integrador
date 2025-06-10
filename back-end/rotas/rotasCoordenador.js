@@ -29,15 +29,15 @@ rota.post('/aluno', authMiddleware, criarAlunoController);
 rota.post('/professor', authMiddleware, criarProfessorController);
 
 // Detalhes (GET) por ID - sem autenticação (se for informação pública, ok)
-rota.get('/aluno/:id', alunoDetalhadoController);
-rota.get('/professor/:id', professorDetalhadoController);
+rota.get('/aluno', alunoDetalhadoController);
+rota.get('/professor', professorDetalhadoController);
 
 // Atualizar (PATCH) precisa de autenticação
-rota.patch('/aluno/:id', authMiddleware, atualizarAlunoController);
-rota.patch('/professor/:id', authMiddleware, atualizarProfessorController);
+rota.patch('/aluno', /*authMiddleware,*/ atualizarAlunoController);
+rota.patch('/professor', /*authMiddleware,*/ atualizarProfessorController);
 
 // Excluir (DELETE) precisa de autenticação
-rota.delete('/aluno/:id', authMiddleware, excluirAlunoController);
-rota.delete('/professor/:id', authMiddleware, excluirProfessorController);
+rota.delete('/aluno', authMiddleware,  excluirAlunoController);
+rota.delete('/professor', authMiddleware,  excluirProfessorController);
 
 export default rota;

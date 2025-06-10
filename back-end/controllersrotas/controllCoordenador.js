@@ -53,32 +53,39 @@ const listarProfessoresController = async (req, res) => {
 // Detalhar aluno por ID
 const alunoDetalhadoController = async (req, res) => {
     try {
-        const aluno = await alunoDetalhado(req.params.id);
-        if (aluno) {
-            res.status(200).json(aluno);
+        const {RA_aluno} = req.body
+
+        const dadosaluno = await alunoDetalhado(RA_aluno)
+
+        if (dadosaluno) {
+            res.status(200).json(dadosaluno);
         } else {
             res.status(404).json({ mensagem: 'Não foi possível encontrar o aluno' });
         }
     } catch (err) {
-        console.error('Erro ao obter aluno por ID: ', err)
-        res.status(500).json({ mensagem: 'Erro ao obter aluno por ID' })
+        console.error('Erro ao obter aluno por CPF: ', err)
+        res.status(500).json({ mensagem: 'Erro ao obter aluno por CPF' })
     }
 }
 
-// Detalhar professor por ID
 const professorDetalhadoController = async (req, res) => {
     try {
-        const professor = await professorDetalhado(req.params.id);
-        if (professor) {
-            res.status(200).json(professor);
+        const { cpf_professor } = req.body;
+
+        const dadosProfessor = await professorDetalhado(cpf_professor); // ✅ CPF puro, sem objeto
+
+        if (dadosProfessor) {
+            res.status(200).json(dadosProfessor);
         } else {
             res.status(404).json({ mensagem: 'Não foi possível encontrar o professor' });
         }
     } catch (err) {
-        console.error('Erro ao obter professor por ID: ', err)
-        res.status(500).json({ mensagem: 'Erro ao obter professor por ID' })
+        console.error('Erro ao obter professor por cpf: ', err);
+        res.status(500).json({ mensagem: 'Erro ao obter professor por cpf' });
     }
-}
+};
+
+
 
 // Cria um novo aluno (inclui hash da senha)
 const criarAlunoController = async (req, res) => {
@@ -133,7 +140,6 @@ const criarProfessorController = async (req, res) => {
 // Atualiza dados de um aluno (inclui hash da nova senha)
 const atualizarAlunoController = async (req, res) => {
     try {
-        const ID_aluno = req.params.id
         const { nome_aluno, turma, RA_aluno, senha_aluno } = req.body
 
         const senhaHash = await bcrypt.hash(senha_aluno, 10);
@@ -141,11 +147,10 @@ const atualizarAlunoController = async (req, res) => {
         const dadosAluno = {
             nome_aluno,
             turma,
-            RA_aluno,
             senha_aluno: senhaHash
         }
 
-        await atualizarAluno(ID_aluno, dadosAluno)
+        await atualizarAluno(RA_aluno, dadosAluno)
         res.status(200).json({ mensagem: 'Usuário atualizado com sucesso!!!' })
     } catch (err) {
         console.error('Erro ao atualizar aluno: ', err)
@@ -156,8 +161,7 @@ const atualizarAlunoController = async (req, res) => {
 // Atualiza dados de um professor (inclui hash da nova senha)
 const atualizarProfessorController = async (req, res) => {
     try {
-        const ID_professor = req.params.id
-        const { nome_professor, materia, qntd_aula, aulas_dadas, turma_professor, cpf_professor, senha_professor } = req.body
+        const { nome_professor, materia, qntd_aula, aulas_dadas, turma_professor, cpf_professor, senha_professor } = req.body;
 
         const senhaHash = await bcrypt.hash(senha_professor, 10);
 
@@ -167,23 +171,24 @@ const atualizarProfessorController = async (req, res) => {
             qntd_aula,
             aulas_dadas,
             turma_professor,
-            cpf_professor,
             senha_professor: senhaHash
-        }
+        };
 
-        await atualizarProfessor(ID_professor, dadosProfessor)
-        res.status(200).json({ mensagem: 'Usuário atualizado com sucesso!!!' })
+        await atualizarProfessor(cpf_professor, dadosProfessor);
+
+        res.status(200).json({ mensagem: 'Usuário atualizado com sucesso!!!' });
     } catch (err) {
-        console.error('Erro ao atualizar professor: ', err)
-        req.status(500).json({ mensagem: 'Erro ao atualizar professor' })
+        console.error('Erro ao atualizar professor: ', err);
+        res.status(500).json({ mensagem: 'Erro ao atualizar professor' });
     }
-}
+};
+
 
 // Exclui um aluno pelo ID
 const excluirAlunoController = async (req, res) => {
     try {
-        const ID_aluno = req.params.id
-        await excluirAluno(ID_aluno)
+        const {RA_aluno} = req.body
+        await excluirAluno(RA_aluno)
         res.status(200).json({ mensagem: 'Usuário excluido com sucesso' })
     } catch (err) {
         console.error('Erro ao excluir aluno: ', err)
@@ -194,8 +199,8 @@ const excluirAlunoController = async (req, res) => {
 // Exclui um professor pelo ID
 const excluirProfessorController = async (req, res) => {
     try {
-        const ID_professor = req.params.id
-        await excluirProfessor(ID_professor)
+        const {cpf_professor} = req.body
+        await excluirProfessor(cpf_professor)
         res.status(200).json({ mensagem: 'Usuário excluido com sucesso' })
     } catch (err) {
         console.error('Erro ao excluir professor: ', err)

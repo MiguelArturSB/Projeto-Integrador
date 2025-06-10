@@ -10,7 +10,7 @@ export default function CardProfUpdate() {
     const [cpf, setCpf] = useState('');
     const [disciplina, setDisciplina] = useState('');
     const [turma, setTurma] = useState('');
-    
+
     const cardData = [
         {
             icon: '%',
@@ -31,17 +31,38 @@ export default function CardProfUpdate() {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsModalOpen(false);
-        setIsConfirmationOpen(true);
-        
-        console.log('Dados atualizados do professor:', { 
-            nome, 
-            cpf, 
-            disciplina,
-            turma 
-        });
+
+        try {
+            await fetch('http://localhost:3001/coordenador/professor', {
+                method: 'PATCH',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    nome_professor: nome,
+                    cpf_professor: cpf,
+                    materia: disciplina,
+                    turma_professor: turma,
+                    senha_professor: senha
+                })
+            });
+
+            setIsModalOpen(false);
+            setIsConfirmationOpen(true);
+
+            console.log('Dados atualizados do professor:', {
+                nome,
+                cpf,
+                disciplina,
+                turma
+            });
+
+        } catch (err) {
+            console.error('Erro ao atualizar professor:', err);
+        }
     };
 
     const closeConfirmation = () => {
@@ -50,18 +71,42 @@ export default function CardProfUpdate() {
 
     const carregarDadosProfessor = (professor) => {
         if (professor) {
-            setNome(professor.nome);
-            setCpf(professor.cpf);
-            setDisciplina(professor.disciplina);
-            setTurma(professor.turma);
+            setNome(professor.nome_professor || '');
+            setDisciplina(professor.materia || '');
+            setTurma(professor.turma_professor || '');
         }
     };
+
+    useEffect(() => {
+        const buscarProfessor = async () => {
+            try {
+                const res = await fetch('http://localhost:3001/coordenador/professor', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cpf_professor: cpf })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.length > 0) {
+                    carregarDadosProfessor(data[0]);
+                } else {
+                    console.warn('Professor não encontrado');
+                }
+            } catch (err) {
+                console.error('Erro ao buscar professor:', err);
+            }
+
+        };
+
+        buscarProfessor();
+    }, [cpf]);
 
     return (
         <>
             <div className="card-container">
                 {cardData.map((card, index) => (
-                    <div 
+                    <div
                         key={index}
                         className="card bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow duration-300 border border-gray-200 hover:border-blue-500"
                         onClick={toggleModal}
@@ -79,10 +124,10 @@ export default function CardProfUpdate() {
                 ))}
             </div>
 
-            <div 
-                id="edit-prof-modal" 
-                tabIndex="-1" 
-                aria-hidden={!isModalOpen} 
+            <div
+                id="edit-prof-modal"
+                tabIndex="-1"
+                aria-hidden={!isModalOpen}
                 className={`${isModalOpen ? 'flex' : 'hidden'} fixed inset-0 z-50 items-center justify-center w-full h-full bg-[rgba(0,0,0,0.5)] backdrop-blur-sm bg-opacity-50 overflow-y-auto overflow-x-hidden`}
             >
                 <div className="relative w-full max-w-md p-4 max-h-full">
@@ -91,74 +136,75 @@ export default function CardProfUpdate() {
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                 Editar Professor
                             </h3>
-                            <button 
-                                type="button" 
-                                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer" 
+                            <button
+                                type="button"
+                                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer"
                                 onClick={toggleModal}
                             >
                                 <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
                                 </svg>
                                 <span className="sr-only">Fechar modal</span>
                             </button>
                         </div>
-                       
+
                         <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
                                 <div className="col-span-2">
                                     <label htmlFor="cpf" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">CPF</label>
                                     <div className='flex justify-center gap-3'>
-                                    <input 
-                                        type="text" 
-                                        name="cpf" 
-                                        id="cpf" 
-                                        value={cpf}
-                                        onChange={(e) => setCpf(e.target.value)}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="000.000.000-00" 
-                                        required 
-                                    />
-                                    <button 
-                                        type="button"
-                                        className='bg-blue-950 rounded-lg text-white hover:text-gray-500 transition-all p-2 cursor-pointer'
-                                    >
-                                        Buscar
-                                    </button>
+                                        <input
+                                            type="text"
+                                            name="cpf"
+                                            id="cpf"
+                                            value={cpf}
+                                            maxLength={11}
+                                            onChange={(e) => setCpf(e.target.value)}
+                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                            placeholder="000.000.000-00"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            className='bg-blue-950 rounded-lg text-white hover:text-gray-500 transition-all p-2 cursor-pointer'
+                                        >
+                                            Buscar
+                                        </button>
                                     </div>
                                 </div>
                                 <div className="col-span-2">
                                     <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nome</label>
-                                    <input 
-                                        type="text" 
-                                        name="name" 
-                                        id="name" 
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        id="name"
                                         value={nome}
                                         onChange={(e) => setNome(e.target.value)}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="Digite o nome do professor" 
-                                        required 
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        placeholder="Digite o nome do professor"
+                                        required
                                     />
                                 </div>
 
                                 <div className="col-span-2">
                                     <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Senha</label>
-                                    <input 
-                                        type="text" 
-                                        name="senha" 
-                                        id="senha" 
+                                    <input
+                                        type="text"
+                                        name="senha"
+                                        id="senha"
                                         value={senha}
                                         onChange={(e) => setSenha(e.target.value)}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                                        placeholder="********" 
-                                        required 
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        placeholder="********"
+                                        required
                                     />
                                 </div>
 
 
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="disciplina" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Disciplina</label>
-                                    <select 
-                                        id="disciplina" 
+                                    <select
+                                        id="disciplina"
                                         value={disciplina}
                                         onChange={(e) => setDisciplina(e.target.value)}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -174,8 +220,8 @@ export default function CardProfUpdate() {
                                 </div>
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Turma</label>
-                                    <select 
-                                        id="turma" 
+                                    <select
+                                        id="turma"
                                         value={turma}
                                         onChange={(e) => setTurma(e.target.value)}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -193,8 +239,8 @@ export default function CardProfUpdate() {
                                     Edite as informações do professor conforme necessário.
                                 </p>
                             </div>
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 className="text-white inline-flex items-center bg-[#1f557b] cursor-pointer hover:bg-[#0e3754]  focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                             >
                                 <svg className="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -207,7 +253,7 @@ export default function CardProfUpdate() {
                 </div>
             </div>
 
-      
+
             {isConfirmationOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">
                     <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 p-6 max-w-sm w-full">
