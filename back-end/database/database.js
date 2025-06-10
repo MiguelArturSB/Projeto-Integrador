@@ -235,8 +235,40 @@ const atualizarAulasDadasProfessor = async (materia, idAluno) => {
     connection.release();
   }
 };
+async function listarAlunos(where = null, values = []) {
+    const connection = await getConnection();
+    try {
+        let sql = `SELECT * FROM Alunos`;
+        if (where) sql += ` WHERE ${where}`;
+        const [rows] = await connection.execute(sql, values);
+        return rows;
+    } finally {
+        connection.release();
+    }
+}
+
+async function listarProfessores(where = null, values = []) {
+    // Pega uma conexão do pool
+    const connection = await getConnection(); 
+    try {
+        // A base da query agora é na tabela 'Professores'
+        let sql = `SELECT * FROM Professores`; 
+
+        // Se uma condição 'where' for fornecida, ela é adicionada à query
+        if (where) {
+            sql += ` WHERE ${where}`;
+        }
+
+        // Executa a query de forma segura e retorna as linhas encontradas
+        const [rows] = await connection.execute(sql, values);
+        return rows;
+
+    } finally {
+        // Libera a conexão de volta para o pool, aconteça o que acontecer
+        connection.release(); 
+    }
+}
 
 
 
-
-export { readAll, read, create, update, deleteRecord, compare, viewPresenca, faltaAluno, atualizarAulasDadasProfessor, viewAluno, viewProfessor, creatHistorico, viewHistoricaAluno,readAllView };
+export { listarProfessores,listarAlunos,readAll, read, create, update, deleteRecord, compare, viewPresenca, faltaAluno, atualizarAulasDadasProfessor, viewAluno, viewProfessor, creatHistorico, viewHistoricaAluno,readAllView };

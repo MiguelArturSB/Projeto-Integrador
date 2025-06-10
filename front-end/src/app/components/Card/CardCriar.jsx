@@ -202,7 +202,7 @@ export default function Card({ onUpdate }) {
                                 <div className="col-span-2">
                                     <label htmlFor="senha" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Senha</label>
                                     <input
-                                        type="text"
+                                        type="password"
                                         name="senha"
                                         id="senha"
                                         value={formData.senha}
@@ -243,8 +243,8 @@ export default function Card({ onUpdate }) {
                                         value={formData.turma}
                                         maxLength={5}
                                         onChange={handleChange}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                                        placeholder='Insira a turma'
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                        placeholder="Ex: 2MD"
                                         required
                                     />
                                 </div>

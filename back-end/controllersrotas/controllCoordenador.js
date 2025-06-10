@@ -1,9 +1,9 @@
 // Importa funções de manipulação de dados e dependências necessárias
-import { readAllView } from '../database/database.js'
+import { readAllView, listarAlunos,listarProfessores } from '../database/database.js'
 
-import { 
-    listarAlunos, listarProfessores, alunoDetalhado, professorDetalhado, 
-    criarAluno, criarProfessor, atualizarAluno, atualizarProfessor, 
+import {
+     alunoDetalhado, professorDetalhado,
+    criarAluno, criarProfessor, atualizarAluno, atualizarProfessor,
     excluirAluno, excluirProfessor
 } from '../configs/configCoordenador.js'
 
@@ -18,13 +18,24 @@ const __dirname = path.dirname(__filename)
 // Controller para listar todos os alunos
 const listarAlunosController = async (req, res) => {
     try {
-        const alunos = await listarAlunos()
-        res.status(200).send(alunos)
+        const filtros = req.body;
+        let where = null;
+        let values = [];
+
+        if (filtros.RA_aluno) {
+            where = `RA_aluno = ?`;
+            values.push(filtros.RA_aluno);
+        }
+
+        const alunos = await listarAlunos(where, values);
+        res.status(200).send(alunos);
     } catch (err) {
-        console.error('Erro ao listar alunos:', err)
-        res.status(500).json({ mensagem: 'Erro ao listar alunos' })
+        console.error('Erro ao listar alunos:', err);
+        res.status(500).json({ mensagem: 'Erro ao listar alunos' });
     }
-}
+};
+
+
 
 // Controller para listar tudo para os graficos
 const listarTudoController = async (req, res) => {
@@ -39,21 +50,38 @@ const listarTudoController = async (req, res) => {
 
 
 
-// Controller para listar todos os professores
+
+// no seu arquivo de controller do backend
+
 const listarProfessoresController = async (req, res) => {
     try {
-        const professores = await listarProfessores()
-        res.status(200).send(professores)
+        const filtros = req.body;
+        let where = null;
+        let values = [];
+
+        // CORREÇÃO 1: Usar o nome correto do campo ('cpf_professor')
+        if (filtros && filtros.cpf_professor) {
+            where = `cpf_professor = ?`;
+            values.push(filtros.cpf_professor);
+        }
+
+        // CORREÇÃO 2: Passar os filtros (where e values) para a função do banco
+        const professores = await listarProfessores(where, values);
+        
+        // Agora, 'professores' será uma lista com apenas o professor daquele CPF, ou uma lista vazia.
+        res.status(200).send(professores);
+
     } catch (err) {
-        console.error('Erro ao listar professores:', err)
-        res.status(500).json({ mensagem: 'Erro ao listar professores' })
+        console.error('Erro ao listar professores:', err);
+        res.status(500).json({ mensagem: 'Erro ao listar professores' });
     }
-}
+};
+
 
 // Detalhar aluno por ID
 const alunoDetalhadoController = async (req, res) => {
     try {
-        const {RA_aluno} = req.body
+        const { RA_aluno } = req.body
 
         const dadosaluno = await alunoDetalhado(RA_aluno)
 
@@ -113,7 +141,7 @@ const criarAlunoController = async (req, res) => {
 
 
         if (err.code === 'ER_DUP_ENTRY') {
-            
+
             return res.status(409).json({ message: 'RA do aluno já cadastrado' });
         }
 
@@ -146,56 +174,107 @@ const criarProfessorController = async (req, res) => {
     } catch (err) {
         console.error('Erro ao criar professor: ', err);
         if (err.code === 'ER_DUP_ENTRY') {
-            
+
             return res.status(409).json({ message: 'CPF do professor já cadastrado' });
         }
         res.status(500).json({ mensagem: 'Erro ao criar professor' });
     }
 };
 
-// Atualiza dados de um aluno (inclui hash da nova senha)
+// Atualiza dados de um aluno 
 const atualizarAlunoController = async (req, res) => {
     try {
-        const { nome_aluno, turma, RA_aluno, senha_aluno } = req.body
 
-        const senhaHash = await bcrypt.hash(senha_aluno, 10);
+        const { nome_aluno, turma, RA_aluno, senha_aluno } = req.body;
+
+
+        if (!RA_aluno) {
+            return res.status(400).json({ mensagem: 'O RA do aluno é obrigatório para a atualização.' });
+        }
 
         const dadosAluno = {
             nome_aluno,
             turma,
-            senha_aluno: senhaHash
-        }
-
-        await atualizarAluno(RA_aluno, dadosAluno)
-        res.status(200).json({ mensagem: 'Usuário atualizado com sucesso!!!' })
-    } catch (err) {
-        console.error('Erro ao atualizar aluno: ', err)
-        req.status(500).json({ mensagem: 'Erro ao atualizar aluno' })
-    }
-}
-
-// Atualiza dados de um professor (inclui hash da nova senha)
-const atualizarProfessorController = async (req, res) => {
-    try {
-        const { nome_professor, materia, qntd_aula, aulas_dadas, turma_professor, cpf_professor, senha_professor } = req.body;
-
-        const senhaHash = await bcrypt.hash(senha_professor, 10);
-
-        const dadosProfessor = {
-            nome_professor,
-            materia,
-            qntd_aula,
-            aulas_dadas,
-            turma_professor,
-            senha_professor: senhaHash
+            RA_aluno, 
         };
 
-        await atualizarProfessor(cpf_professor, dadosProfessor);
+        if (senha_aluno && senha_aluno.trim() !== '') {
+            const senhaHash = await bcrypt.hash(senha_aluno, 10);
+            dadosAluno.senha_aluno = senhaHash;
+        }
 
-        res.status(200).json({ mensagem: 'Usuário atualizado com sucesso!!!' });
+
+        const numAtualizados = await atualizarAluno(RA_aluno, dadosAluno);
+
+        if (numAtualizados === 0) {
+            return res.status(404).json({ mensagem: 'Aluno não encontrado para atualização.' });
+        }
+
+        res.status(200).json({ mensagem: 'Aluno atualizado com sucesso!' });
+
+    } catch (err) {
+        console.error('Erro ao atualizar aluno: ', err);
+        // Corrigido: `res.status` em vez de `req.status`
+        res.status(500).json({ mensagem: 'Erro interno ao atualizar aluno' });
+    }
+};
+
+
+
+
+// no seu arquivo de controller do backend (ex: controllCoordenador.js)
+
+const atualizarProfessorController = async (req, res) => {
+    try {
+
+        const { 
+            nome_professor, 
+            materia, 
+            qntd_aula, 
+            aulas_dadas, 
+            turma_professor, 
+            cpf_professor, 
+            senha_professor 
+        } = req.body;
+
+        
+        if (!cpf_professor) {
+            return res.status(400).json({ mensagem: 'O CPF do professor é obrigatório para a atualização.' });
+        }
+
+        
+        const dadosProfessor = {}; // Começa com um objeto vazio
+
+        //grande pra caranba da ate enjou
+        if (nome_professor !== undefined) dadosProfessor.nome_professor = nome_professor;
+        if (materia !== undefined) dadosProfessor.materia = materia;
+        if (qntd_aula !== undefined) dadosProfessor.qntd_aula = qntd_aula;
+        if (aulas_dadas !== undefined) dadosProfessor.aulas_dadas = aulas_dadas;
+        if (turma_professor !== undefined) dadosProfessor.turma_professor = turma_professor;
+
+        
+        if (senha_professor && senha_professor.trim() !== '') {
+            const senhaHash = await bcrypt.hash(senha_professor, 10);
+            dadosProfessor.senha_professor = senhaHash;
+        }
+
+ 
+        if (Object.keys(dadosProfessor).length === 0) {
+            return res.status(400).json({ mensagem: 'Nenhum dado válido foi enviado para atualização.' });
+        }
+
+        
+        const numAtualizados = await atualizarProfessor(cpf_professor, dadosProfessor);
+
+        if (numAtualizados === 0) {
+            return res.status(404).json({ mensagem: 'Professor não encontrado para atualização.' });
+        }
+
+        res.status(200).json({ mensagem: 'Professor atualizado com sucesso!' });
+
     } catch (err) {
         console.error('Erro ao atualizar professor: ', err);
-        res.status(500).json({ mensagem: 'Erro ao atualizar professor' });
+        res.status(500).json({ mensagem: 'Erro interno ao atualizar professor' });
     }
 };
 
@@ -203,7 +282,7 @@ const atualizarProfessorController = async (req, res) => {
 // Exclui um aluno pelo ID
 const excluirAlunoController = async (req, res) => {
     try {
-        const {RA_aluno} = req.body
+        const { RA_aluno } = req.body
         await excluirAluno(RA_aluno)
         res.status(200).json({ mensagem: 'Usuário excluido com sucesso' })
     } catch (err) {
@@ -215,7 +294,7 @@ const excluirAlunoController = async (req, res) => {
 // Exclui um professor pelo ID
 const excluirProfessorController = async (req, res) => {
     try {
-        const {cpf_professor} = req.body
+        const { cpf_professor } = req.body
         await excluirProfessor(cpf_professor)
         res.status(200).json({ mensagem: 'Usuário excluido com sucesso' })
     } catch (err) {
@@ -225,7 +304,7 @@ const excluirProfessorController = async (req, res) => {
 }
 
 // Exporta todos os controllers
-export { 
+export {
     listarProfessoresController,
     listarAlunosController,
     alunoDetalhadoController,
@@ -235,6 +314,6 @@ export {
     atualizarAlunoController,
     atualizarProfessorController,
     excluirAlunoController,
-    excluirProfessorController ,
+    excluirProfessorController,
     listarTudoController
 }

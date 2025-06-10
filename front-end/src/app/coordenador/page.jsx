@@ -36,7 +36,7 @@ export default function Coordenador() {
     const [erro, setErro] = useState(null);
     const [carregando, setCarregando] = useState(true);
 
-    // ⭐ ALTERADO: A função agora é autossuficiente, buscando o token internamente.
+    //  ALTERADO: A função agora é autossuficiente, buscando o token internamente.
     // Isso permite que ela seja passada como uma função simples para os componentes filhos.
     const buscarDadosCoordenador = async () => {
         console.log("Iniciando a busca de dados atualizados...");

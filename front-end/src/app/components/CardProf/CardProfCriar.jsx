@@ -222,7 +222,7 @@ export default function CardProfCriar({ onUpdate }) {
                                 <div className="col-span-2">
                                     <label htmlFor="senha" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Senha</label>
                                     <input
-                                        type="text"
+                                        type="password"
                                         name="senha"
                                         id="senha"
                                         value={formData.senha}
