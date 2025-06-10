@@ -243,7 +243,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         id="cpf"
                                         value={formData.cpf}
                                         onChange={handleChange}
-                                        maxLength={14}
+                                        maxLength={11}
                                         className={`bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-600 dark:placeholder-gray-400 dark:text-white
                                         ${cpfError
                                                 ? 'border-red-500 focus:ring-red-500 focus:border-red-500 dark:border-red-500'

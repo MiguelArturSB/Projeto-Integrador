@@ -9,6 +9,8 @@ export default function Card() {
     const [ra, setRa] = useState('');
     const [nome, setNome] = useState('');
     
+    const backendUrl = `http://${typeof window !== "undefined" ? window.location.hostname : "localhost"}:3001`;
+
     const cardData = [
         {
             icon: '-',

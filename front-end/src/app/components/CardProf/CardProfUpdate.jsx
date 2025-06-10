@@ -10,7 +10,7 @@ export default function CardProfUpdate() {
     const [cpf, setCpf] = useState('');
     const [disciplina, setDisciplina] = useState('');
     const [turma, setTurma] = useState('');
-    
+
     const cardData = [
         {
             icon: '%',
@@ -32,18 +32,38 @@ export default function CardProfUpdate() {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsModalOpen(false);
-        setIsConfirmationOpen(true);
-        
-        console.log('Dados atualizados do professor:', { 
-            nome, 
-            cpf, 
-            disciplina,
-            turma,
-            senha 
-        });
+
+        try {
+            await fetch('http://localhost:3001/coordenador/professor', {
+                method: 'PATCH',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    nome_professor: nome,
+                    cpf_professor: cpf,
+                    materia: disciplina,
+                    turma_professor: turma,
+                    senha_professor: senha
+                })
+            });
+
+            setIsModalOpen(false);
+            setIsConfirmationOpen(true);
+
+            console.log('Dados atualizados do professor:', {
+                nome,
+                cpf,
+                disciplina,
+                turma
+            });
+
+        } catch (err) {
+            console.error('Erro ao atualizar professor:', err);
+        }
     };
 
     const closeConfirmation = () => {
@@ -53,19 +73,42 @@ export default function CardProfUpdate() {
  
     const carregarDadosProfessor = (professor) => {
         if (professor) {
-            setNome(professor.nome);
-            setCpf(professor.cpf);
-            setDisciplina(professor.disciplina);
-            setTurma(professor.turma);
-            setSenha(professor.senha); 
+            setNome(professor.nome_professor || '');
+            setDisciplina(professor.materia || '');
+            setTurma(professor.turma_professor || '');
         }
     };
+
+    useEffect(() => {
+        const buscarProfessor = async () => {
+            try {
+                const res = await fetch('http://localhost:3001/coordenador/professor', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cpf_professor: cpf })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.length > 0) {
+                    carregarDadosProfessor(data[0]);
+                } else {
+                    console.warn('Professor não encontrado');
+                }
+            } catch (err) {
+                console.error('Erro ao buscar professor:', err);
+            }
+
+        };
+
+        buscarProfessor();
+    }, [cpf]);
 
     return (
         <>
             <div className="card-container">
                 {cardData.map((card, index) => (
-                    <div 
+                    <div
                         key={index}
                         className="card bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow duration-300 border border-gray-200 hover:border-blue-500"
                         onClick={toggleModal}
@@ -82,6 +125,12 @@ export default function CardProfUpdate() {
                     </div>
                 ))}
             </div>
+
+            <div
+                id="edit-prof-modal"
+                tabIndex="-1"
+                aria-hidden={!isModalOpen}
+                className={`${isModalOpen ? 'flex' : 'hidden'} fixed inset-0 z-50 items-center justify-center w-full h-full bg-[rgba(0,0,0,0.5)] backdrop-blur-sm bg-opacity-50 overflow-y-auto overflow-x-hidden`}
 
    
             <div 
