@@ -14,7 +14,7 @@ app.use(express.json());
 app.use('/aluno', viewA);
 app.use('/login', login);
 app.use('/coordenador', rotaCoordenador);
-app.use('/presenca', viewP);
+app.use('/professor', viewP);
 
 // Rota raiz
 app.get('/', (req, res) => {
