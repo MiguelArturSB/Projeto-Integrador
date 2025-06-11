@@ -72,12 +72,13 @@ async function read(table, where, params = []) {
   }
 }
 
+
 async function deleteRecord(table, where, params = []) {
   const connection = await getConnection();
   try {
       const sql = `DELETE FROM ${table} WHERE ${where}`;
       const [result] = await connection.execute(sql, params);
-      return result.affectedRows;
+      return result; 
   } finally {
       connection.release();
   }

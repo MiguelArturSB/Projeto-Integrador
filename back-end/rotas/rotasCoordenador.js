@@ -37,7 +37,7 @@ rota.patch('/aluno', authMiddleware, atualizarAlunoController);
 rota.patch('/professor', authMiddleware, atualizarProfessorController);
 // authMiddleware,
 // Excluir (DELETE) precisa de autenticação
-rota.delete('/aluno', excluirAlunoController);
+rota.delete('/aluno', authMiddleware,excluirAlunoController);
 rota.delete('/professor', authMiddleware, excluirProfessorController);
 
 export default rota;

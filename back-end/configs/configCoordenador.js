@@ -71,14 +71,25 @@ const atualizarProfessor = async (cpf, dadosProfessor) => {
 
 
 // Exclui um aluno específico
-const excluirAluno = async (RA) => {
+const excluirAluno = async (ra) => {
     try {
-        return await deleteRecord('Alunos', `RA_aluno = ${RA}`);
+        // --- CORREÇÃO PRINCIPAL ---
+        // Usa queries parametrizadas para segurança e correção.
+        // O '?' é um placeholder que será substituído pelo valor no array [ra].
+        const whereClause = 'RA_aluno = ?';
+        const values = [ra];
+
+        // Supondo que você tenha uma função genérica deleteRecord(tabela, condição, valores)
+        const result = await deleteRecord('Alunos', whereClause, values);
+        
+        // Retorna o número de linhas afetadas
+        return result.affectedRows; 
+
     } catch (err) {
-        console.error('Erro ao excluir usuário: ', err);
-        throw err;
+        console.error('Erro na camada de dados ao excluir usuário:', err);
+        throw err; // Lança o erro para o controller capturar
     }
-}
+};
 
 // Exclui um professor específico
 const excluirProfessor = async (cpf) => {

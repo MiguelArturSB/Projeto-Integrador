@@ -2,24 +2,18 @@
 
 import { useState } from 'react';
 
-// --- PASSO 1: Criar uma função helper para formatar o CPF ---
-// Colocamos fora do componente para não ser recriada a cada renderização.
+// Função helper para formatar o CPF para exibição
 const formatCpf = (value) => {
-    // 1. Remove tudo que não for dígito
     const onlyNums = value.replace(/[^\d]/g, '');
-
-    // 2. Limita a 11 dígitos
     const truncatedValue = onlyNums.slice(0, 11);
-
-    // 3. Aplica a máscara
     return truncatedValue
         .replace(/(\d{3})(\d)/, '$1.$2')
         .replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
         .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
 };
 
-
-export default function CardProf() {
+// O componente aceita a prop 'onUpdate' para notificar o componente pai
+export default function CardProf({ onUpdate }) {
     
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
@@ -55,7 +49,6 @@ export default function CardProf() {
         }
     };
 
-    // --- PASSO 2: Criar um handler para o input de CPF que usa a formatação ---
     const handleCpfChange = (e) => {
         const formattedCpf = formatCpf(e.target.value);
         setCpf(formattedCpf);
@@ -66,54 +59,41 @@ export default function CardProf() {
             setSearchError('Por favor, digite um CPF para buscar.');
             return;
         }
-
         const token = localStorage.getItem("token");
         if (!token) {
             setSearchError("Erro de autenticação. Faça o login novamente.");
             return;
         }
-        
         setIsLoading(true);
         setSearchError('');
         setNome('');
         setDisciplina('');
         setTurma('');
-
         try {
-            // A lógica de limpeza continua a mesma e funciona perfeitamente!
             const cpfLimpo = cpf.replace(/\D/g, '');
             const filtro = { cpf_professor: cpfLimpo };
-
             const response = await fetch(`${backendUrl}/coordenador/professores`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(filtro),
             });
-
             if (!response.ok) {
-                const errorData = await response.text();
-                throw new Error(`Erro ${response.status}: Falha na comunicação.`);
+                const errorData = await response.json().catch(() => ({}));
+                setSearchError(errorData.mensagem || "Erro ao buscar professor.");
+                return;
             }
-
             const professores = await response.json();
-            
             if (!professores || professores.length === 0) {
                 setSearchError("Nenhum professor encontrado com este CPF.");
-                return; 
+                return;
             }
-
             const professorEncontrado = professores[0];
-            
             setNome(professorEncontrado.nome_professor);
             setDisciplina(professorEncontrado.materia);
             setTurma(professorEncontrado.turma_professor);
-
         } catch (error) {
             console.error("ERRO INESPERADO AO BUSCAR PROFESSOR:", error);
-            setSearchError(error.message);
+            setSearchError("Erro de comunicação. Tente novamente.");
         } finally {
             setIsLoading(false);
         }
@@ -123,7 +103,6 @@ export default function CardProf() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // A lógica de limpeza continua a mesma e funciona perfeitamente!
         const cpfLimpo = cpf.replace(/\D/g, '');
         const token = localStorage.getItem("token");
         if (!token) {
@@ -137,23 +116,20 @@ export default function CardProf() {
         try {
             const response = await fetch(`${backendUrl}/coordenador/professor`, {
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json', 
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ cpf_professor: cpfLimpo })
             });
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ mensagem: "Erro ao tentar remover." }));
+            if (response.ok) {
+                console.log("[SUCESSO] Remoção bem-sucedida. Ativando modal de confirmação.");
+                // Apenas fecha o modal de remoção e abre o de confirmação.
+                // NÃO CHAME onUpdate() AQUI.
+                setIsModalOpen(false);
+                setIsConfirmationOpen(true);
+            } else {
+                const errorData = await response.json().catch(() => ({ mensagem: "Erro desconhecido ao tentar remover." }));
                 throw new Error(errorData.mensagem);
             }
-
-            const result = await response.json();
-            console.log("Resposta do backend (exclusão):", result.mensagem);
-
-            setIsModalOpen(false);
-            setIsConfirmationOpen(true);
 
         } catch (error) {
             console.error("Erro ao remover professor:", error);
@@ -163,7 +139,18 @@ export default function CardProf() {
         }
     };
     
-    const closeConfirmation = () => setIsConfirmationOpen(false);
+    // --- FUNÇÃO DE CONFIRMAÇÃO CORRIGIDA ---
+    const closeConfirmation = () => {
+        // 1. Primeiro, fecha o modal de confirmação.
+        setIsConfirmationOpen(false);
+
+        // 2. AGORA, com o modal já fechado, notificamos o pai para atualizar.
+        // Isso evita a corrida de re-renderização.
+        if (onUpdate) {
+            console.log("Fechando confirmação e chamando onUpdate().");
+            onUpdate();
+        }
+    };
 
     return (
         <>
@@ -215,14 +202,13 @@ export default function CardProf() {
                             <div className="col-span-2">
                                 <label htmlFor="cpf" className="block mb-2 text-sm font-medium text-gray-900">CPF</label>
                                 <div className='flex justify-center gap-3'>
-                                    {/* --- PASSO 3: Atualizar o input --- */}
                                     <input
                                         type="text"
                                         name="cpf"
                                         id="cpf"
                                         value={cpf}
-                                        onChange={handleCpfChange} // Usar a nova função de change
-                                        maxLength={14} // Limitar o campo a 14 caracteres (11 dígitos + 2 pontos + 1 traço)
+                                        onChange={handleCpfChange}
+                                        maxLength={14}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                         placeholder="000.000.000-00"
                                         required
@@ -286,7 +272,12 @@ export default function CardProf() {
                          </svg>
                          <p className="text-gray-700">Professor removido com sucesso!</p>
                      </div>
-                     <button onClick={closeConfirmation} className="w-full mt-4 px-4 py-2 bg-[#1f557b] hover:bg-[#0e3754] text-white rounded-lg cursor-pointer transition-colors">OK</button>
+                     <button 
+                        onClick={closeConfirmation} 
+                        className="w-full mt-4 px-4 py-2 bg-[#1f557b] hover:bg-[#0e3754] text-white rounded-lg cursor-pointer transition-colors"
+                     >
+                        OK
+                     </button>
                  </div>
              </div>
             )}

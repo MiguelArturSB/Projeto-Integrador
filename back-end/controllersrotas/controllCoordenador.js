@@ -1,8 +1,8 @@
 // Importa funções de manipulação de dados e dependências necessárias
-import { readAllView, listarAlunos,listarProfessores } from '../database/database.js'
+import { readAllView, listarAlunos,listarProfessores,read,deleteRecord } from '../database/database.js'
 
 import {
-     alunoDetalhado, professorDetalhado,
+     professorDetalhado,
     criarAluno, criarProfessor, atualizarAluno, atualizarProfessor,
     excluirAluno, excluirProfessor
 } from '../configs/configCoordenador.js'
@@ -286,19 +286,32 @@ const atualizarProfessorController = async (req, res) => {
 
 
 // Exclui um aluno pelo ID
-const excluirAlunoController = async (req, res) => {
+ const excluirAlunoController = async (req, res) => {
     try {
         const { RA_aluno } = req.body;
-        if (!RA_aluno) return res.status(400).json({ mensagem: 'RA não informado.' });
-        const deleted = await deleteRecord('Alunos', 'RA_aluno = ?', [RA_aluno]);
-        if (deleted > 0) {
-            res.status(200).json({ mensagem: 'Usuário excluído com sucesso' });
-        } else {
-            res.status(404).json({ mensagem: 'Aluno não encontrado para exclusão.' });
+
+        if (!RA_aluno) {
+            return res.status(400).json({ mensagem: 'O RA do aluno é obrigatório.' });
         }
+
+
+        const whereClause = 'RA_aluno = ?';
+        const values = [RA_aluno];
+
+
+        const result = await deleteRecord('Alunos', whereClause, values);
+
+
+        
+        if (result && result.affectedRows > 0) {
+            res.status(200).json({ mensagem: 'Aluno excluído com sucesso.' });
+        } else {
+            res.status(404).json({ mensagem: 'Nenhum aluno encontrado com este RA para ser excluído.' });
+        }
+
     } catch (err) {
-        console.error('Erro ao excluir aluno: ', err)
-        res.status(500).json({ mensagem: 'Erro ao excluir aluno' })
+        console.error('Erro ao excluir aluno:', err);
+        res.status(500).json({ mensagem: 'Erro interno no servidor ao excluir aluno.' });
     }
 };
 

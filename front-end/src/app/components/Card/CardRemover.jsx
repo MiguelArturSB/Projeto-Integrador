@@ -2,15 +2,30 @@
 
 import { useState } from 'react';
 
-export default function CardRemover() {
+// Função helper para formatar o RA para exibição (ex: 000.000.000)
+const formatRa = (value) => {
+    const onlyNums = value.replace(/[^\d]/g, '');
+    const truncatedValue = onlyNums.slice(0, 9);
+    return truncatedValue
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+};
+
+// O componente agora aceita uma "prop" chamada onUpdate.
+// Esta prop será uma função passada pelo componente pai.
+export default function CardRemover({ onUpdate }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+    
+    // Estados do formulário
     const [turma, setTurma] = useState('');
     const [ra, setRa] = useState('');
     const [nome, setNome] = useState('');
+    
+    // Estados de controle da UI
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
-    // Ajuste a porta/URL do back-end conforme necessário!
     const backendUrl = `http://${typeof window !== "undefined" ? window.location.hostname : "localhost"}:3001`;
 
     const cardData = [
@@ -23,45 +38,80 @@ export default function CardRemover() {
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
-        setError('');
-        setTurma('');
-        setRa('');
-        setNome('');
+        if (!isModalOpen) {
+            setError('');
+            setTurma('');
+            setRa('');
+            setNome('');
+            setIsLoading(false);
+        }
     };
 
-    // Buscar aluno pelo RA
+    // Handler que formata o RA enquanto o usuário digita
+    const handleRaChange = (e) => {
+        const formattedRa = formatRa(e.target.value);
+        setRa(formattedRa);
+    };
+
     const handleBuscarAluno = async () => {
         setError('');
         setNome('');
         setTurma('');
+
         if (!ra) {
-            setError('Digite um RA para buscar.');
+            setError('Por favor, digite um RA para buscar.');
             return;
         }
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+            setError("Erro de autenticação. Faça o login novamente.");
+            console.error("[handleBuscarAluno] Falha na autenticação: token é nulo ou não existe.");
+            return;
+        }
+
+        setIsLoading(true);
+
         try {
-            const res = await fetch(`${backendUrl}/coordenador/aluno?ra=${encodeURIComponent(ra)}`, {
-                method: 'GET'
+            const raLimpo = ra.replace(/\D/g, '');
+            const filtro = { RA_aluno: raLimpo };
+            
+            console.log(`[BUSCANDO ALUNO] Enviando requisição para ${backendUrl}/coordenador/alunos com filtro:`, filtro);
+
+            const res = await fetch(`${backendUrl}/coordenador/alunos`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(filtro)
             });
-            console.log("Status da resposta GET:", res.status);
+
             if (!res.ok) {
-                setError('Aluno não encontrado.');
-                setNome('');
-                setTurma('');
+                const errorBody = await res.json().catch(() => ({}));
+                setError(errorBody.mensagem || 'Erro ao buscar aluno.');
                 return;
             }
-            const data = await res.json();
-            console.log("Resposta do backend (GET aluno):", data);
-            setNome(data.nome_aluno || '');
-            setTurma(data.turma || '');
-        } catch (error) {
-            setError('Erro ao buscar aluno.');
-            setNome('');
-            setTurma('');
-            console.log("Erro no fetch GET aluno:", error);
+
+            const alunos = await res.json();
+            
+            if (!alunos || alunos.length === 0) {
+                setError('Nenhum aluno encontrado com este RA.');
+                return;
+            }
+
+            const alunoEncontrado = alunos[0];
+            setNome(alunoEncontrado.nome_aluno || '');
+            setTurma(alunoEncontrado.turma || '');
+
+        } catch (err) {
+            setError('Erro de comunicação. Tente novamente.');
+            console.error("[FALHA GERAL - BUSCA]", { errorObject: err, RA_enviado: ra });
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    // Remover aluno
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -69,34 +119,50 @@ export default function CardRemover() {
             setError('RA não preenchido');
             return;
         }
+
+        const token = localStorage.getItem("token");
+        if (!token) {
+            setError("Erro de autenticação. Faça o login novamente.");
+            return;
+        }
+
+        setIsLoading(true);
+
         try {
+            const raLimpo = ra.replace(/\D/g, '');
             const res = await fetch(`${backendUrl}/coordenador/aluno`, {
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ RA_aluno: ra })
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ RA_aluno: raLimpo })
             });
-            console.log("Status da resposta DELETE:", res.status);
-            const data = await res.json().catch(() => ({}));
-            console.log("Resposta do backend (DELETE aluno):", data);
-            if (res.ok) {
+
+            if (!res.ok) {
+                const errorBody = await res.json().catch(() => ({}));
+                setError(errorBody.mensagem || 'Erro ao remover aluno.');
+            } else {
+                console.log("[SUCESSO - REMOÇÃO] Aluno removido com sucesso.");
+                
+  
+
                 setIsModalOpen(false);
                 setIsConfirmationOpen(true);
-                setTurma('');
-                setRa('');
-                setNome('');
-            } else {
-                setError(data.mensagem || 'Erro ao remover aluno.');
             }
-        } catch (error) {
-            setError('Erro ao remover aluno.');
-            console.log("Erro no fetch DELETE aluno:", error);
+        } catch (err) {
+            setError('Erro de comunicação ao tentar remover.');
+            console.error("[FALHA GERAL - REMOÇÃO]", { errorObject: err, RA_enviado: ra });
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const closeConfirmation = () => {
         setIsConfirmationOpen(false);
+        
+        // Também chama o onUpdate aqui para garantir que a atualização aconteça
+        // quando o usuário fechar o modal de sucesso.
+        if (onUpdate) {
+            onUpdate();
+        }
     };
 
     return (
@@ -153,17 +219,19 @@ export default function CardRemover() {
                                         name="ra"
                                         id="ra"
                                         value={ra}
-                                        onChange={(e) => setRa(e.target.value)}
+                                        onChange={handleRaChange}
+                                        maxLength={11} // 9 dígitos + 2 pontos
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                         placeholder="000.000.000"
                                         required
                                     />
                                     <button
                                         type="button"
-                                        className='bg-blue-950 rounded-lg text-white hover:bg-blue-800 transition-all p-2 cursor-pointer'
+                                        className='bg-blue-950 rounded-lg text-white hover:bg-blue-800 transition-all p-2 px-4 cursor-pointer disabled:bg-gray-400'
                                         onClick={handleBuscarAluno}
+                                        disabled={isLoading}
                                     >
-                                        Buscar
+                                        {isLoading ? 'Buscando...' : 'Buscar'}
                                     </button>
                                 </div>
                                 {error && <div className="text-red-600 text-sm mt-2">{error}</div>}
@@ -171,21 +239,16 @@ export default function CardRemover() {
 
                             <div className="col-span-2 sm:col-span-1">
                                 <label htmlFor="nome" className="block mb-2 text-sm font-medium text-gray-900">Nome do aluno</label>
-                                <div className='bg-gray-100 border border-gray-200 text-gray-500 text-sm rounded-lg w-full p-2.5'>{nome || <span className="italic text-gray-400">-</span>}</div>
+                                <div className={`bg-gray-100 border border-gray-200 text-sm rounded-lg w-full p-2.5 min-h-[42px] flex items-center ${nome ? 'text-gray-900' : 'text-gray-400'}`}>
+                                    {nome || '-'}
+                                </div>
                             </div>
 
                             <div className="col-span-2 sm:col-span-1">
                                 <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900">Turma</label>
-                                <input
-                                    type="text"
-                                    name="turma"
-                                    id="turma"
-                                    value={turma}
-                                    readOnly
-                                    className="bg-gray-100 border border-gray-200 text-gray-900 text-sm rounded-lg w-full p-2.5 focus:outline-none"
-                                    placeholder="2MD"
-                                    required
-                                />
+                                <div className={`bg-gray-100 border border-gray-200 text-sm rounded-lg w-full p-2.5 min-h-[42px] flex items-center ${turma ? 'text-gray-900' : 'text-gray-400'}`}>
+                                    {turma || '-'}
+                                </div>
                             </div>
                         </div>
                         <div className="mb-4">
@@ -195,13 +258,13 @@ export default function CardRemover() {
                         </div>
                         <button
                             type="submit"
-                            className="text-white inline-flex items-center bg-[#1f557b] cursor-pointer hover:bg-red-700 transition-all focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                            disabled={!nome || !turma || !ra}
+                            className="text-white inline-flex items-center bg-red-600 cursor-pointer hover:bg-red-800 transition-all focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center disabled:bg-gray-400"
+                            disabled={!nome || !turma || !ra || isLoading}
                         >
                             <svg className="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                 <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"></path>
                             </svg>
-                            Confirmar remoção
+                            {isLoading ? 'Removendo...' : 'Confirmar remoção'}
                         </button>
                     </form>
                 </div>
@@ -210,18 +273,12 @@ export default function CardRemover() {
             {isConfirmationOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm p-4">
                     <div className="relative bg-white rounded-lg shadow p-6 max-w-sm w-full">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-gray-900">
-                                Sucesso!
-                            </h3>
-                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Sucesso!</h3>
                         <div className="flex items-center mb-4">
-                            <svg className="w-8 h-8 text-blue-900 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <svg className="w-8 h-8 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                             </svg>
-                            <p className="text-gray-700">
-                                Aluno removido com sucesso!
-                            </p>
+                            <p className="text-gray-700">Aluno removido com sucesso!</p>
                         </div>
                         <button
                             onClick={closeConfirmation}
