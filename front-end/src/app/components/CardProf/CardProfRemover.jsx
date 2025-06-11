@@ -138,14 +138,12 @@ export default function CardProf({ onUpdate }) {
             setIsLoading(false); 
         }
     };
-    
-    // --- FUNÇÃO DE CONFIRMAÇÃO CORRIGIDA ---
+
     const closeConfirmation = () => {
-        // 1. Primeiro, fecha o modal de confirmação.
+
         setIsConfirmationOpen(false);
 
-        // 2. AGORA, com o modal já fechado, notificamos o pai para atualizar.
-        // Isso evita a corrida de re-renderização.
+
         if (onUpdate) {
             console.log("Fechando confirmação e chamando onUpdate().");
             onUpdate();
@@ -187,7 +185,7 @@ export default function CardProf({ onUpdate }) {
                         </h3>
                         <button
                             type="button"
-                            className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center cursor-pointer"
+                            className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center "
                             onClick={toggleModal}
                         >
                             <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">

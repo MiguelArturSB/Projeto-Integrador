@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 export default function Card({ onUpdate }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
-    const [raError, setRaError] = useState(''); // Estado específico para o erro do RA
+    const [raError, setRaError] = useState('');
     const [carregando, setCarregando] = useState(true);
     const [formData, setFormData] = useState({
         name: '',
@@ -26,7 +26,6 @@ export default function Card({ onUpdate }) {
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
-        // Limpa o erro e o formulário ao abrir/fechar o modal
         setRaError('');
         setFormData({ name: '', senha: '', RA: '', turma: '' });
     };
@@ -44,7 +43,6 @@ export default function Card({ onUpdate }) {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // Limpa o erro específico do RA assim que o usuário começar a corrigi-lo
         if (name === 'RA') {
             if (raError) setRaError('');
             const formattedRA = formatRA(value);
@@ -97,17 +95,14 @@ export default function Card({ onUpdate }) {
             if (!response.ok) {
                 let errorData = {}; 
                 try {
-
                     errorData = await response.json();
                 } catch (jsonError) {
                     console.warn("Não foi possível analisar o JSON da resposta de erro.", jsonError);
-
                 }
     
                 console.log("Erro recebido do backend:", errorData); 
     
                 if (response.status === 409) {
-                    // Usa a mensagem do backend, se existir, ou uma mensagem padrão.
                     setRaError(errorData.message || "Este R.A. já está em uso.");
                 } else {
                     const errorMessage = errorData.message || 'Ocorreu um problema no servidor. Tente novamente.';
@@ -116,13 +111,11 @@ export default function Card({ onUpdate }) {
                 return;
             }
 
-            // Sucesso
             const data = await response.json();
             console.log("Aluno cadastrado com sucesso:", data);
 
             setIsModalOpen(false);
             setIsConfirmationOpen(true);
-
             setFormData({ name: '', senha: '', RA: '', turma: '' });
 
         } catch (error) {
@@ -167,14 +160,14 @@ export default function Card({ onUpdate }) {
                 className={`${isModalOpen ? 'flex' : 'hidden'} fixed inset-0 z-50 items-center justify-center w-full h-full bg-[rgba(0,0,0,0.5)] backdrop-blur-sm bg-opacity-50 overflow-y-auto overflow-x-hidden`}
             >
                 <div className="relative w-full max-w-md p-4 max-h-full">
-                    <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                        <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <div className="relative bg-white rounded-lg shadow">
+                        <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-200">
+                            <h3 className="text-lg font-semibold text-gray-900">
                                 Cadastrar Novo Aluno
                             </h3>
                             <button
                                 type="button"
-                                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white cursor-pointer"
+                                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
                                 onClick={toggleModal}
                             >
                                 <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -186,7 +179,7 @@ export default function Card({ onUpdate }) {
                         <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
                                 <div className="col-span-2">
-                                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nome</label>
+                                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900">Nome</label>
                                     <input
                                         type="text"
                                         name="name"
@@ -194,13 +187,13 @@ export default function Card({ onUpdate }) {
                                         value={formData.name}
                                         maxLength={40}
                                         onChange={handleChange}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                         placeholder="Digite o nome do aluno"
                                         required
                                     />
                                 </div>
                                 <div className="col-span-2">
-                                    <label htmlFor="senha" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Senha</label>
+                                    <label htmlFor="senha" className="block mb-2 text-sm font-medium text-gray-900">Senha</label>
                                     <input
                                         type="password"
                                         name="senha"
@@ -208,13 +201,13 @@ export default function Card({ onUpdate }) {
                                         value={formData.senha}
                                         maxLength={40}
                                         onChange={handleChange}
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                         placeholder="Digite a senha do aluno"
                                         required
                                     />
                                 </div>
                                 <div className="col-span-2 sm:col-span-1">
-                                    <label htmlFor="RA" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Registro do Aluno (R.A)</label>
+                                    <label htmlFor="RA" className="block mb-2 text-sm font-medium text-gray-900">Registro do Aluno (R.A)</label>
                                     <input
                                         type="text"
                                         name="RA"
@@ -222,20 +215,20 @@ export default function Card({ onUpdate }) {
                                         value={formData.RA}
                                         onChange={handleChange}
                                         maxLength={11}
-                                        className={`bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-600 dark:placeholder-gray-400 dark:text-white
+                                        className={`bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5
                                         ${raError
-                                                ? 'border-red-500 focus:ring-red-500 focus:border-red-500 dark:border-red-500'
-                                                : 'border-gray-300 focus:ring-primary-600 focus:border-primary-600 dark:border-gray-500 dark:focus:ring-primary-500 dark:focus:border-primary-500'
+                                                ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                                                : 'border-gray-300 focus:ring-primary-600 focus:border-primary-600'
                                             }`}
                                         placeholder="123.456.789"
                                         required
                                     />
                                     {raError && (
-                                        <p className="mt-2 text-sm text-red-600 dark:text-red-500">{raError}</p>
+                                        <p className="mt-2 text-sm text-red-600">{raError}</p>
                                     )}
                                 </div>
                                 <div className="col-span-2 sm:col-span-1">
-                                    <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Turma</label>
+                                    <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900">Turma</label>
                                     <input
                                         type="text"
                                         name="turma"
@@ -249,7 +242,7 @@ export default function Card({ onUpdate }) {
                                     />
                                 </div>
                             </div>
-                            <button type="submit" className="text-white inline-flex items-center bg-[#1f557b] cursor-pointer hover:bg-[#0e3754] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                            <button type="submit" className="text-white inline-flex items-center bg-[#1f557b] cursor-pointer hover:bg-[#0e3754] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                                 <svg className="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                     <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd"></path>
                                 </svg>
@@ -262,9 +255,9 @@ export default function Card({ onUpdate }) {
 
             {isConfirmationOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">
-                    <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 p-6 max-w-sm w-full">
+                    <div className="relative bg-white rounded-lg shadow p-6 max-w-sm w-full">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                            <h3 className="text-lg font-semibold text-gray-900">
                                 Sucesso!
                             </h3>
                         </div>
@@ -272,7 +265,7 @@ export default function Card({ onUpdate }) {
                             <svg className="w-8 h-8 text-blue-900 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                             </svg>
-                            <p className="text-gray-700 dark:text-gray-300">
+                            <p className="text-gray-700">
                                 Aluno cadastrado com sucesso!
                             </p>
                         </div>

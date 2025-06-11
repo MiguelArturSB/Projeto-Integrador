@@ -242,14 +242,14 @@ const todosProfessores = useMemo(() =>
                     <h1 className="font-semibold">Gerenciar</h1>
                     <button
                         onClick={() => setModalAberto(true)}
-                        className="cursor-pointer font-bold bg-[#1f557b] hover:bg-[#0e3754] transition-all duration-300 border-2 border-solid border-blue-200 mt-4 text-white hover:text-gray-500 text-xs md:text-sm text-center px-4 py-2 md:p-3 rounded-full h-10 md:h-11"
+                        className="cursor-pointer font-bold bg-[#1f557b] hover:bg-[#0e3754] transition-all duration-300 border-2 border-solid border-blue-200 mt-4 text-white hover:text-gray-500 text-xs md:text-sm text-center px-2 py-2 md:p-3 rounded-full h-10 md:h-11"
                     >
                         Buscar Aluno
                     </button>
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-10 mb-8 px-4">
-                    {/* ⭐ ALTERADO: Passando a função de atualização para os componentes filhos */}
+    
                     <Card onUpdate={buscarDadosCoordenador} />
                     <CardRemover onUpdate={buscarDadosCoordenador} />
                     <CardUpdate onUpdate={buscarDadosCoordenador} />
@@ -327,7 +327,7 @@ const todosProfessores = useMemo(() =>
                     </div>
 
                     <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-10 px-4">
-                        {/*  ALTERADO: Passando a função de atualização para os componentes filhos bora atualiza ai fiada */}
+
                         <CardProf onUpdate={buscarDadosCoordenador} />
                         <CardProfRemover onUpdate={buscarDadosCoordenador} />
                         <CardProfUpdate onUpdate={buscarDadosCoordenador} />
