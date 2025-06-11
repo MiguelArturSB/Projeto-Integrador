@@ -37,7 +37,7 @@ export default function CardProfCriar({ onUpdate }) {
         const numericValue = value.replace(/\D/g, '');
         const truncatedValue = numericValue.slice(0, 11);
       
-        if (truncatedValue.length > 9) {
+        if (truncatedValue.length > 11) {
           return truncatedValue.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
         } else if (truncatedValue.length > 6) {
           return truncatedValue.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
@@ -243,7 +243,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         id="cpf"
                                         value={formData.cpf}
                                         onChange={handleChange}
-                                        maxLength={11}
+                                        maxLength={13}
                                         className={`bg-gray-50 border text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-600 dark:placeholder-gray-400 dark:text-white
                                         ${cpfError
                                                 ? 'border-red-500 focus:ring-red-500 focus:border-red-500 dark:border-red-500'

@@ -79,22 +79,28 @@ const listarProfessoresController = async (req, res) => {
 
 
 // Detalhar aluno por ID
+// Altere seu controller para adequar os campos retornados
+
 const alunoDetalhadoController = async (req, res) => {
     try {
-        const { RA_aluno } = req.body
-
-        const dadosaluno = await alunoDetalhado(RA_aluno)
-
+        const { ra } = req.query;
+        if (!ra) return res.status(400).json({ mensagem: 'RA não informado.' });
+        const dadosaluno = await read('Alunos', 'RA_aluno = ?', [ra]);
         if (dadosaluno) {
-            res.status(200).json(dadosaluno);
+            res.status(200).json({
+                nome: dadosaluno.nome_aluno, // renomeia para o front
+                turma: dadosaluno.turma
+            });
         } else {
             res.status(404).json({ mensagem: 'Não foi possível encontrar o aluno' });
         }
     } catch (err) {
-        console.error('Erro ao obter aluno por CPF: ', err)
-        res.status(500).json({ mensagem: 'Erro ao obter aluno por CPF' })
+        console.error('Erro ao obter aluno: ', err)
+        res.status(500).json({ mensagem: 'Erro ao obter aluno' })
     }
-}
+};
+
+// O restante do arquivo permanece igual
 
 const professorDetalhadoController = async (req, res) => {
     try {
@@ -282,14 +288,19 @@ const atualizarProfessorController = async (req, res) => {
 // Exclui um aluno pelo ID
 const excluirAlunoController = async (req, res) => {
     try {
-        const { RA_aluno } = req.body
-        await excluirAluno(RA_aluno)
-        res.status(200).json({ mensagem: 'Usuário excluido com sucesso' })
+        const { RA_aluno } = req.body;
+        if (!RA_aluno) return res.status(400).json({ mensagem: 'RA não informado.' });
+        const deleted = await deleteRecord('Alunos', 'RA_aluno = ?', [RA_aluno]);
+        if (deleted > 0) {
+            res.status(200).json({ mensagem: 'Usuário excluído com sucesso' });
+        } else {
+            res.status(404).json({ mensagem: 'Aluno não encontrado para exclusão.' });
+        }
     } catch (err) {
         console.error('Erro ao excluir aluno: ', err)
         res.status(500).json({ mensagem: 'Erro ao excluir aluno' })
     }
-}
+};
 
 // Exclui um professor pelo ID
 const excluirProfessorController = async (req, res) => {

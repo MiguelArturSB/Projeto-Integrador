@@ -30,17 +30,7 @@ async function readAll(table, where = null) {
 }
 
 // Lê um registro único da tabela
-async function read(table, where) {
-  const connection = await getConnection();
-  try {
-    let sql = `SELECT * FROM ${table}`;
-    if (where) sql += ` WHERE ${where}`;
-    const [rows] = await connection.execute(sql);
-    return rows[0] || null;
-  } finally {
-    connection.release();
-  }
-}
+
 
 // Insere um registro na tabela e retorna o ID gerado
 async function create(table, data) {
@@ -70,16 +60,26 @@ async function update(table, data, where) {
     connection.release();
   }
 }
-
-// Deleta registros conforme condição
-async function deleteRecord(table, where) {
+async function read(table, where, params = []) {
   const connection = await getConnection();
   try {
-    const sql = `DELETE FROM ${table} WHERE ${where}`;
-    const [result] = await connection.execute(sql);
-    return result.affectedRows;
+      let sql = `SELECT * FROM ${table}`;
+      if (where) sql += ` WHERE ${where}`;
+      const [rows] = await connection.execute(sql, params);
+      return rows[0] || null;
   } finally {
-    connection.release();
+      connection.release();
+  }
+}
+
+async function deleteRecord(table, where, params = []) {
+  const connection = await getConnection();
+  try {
+      const sql = `DELETE FROM ${table} WHERE ${where}`;
+      const [result] = await connection.execute(sql, params);
+      return result.affectedRows;
+  } finally {
+      connection.release();
   }
 }
 
