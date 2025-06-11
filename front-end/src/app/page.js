@@ -220,7 +220,7 @@ export default function Portal() {
       )}
 
       <div className="overflow-y-hidden h-screen bg-[url('/backsm.jpg')] md:bg-[url('/background.jpg')] bg-cover bg-center bg-no-repeat  flex flex-col">
-        {/* Header com logo e nome */}
+        {/* Header com logo e nome
         <div className="pr-8 flex justify-end items-center">
           <div className="flex items-center gap-4 w-[100%] md:w-auto">
             <img
@@ -234,7 +234,7 @@ export default function Portal() {
               <span className="hidden sm:block">Prof. Tereza Costa</span>
             </h2>
           </div>
-        </div>
+        </div> */}
         {/* Título e subtítulo */}
         <div className={`flex flex-col items-center justify-center text-[#1f557b] font-bold text-6xl  titulo transition-opacity duration-700 ${activeForm ? 'fade-out' : 'fade-in'}`}>
           <h1 className='mt-30 md:mt-0 text-[18px] md:text-[49px] lg:text-[50px]'>Olá, seja bem vindo!</h1>
