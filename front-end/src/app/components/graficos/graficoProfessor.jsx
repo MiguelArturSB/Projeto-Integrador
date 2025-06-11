@@ -2,27 +2,26 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 
-// Carrega o componente Chart do ApexCharts de forma dinâmica para evitar problemas de SSR com Next.js
+// Carrega o componente Chart do ApexCharts de forma dinâmica
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 /**
- * Componente de gráfico de pizza para exibir o percentual de faltas e presenças de uma turma.
+ * Componente de gráfico de pizza para exibir o progresso de aulas dadas.
  * 
  * Props:
- * - dadosDaTurma: { totalFaltas: number, totalAulas: number }
- * - titulo: string (título do gráfico)
+ * - aulasDadas: number (Quantidade de aulas que já foram ministradas)
+ * - aulasTotais: number (Quantidade total de aulas planejadas)
+ * - titulo: string (Título do gráfico)
  */
-export default function GraficoPizza({ dadosDaTurma, titulo }) {
-  const totalFaltas = dadosDaTurma?.totalFaltas || 0;
-  const totalAulas = dadosDaTurma?.totalAulas || 0;
-
-  // Calcula os percentuais
-  const percentualFaltas = totalAulas > 0 ? (totalFaltas / totalAulas) * 100 : 0;
-  const percentualPresencas = 100 - percentualFaltas;
+export default function GraficoPizza({ aulasDadas = 0, aulasTotais = 0, titulo }) {
+  
+  // Calcula os percentuais com base nas novas props
+  const percentualDadas = aulasTotais > 0 ? (aulasDadas / aulasTotais) * 100 : 0;
+  const percentualRestantes = 100 - percentualDadas;
   
   const series = [
-    parseFloat(percentualFaltas.toFixed(1)),
-    parseFloat(percentualPresencas.toFixed(1))
+    parseFloat(percentualDadas.toFixed(1)),
+    parseFloat(percentualRestantes.toFixed(1))
   ];
 
   const options = {
@@ -30,8 +29,9 @@ export default function GraficoPizza({ dadosDaTurma, titulo }) {
       type: 'pie',
       height: 350,
     },
-    labels: ['Faltas', 'Presenças'], 
-    colors: ['#054068', '#b6dffa'],
+    // Labels atualizadas para refletir os dados corretamente
+    labels: ['Aulas Dadas', 'Aulas Restantes'], 
+    colors: ['#054068', '#b6dffa'], // Cor mais escura para 'Dadas', mais clara para 'Restantes'
     legend: {
       position: 'bottom',
       fontFamily: 'Inter, sans-serif',
@@ -57,8 +57,9 @@ export default function GraficoPizza({ dadosDaTurma, titulo }) {
       style: {
         fontFamily: 'Inter, sans-serif',
       },
-      formatter: function (val) {
-        return `${val.toFixed(1)}%`;
+      formatter: function (val, { seriesIndex }) {
+          // Mostra o valor em porcentagem
+          return `${series[seriesIndex].toFixed(1)}%`;
       },
     },
   };
@@ -66,7 +67,9 @@ export default function GraficoPizza({ dadosDaTurma, titulo }) {
   return (
     <div className="w-full bg-white rounded-lg p-4 md:p-6">
       <h2 className="text-xl text-center font-bold text-sky-900 mb-4">{titulo}</h2>
-      {totalAulas === 0 ? ( 
+      
+      {/* A condição agora verifica 'aulasTotais' */}
+      {aulasTotais === 0 ? ( 
         <div className="h-[350px] flex items-center justify-center">
           <p className="text-gray-500">Não há dados de aulas para esta turma.</p>
         </div>
