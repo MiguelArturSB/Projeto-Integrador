@@ -237,7 +237,7 @@ export default function Portal() {
         </div> */}
         {/* Título e subtítulo */}
         <div className={`flex flex-col items-center justify-center text-[#1f557b] font-bold text-6xl  titulo transition-opacity duration-700 ${activeForm ? 'fade-out' : 'fade-in'}`}>
-          <h1 className='mt-30 md:mt-0 text-[18px] md:text-[49px] lg:text-[50px]'>Olá, seja bem vindo!</h1>
+          <h1 className='mt-30 md:mt-50 text-[18px] md:text-[49px] lg:text-[50px]'>Olá, seja bem vindo!</h1>
           <h4 className='hidden md:block text-[18px]'>Controle acadêmico de presença de forma prática e segura.</h4>
         </div>
         {/* Bloco central: escolha perfil ou formulário de login */}
