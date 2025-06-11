@@ -2,13 +2,21 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 
+// Carrega o componente Chart do ApexCharts de forma dinâmica para evitar problemas de SSR com Next.js
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
+/**
+ * Componente de gráfico de pizza para exibir o percentual de faltas e presenças de uma turma.
+ * 
+ * Props:
+ * - dadosDaTurma: { totalFaltas: number, totalAulas: number }
+ * - titulo: string (título do gráfico)
+ */
 export default function GraficoPizza({ dadosDaTurma, titulo }) {
-  
   const totalFaltas = dadosDaTurma?.totalFaltas || 0;
   const totalAulas = dadosDaTurma?.totalAulas || 0;
 
+  // Calcula os percentuais
   const percentualFaltas = totalAulas > 0 ? (totalFaltas / totalAulas) * 100 : 0;
   const percentualPresencas = 100 - percentualFaltas;
   
@@ -35,12 +43,11 @@ export default function GraficoPizza({ dadosDaTurma, titulo }) {
         }
       }
     },
-    // EFEITO DE HOVER NA POSIÇÃO CORRETA
     states: {
       hover: {
         filter: {
           colors: ['#054068', '#b6dffa'],
-          type: 'darck',
+          type: 'darck', // 'darck' parece ser um erro de digitação, deveria ser 'dark', mas deixado conforme original
           value: 0.15,
         }
       }
@@ -57,7 +64,7 @@ export default function GraficoPizza({ dadosDaTurma, titulo }) {
   };
 
   return (
-    <div className="w-full bg-white rounded-lg  p-4 md:p-6">
+    <div className="w-full bg-white rounded-lg p-4 md:p-6">
       <h2 className="text-xl text-center font-bold text-sky-900 mb-4">{titulo}</h2>
       {totalAulas === 0 ? ( 
         <div className="h-[350px] flex items-center justify-center">

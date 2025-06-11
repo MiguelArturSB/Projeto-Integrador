@@ -2,11 +2,17 @@
 
 import { useState, useEffect } from 'react';
 
+/**
+ * Componente Card para cadastrar novo aluno.
+ * Mostra um card com botão para abrir modal.
+ * Modal contém formulário de cadastro com validação de RA, nome, senha e turma.
+ * Exibe mensagem de confirmação ao cadastrar com sucesso.
+ */
 export default function Card({ onUpdate }) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
-    const [raError, setRaError] = useState(''); // Estado específico para o erro do RA
-    const [carregando, setCarregando] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false); // Controle de exibição do modal de cadastro
+    const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); // Controle de exibição do modal de sucesso
+    const [raError, setRaError] = useState(''); // Estado do erro do RA
+    const [carregando, setCarregando] = useState(true); // Estado de carregamento inicial
     const [formData, setFormData] = useState({
         name: '',
         senha: '',
@@ -16,6 +22,7 @@ export default function Card({ onUpdate }) {
 
     const backendUrl = `http://localhost:3001`;
 
+    // Dados do card de cadastro
     const cardData = [
         {
             icon: '+',
@@ -24,27 +31,38 @@ export default function Card({ onUpdate }) {
         }
     ];
 
+    /**
+     * Abre/fecha o modal e limpa o formulário e erro do RA.
+     */
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
-        // Limpa o erro e o formulário ao abrir/fechar o modal
         setRaError('');
         setFormData({ name: '', senha: '', RA: '', turma: '' });
     };
 
+    /**
+     * Formata o RA no padrão 123.456.789
+     */
     const formatRA = (value) => {
         const numericValue = value.replace(/\D/g, '');
         const truncatedValue = numericValue.slice(0, 9);
         return truncatedValue.replace(/(\d{3})(?=\d)/g, '$1.');
     };
 
+    /**
+     * Permite apenas letras e espaços no nome.
+     */
     const formatName = (value) => {
         return value.replace(/[^a-zA-Z\sà-üÀ-Ü]/g, '');
     };
 
+    /**
+     * Atualiza os campos do formulário e aplica formatação/validação.
+     */
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // Limpa o erro específico do RA assim que o usuário começar a corrigi-lo
+        // Limpa erro de RA ao editar
         if (name === 'RA') {
             if (raError) setRaError('');
             const formattedRA = formatRA(value);
@@ -57,6 +75,9 @@ export default function Card({ onUpdate }) {
         }
     };
 
+    /**
+     * Efeito inicial: checa token e zera carregamento.
+     */
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
         if (!storedToken) {
@@ -66,6 +87,10 @@ export default function Card({ onUpdate }) {
         window.scrollTo(0, 0);
     }, []);
 
+    /**
+     * Envia os dados do formulário ao backend.
+     * Trata erros e mostra modal de confirmação em caso de sucesso.
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -75,6 +100,7 @@ export default function Card({ onUpdate }) {
             return;
         }
 
+        // Remove pontos do RA
         const raNumerico = formData.RA.replace(/\./g, '');
 
         const dadosFormatados = {
@@ -97,17 +123,12 @@ export default function Card({ onUpdate }) {
             if (!response.ok) {
                 let errorData = {}; 
                 try {
-
                     errorData = await response.json();
                 } catch (jsonError) {
                     console.warn("Não foi possível analisar o JSON da resposta de erro.", jsonError);
-
                 }
-    
-                console.log("Erro recebido do backend:", errorData); 
-    
+                // Mostra mensagem específica para RA duplicado
                 if (response.status === 409) {
-                    // Usa a mensagem do backend, se existir, ou uma mensagem padrão.
                     setRaError(errorData.message || "Este R.A. já está em uso.");
                 } else {
                     const errorMessage = errorData.message || 'Ocorreu um problema no servidor. Tente novamente.';
@@ -116,21 +137,22 @@ export default function Card({ onUpdate }) {
                 return;
             }
 
-            // Sucesso
+            // Sucesso no cadastro
             const data = await response.json();
             console.log("Aluno cadastrado com sucesso:", data);
 
             setIsModalOpen(false);
             setIsConfirmationOpen(true);
-
             setFormData({ name: '', senha: '', RA: '', turma: '' });
-
         } catch (error) {
             console.error("Erro na requisição ao cadastrar aluno:", error);
             alert("Não foi possível conectar ao servidor. Verifique sua conexão.");
         }
     };
 
+    /**
+     * Fecha modal de confirmação e executa callback para atualizar lista de alunos.
+     */
     const closeConfirmation = () => {
         setIsConfirmationOpen(false);
         if (onUpdate) {
@@ -140,6 +162,7 @@ export default function Card({ onUpdate }) {
 
     return (
         <>
+            {/* Card de ação para abrir modal */}
             <div className="card-container">
                 {cardData.map((card, index) => (
                     <div
@@ -160,6 +183,7 @@ export default function Card({ onUpdate }) {
                 ))}
             </div>
 
+            {/* Modal de cadastro */}
             <div
                 id="crud-modal"
                 tabIndex="-1"
@@ -185,6 +209,7 @@ export default function Card({ onUpdate }) {
                         </div>
                         <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
+                                {/* Campo Nome */}
                                 <div className="col-span-2">
                                     <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nome</label>
                                     <input
@@ -199,6 +224,7 @@ export default function Card({ onUpdate }) {
                                         required
                                     />
                                 </div>
+                                {/* Campo Senha */}
                                 <div className="col-span-2">
                                     <label htmlFor="senha" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Senha</label>
                                     <input
@@ -213,6 +239,7 @@ export default function Card({ onUpdate }) {
                                         required
                                     />
                                 </div>
+                                {/* Campo RA */}
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="RA" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Registro do Aluno (R.A)</label>
                                     <input
@@ -234,6 +261,7 @@ export default function Card({ onUpdate }) {
                                         <p className="mt-2 text-sm text-red-600 dark:text-red-500">{raError}</p>
                                     )}
                                 </div>
+                                {/* Campo Turma */}
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Turma</label>
                                     <input
@@ -260,6 +288,7 @@ export default function Card({ onUpdate }) {
                 </div>
             </div>
 
+            {/* Modal de confirmação */}
             {isConfirmationOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">
                     <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 p-6 max-w-sm w-full">

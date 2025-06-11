@@ -3,24 +3,33 @@
 import { useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
+/**
+ * ModalHistorico
+ * 
+ * Modal para exibir o histórico de faltas do aluno autenticado.
+ * Busca o histórico no backend ao abrir o modal, usando o token JWT salvo no localStorage.
+ * 
+ * Props:
+ * - isOpen (boolean): controla se o modal está aberto
+ * - onClose (function): chamada ao fechar o modal
+ */
 export default function ModalHistorico({ isOpen, onClose }) {
-    const [historico, setPresencas] = useState([]);
+    const [historico, setHistorico] = useState([]);
     const [erro, setErro] = useState('');
     const [token, setToken] = useState('');
     const [decoded, setDecoded] = useState(null);
 
     const backendUrl = `http://localhost:3001`;
 
-    const handleSubmit = async (token, decoded) => {
-if (!decoded?.idAluno) {
-    console.warn('ID do aluno não encontrado no token:', decoded);
-    return;
-}
+    // Busca o histórico de faltas do aluno autenticado
+    const buscarHistorico = async (token, decoded) => {
+        if (!decoded?.idAluno) {
+            console.warn('ID do aluno não encontrado no token:', decoded);
+            setErro("Sessão inválida. Faça login novamente.");
+            return;
+        }
 
-const payload = { ID_aluno: decoded.idAluno };
-
-        console.log("🔐 Enviando para backend:", payload);
-
+        const payload = { ID_aluno: decoded.idAluno };
         try {
             const response = await fetch(`${backendUrl}/aluno/viewH`, {
                 method: 'POST',
@@ -32,42 +41,34 @@ const payload = { ID_aluno: decoded.idAluno };
             });
 
             const data = await response.json();
-            console.log("📦 Resposta do backend:", data);
 
             if (response.ok) {
-                setPresencas(data.view || []);
+                setHistorico(data.view || []);
                 setErro('');
             } else {
-                console.warn("⚠️ Erro do backend:", data.mensagem);
                 setErro(data.mensagem || "Erro ao buscar dados de presença.");
             }
         } catch (error) {
-            console.error("🚨 Erro na requisição:", error);
             setErro("Erro de conexão com o servidor. Tente novamente mais tarde.");
         }
     };
 
+    // Executa busca ao abrir o modal
     useEffect(() => {
         if (isOpen) {
             const storedToken = localStorage.getItem("token");
-            console.log("🔑 Token recuperado:", storedToken);
-
             if (storedToken) {
                 try {
                     const decodedToken = jwtDecode(storedToken);
-                    console.log("🧬 Token decodificado:", decodedToken);
-
                     setToken(storedToken);
                     setDecoded(decodedToken);
-                    handleSubmit(storedToken, decodedToken);
+                    buscarHistorico(storedToken, decodedToken);
                 } catch (e) {
-                    console.error("❌ Erro ao decodificar token:", e);
                     setErro("Sessão inválida. Por favor, faça login novamente.");
                 }
             } else {
-                console.warn("⚠️ Nenhum token encontrado no localStorage.");
+                setErro("Sessão expirada. Faça login novamente.");
             }
-
             window.scrollTo(0, 0);
         }
     }, [isOpen]);
@@ -90,7 +91,9 @@ const payload = { ID_aluno: decoded.idAluno };
                 </div>
 
                 <div className="max-h-60 md:max-h-100 overflow-auto">
-                    {historico.length > 0 ? (
+                    {erro ? (
+                        <p className="text-center text-sm p-4 text-red-600">{erro}</p>
+                    ) : historico.length > 0 ? (
                         historico.map((item, index) => (
                             <div key={index} className="flex flex-col items-center justify-center bg-blue-100 w-auto mx-3 my-2 sm:my-3 rounded-2xl">
                                 <h1 className="text-xl sm:text-2xl m-1 font-semibold text-[#1d577b]">{new Date(item.data_falta).toLocaleDateString('pt-BR')}</h1>

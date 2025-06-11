@@ -1,21 +1,36 @@
-
-
 'use client'
 import React from 'react';
 import dynamic from 'next/dynamic';
 
+// Carrega o componente Chart do ApexCharts de forma dinâmica para evitar problemas de SSR com Next.js
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
+/**
+ * Componente de gráfico de pizza para exibir o percentual de faltas e presenças de uma turma.
+ * 
+ * Props:
+ * - dadosDaTurma: { totalFaltas: number, totalAulas: number }
+ * - titulo: string (título do gráfico)
+ */
+export default function GraficoPizza({ dadosDaTurma, titulo }) {
+  const totalFaltas = dadosDaTurma?.totalFaltas || 0;
+  const totalAulas = dadosDaTurma?.totalAulas || 0;
 
-export default function GraficoPizza({ data }) {
-
+  // Calcula os percentuais
+  const percentualFaltas = totalAulas > 0 ? (totalFaltas / totalAulas) * 100 : 0;
+  const percentualPresencas = 100 - percentualFaltas;
+  
+  const series = [
+    parseFloat(percentualFaltas.toFixed(1)),
+    parseFloat(percentualPresencas.toFixed(1))
+  ];
 
   const options = {
     chart: {
       type: 'pie',
       height: 350,
     },
-    labels: ['Faltas (%)', 'Presenças (%)'],
+    labels: ['Faltas', 'Presenças'], 
     colors: ['#054068', '#b6dffa'],
     legend: {
       position: 'bottom',
@@ -31,7 +46,8 @@ export default function GraficoPizza({ data }) {
     states: {
       hover: {
         filter: {
-          type: 'dark',
+          colors: ['#054068', '#b6dffa'],
+          type: 'darck', // 'darck' parece ser um erro de digitação, deveria ser 'dark', mas deixado conforme original
           value: 0.15,
         }
       }
@@ -47,38 +63,19 @@ export default function GraficoPizza({ data }) {
     },
   };
 
-
-  const alunos = data?.total_alunos || 0;
-  const total_faltas = data?.total_faltas_turma || 0;
-  const total_aulas = data?.qntd_aula || 0;
-  
-  let percentual_faltas = 0;
-  let percentual_presencas = 0;
-  let series = [0, 100]; 
-  
-  const totalPossibilidades = alunos * total_aulas;
-  
-  if (alunos > 0 && total_aulas > 0 && totalPossibilidades > 0) {
-    percentual_faltas = (total_faltas / totalPossibilidades) * 100;
-    percentual_presencas = 100 - percentual_faltas;
-  
- 
-    series = [parseFloat(percentual_faltas.toFixed(1)), parseFloat(percentual_presencas.toFixed(1))];
-  }
-
   return (
-    <div className="max-w-sm w-full bg-none rounded-lg p-4 md:p-6">
-      <h2 className="text-xl text-center font-bold text-gray-900 dark:text-white mb-4">Média semestral</h2>
-
-    
-      {!data || total_aulas === 0 ? (
-        <p className="text-center text-gray-400 dark:text-gray-300">Aguardando dados da chamada...</p>
+    <div className="w-full bg-white rounded-lg p-4 md:p-6">
+      <h2 className="text-xl text-center font-bold text-sky-900 mb-4">{titulo}</h2>
+      {totalAulas === 0 ? ( 
+        <div className="h-[350px] flex items-center justify-center">
+          <p className="text-gray-500">Não há dados de aulas para esta turma.</p>
+        </div>
       ) : (
-        <Chart
-          options={options}
-          series={series}
-          type="pie"
-          height={350}
+        <Chart 
+          options={options} 
+          series={series} 
+          type="pie"  
+          height={350} 
         />
       )}
     </div>

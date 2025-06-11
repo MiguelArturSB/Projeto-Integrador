@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 
-// Função helper para formatar o RA para exibição (ex: 000.000.000)
+/**
+ * Formata o R.A para exibição no padrão 000.000.000
+ */
 const formatRa = (value) => {
     const onlyNums = value.replace(/[^\d]/g, '');
     const truncatedValue = onlyNums.slice(0, 9);
@@ -11,23 +13,29 @@ const formatRa = (value) => {
         .replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
 };
 
-// O componente agora aceita uma "prop" chamada onUpdate.
-// Esta prop será uma função passada pelo componente pai.
+/**
+ * CardRemover - Componente para remoção de alunos.
+ *
+ * - Permite buscar aluno por RA, exibe nome e turma antes de permitir remoção.
+ * - Chama o callback onUpdate ao remover com sucesso.
+ */
 export default function CardRemover({ onUpdate }) {
+    // Estado do modal e de confirmação
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
-    
+
     // Estados do formulário
     const [turma, setTurma] = useState('');
     const [ra, setRa] = useState('');
     const [nome, setNome] = useState('');
-    
-    // Estados de controle da UI
+
+    // Controle de UI
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
     const backendUrl = `http://localhost:3001`;
 
+    // Dados do card
     const cardData = [
         {
             icon: '-',
@@ -36,6 +44,9 @@ export default function CardRemover({ onUpdate }) {
         }
     ];
 
+    /**
+     * Abre/fecha o modal e limpa campos/erros.
+     */
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
         if (!isModalOpen) {
@@ -47,12 +58,17 @@ export default function CardRemover({ onUpdate }) {
         }
     };
 
-    // Handler que formata o RA enquanto o usuário digita
+    /**
+     * Formata o RA enquanto digita.
+     */
     const handleRaChange = (e) => {
         const formattedRa = formatRa(e.target.value);
         setRa(formattedRa);
     };
 
+    /**
+     * Busca o aluno no backend usando o RA.
+     */
     const handleBuscarAluno = async () => {
         setError('');
         setNome('');
@@ -75,8 +91,6 @@ export default function CardRemover({ onUpdate }) {
         try {
             const raLimpo = ra.replace(/\D/g, '');
             const filtro = { RA_aluno: raLimpo };
-            
-            console.log(`[BUSCANDO ALUNO] Enviando requisição para ${backendUrl}/coordenador/alunos com filtro:`, filtro);
 
             const res = await fetch(`${backendUrl}/coordenador/alunos`, {
                 method: 'POST',
@@ -94,7 +108,7 @@ export default function CardRemover({ onUpdate }) {
             }
 
             const alunos = await res.json();
-            
+
             if (!alunos || alunos.length === 0) {
                 setError('Nenhum aluno encontrado com este RA.');
                 return;
@@ -112,6 +126,9 @@ export default function CardRemover({ onUpdate }) {
         }
     };
 
+    /**
+     * Submete o formulário para remoção do aluno.
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -140,10 +157,6 @@ export default function CardRemover({ onUpdate }) {
                 const errorBody = await res.json().catch(() => ({}));
                 setError(errorBody.mensagem || 'Erro ao remover aluno.');
             } else {
-                console.log("[SUCESSO - REMOÇÃO] Aluno removido com sucesso.");
-                
-  
-
                 setIsModalOpen(false);
                 setIsConfirmationOpen(true);
             }
@@ -155,11 +168,11 @@ export default function CardRemover({ onUpdate }) {
         }
     };
 
+    /**
+     * Fecha modal de confirmação e executa callback para atualização.
+     */
     const closeConfirmation = () => {
         setIsConfirmationOpen(false);
-        
-        // Também chama o onUpdate aqui para garantir que a atualização aconteça
-        // quando o usuário fechar o modal de sucesso.
         if (onUpdate) {
             onUpdate();
         }
@@ -167,6 +180,7 @@ export default function CardRemover({ onUpdate }) {
 
     return (
         <>
+            {/* Card de ação para abrir modal */}
             <div className="card-container">
                 {cardData.map((card, index) => (
                     <div
@@ -187,6 +201,7 @@ export default function CardRemover({ onUpdate }) {
                 ))}
             </div>
 
+            {/* Modal - Remover aluno */}
             <div
                 id="remove-modal"
                 tabIndex="-1"
@@ -270,6 +285,7 @@ export default function CardRemover({ onUpdate }) {
                 </div>
             </div>
 
+            {/* Modal de confirmação */}
             {isConfirmationOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm p-4">
                     <div className="relative bg-white rounded-lg shadow p-6 max-w-sm w-full">

@@ -1,16 +1,23 @@
 'use client';
 import { useState } from 'react';
 
+/**
+ * ModalBuscaAluno
+ * 
+ * Modal para buscar e selecionar aluno por nome, RA ou turma.
+ * 
+ * Props:
+ * - isOpen (boolean): controla se o modal está aberto
+ * - onClose (function): chamada ao fechar o modal
+ * - onSelectAluno (function): chamada ao selecionar um aluno
+ * - alunos (array): lista de objetos { nome, ra, turma, frequencia }
+ */
 const ModalBuscaAluno = ({ isOpen, onClose, onSelectAluno, alunos }) => {
-  // const de buscas
   const [termoBusca, setTermoBusca] = useState('');
 
-  // modal para fechar sozinho
   if (!isOpen) return null;
 
-
-  // const para filtrar os alunos
-  // aqui é só um teste para o front-end tabomm
+  // Filtra os alunos pelo termo de busca (nome, ra, turma)
   const alunosFiltrados = alunos.filter(aluno =>
     aluno.nome.toLowerCase().includes(termoBusca.toLowerCase()) ||
     aluno.ra.includes(termoBusca) ||
@@ -18,24 +25,22 @@ const ModalBuscaAluno = ({ isOpen, onClose, onSelectAluno, alunos }) => {
   );
 
   return (
-    <div className="fixed inset-0 backdrop-blur-sm  bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-50 overflow-hidden">
+    <div className="fixed inset-0 backdrop-blur-sm bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-50 overflow-hidden">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[80vh] flex flex-col mx-4">
-
-
+        {/* Header */}
         <div className="flex justify-between items-center p-3">
           <h2 className="text-lg font-semibold text-[#054068]">Buscar Aluno</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-900 text-lg cursor-pointer"
+            aria-label="Fechar"
           >
             ✕
           </button>
         </div>
 
-
+        {/* Busca */}
         <div className="p-3 overflow-y-auto flex-grow">
-
-
           <div className="relative mb-3">
             <input
               type="text"
@@ -45,11 +50,10 @@ const ModalBuscaAluno = ({ isOpen, onClose, onSelectAluno, alunos }) => {
               placeholder="Nome, RA ou turma"
               autoFocus
             />
-            <div className="absolute right-2 top-2 text-gray-400 text-sm select-none">
-            </div>
+            <div className="absolute right-2 top-2 text-gray-400 text-sm select-none"></div>
           </div>
 
-
+          {/* Lista de alunos filtrados */}
           {alunosFiltrados.length > 0 ? (
             <div className="border-t border-gray-200 max-h-[60vh] overflow-y-auto overflow-x-auto">
               <table className="w-full text-sm text-left text-gray-800">
@@ -84,9 +88,6 @@ const ModalBuscaAluno = ({ isOpen, onClose, onSelectAluno, alunos }) => {
             </div>
           )}
         </div>
-
-
-        
       </div>
     </div>
   );

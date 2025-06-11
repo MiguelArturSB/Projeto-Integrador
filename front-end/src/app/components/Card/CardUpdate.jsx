@@ -1,26 +1,43 @@
 'use client'
 import { useState, useEffect } from 'react';
 
+/**
+ * CardUpdateAluno
+ * 
+ * Componente React para editar os dados de um aluno.
+ * Permite buscar aluno por RA, exibe dados e permite edição do nome, turma e senha.
+ * Garante que apenas dados alterados sejam enviados. Mostra feedback de sucesso ou erro.
+ * 
+ * Props:
+ * - onUpdate (function): callback para atualizar lista de alunos após edição.
+ */
 export default function CardUpdateAluno({ onUpdate }) {
+    // Modais e loading
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [erroBusca, setErroBusca] = useState('');
 
+    // Campos do formulário
     const [turma, setTurma] = useState('');
     const [ra, setRa] = useState('');
     const [nome, setNome] = useState('');
     const [senha, setSenha] = useState('');
 
+    // Estado do aluno original e controle de mudanças
     const [alunoOriginal, setAlunoOriginal] = useState(null);
     const [houveMudancas, setHouveMudancas] = useState(false);
 
     const backendUrl = `http://localhost:3001`;
 
+    // Dados do card de ação
     const cardData = [
         { icon: '%', titulo: 'Editar aluno', descricao: 'Clique para editar os dados de um aluno' }
     ];
 
+    /**
+     * Limpa campos do formulário e estados auxiliares
+     */
     const limparFormulario = () => {
         setTurma(''); setRa(''); setNome(''); setSenha('');
         setAlunoOriginal(null);
@@ -28,6 +45,9 @@ export default function CardUpdateAluno({ onUpdate }) {
         setErroBusca('');
     };
 
+    /**
+     * Abre/fecha o modal principal e limpa formulário ao fechar
+     */
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
         if (isModalOpen) {
@@ -35,6 +55,9 @@ export default function CardUpdateAluno({ onUpdate }) {
         }
     };
 
+    /**
+     * Monitora mudanças dos campos e ativa o botão Salvar apenas se houver alterações.
+     */
     useEffect(() => {
         if (!alunoOriginal) {
             setHouveMudancas(false);
@@ -43,10 +66,12 @@ export default function CardUpdateAluno({ onUpdate }) {
         const nomeMudou = nome !== alunoOriginal.nome_aluno;
         const turmaMudou = turma !== alunoOriginal.turma;
         const senhaMudou = senha !== '';
-
         setHouveMudancas(nomeMudou || turmaMudou || senhaMudou);
     }, [nome, turma, senha, alunoOriginal]);
 
+    /**
+     * Busca aluno pelo RA usando o backend.
+     */
     const handleBuscar = async () => {
         if (!ra) {
             setErroBusca("Por favor, digite o R.A para buscar.");
@@ -60,28 +85,23 @@ export default function CardUpdateAluno({ onUpdate }) {
         setIsLoading(true);
         setErroBusca('');
         try {
-            // O RA já está limpo (só números) graças ao novo handleChange
             const filtro = { RA_aluno: ra };
             const response = await fetch(`${backendUrl}/coordenador/alunos`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(filtro),
             });
-            
-            // --- CORREÇÃO DE TRATAMENTO DE ERRO (BUSCA) ---
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
                 setErroBusca(errorData.mensagem || "Erro ao buscar aluno.");
                 return;
             }
-            
             const alunos = await response.json();
             if (alunos.length === 0) {
                 setErroBusca("Nenhum aluno encontrado com este R.A.");
                 return;
             }
             carregarDadosAluno(alunos[0]);
-
         } catch (error) {
             console.error("Erro ao buscar aluno:", error);
             setErroBusca("Erro de comunicação. Tente novamente.");
@@ -90,6 +110,9 @@ export default function CardUpdateAluno({ onUpdate }) {
         }
     };
 
+    /**
+     * Envia as alterações para o backend via PATCH.
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!houveMudancas) {
@@ -103,7 +126,6 @@ export default function CardUpdateAluno({ onUpdate }) {
         }
         setIsLoading(true);
         setErroBusca('');
-
         const dadosParaEnviar = {
             RA_aluno: alunoOriginal.RA_aluno,
             nome_aluno: nome,
@@ -118,17 +140,13 @@ export default function CardUpdateAluno({ onUpdate }) {
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(dadosParaEnviar)
             });
-
-            // --- CORREÇÃO DE TRATAMENTO DE ERRO (SUBMIT) ---
             if (response.ok) {
                 setIsModalOpen(false);
                 setIsConfirmationOpen(true);
             } else {
                 const erro = await response.json().catch(() => ({}));
-                // Usando alert para erros de submit, pois o modal principal pode fechar
                 alert(`Erro ao salvar: ${erro.mensagem || "Falha ao atualizar o aluno."}`);
             }
-
         } catch (error) {
             console.error("Erro ao salvar dados:", error);
             alert(`Erro ao salvar: ${error.message}`);
@@ -137,6 +155,9 @@ export default function CardUpdateAluno({ onUpdate }) {
         }
     };
 
+    /**
+     * Fecha o modal de confirmação e executa o callback de atualização do componente pai.
+     */
     const closeConfirmation = () => {
         setIsConfirmationOpen(false);
         limparFormulario();
@@ -145,6 +166,9 @@ export default function CardUpdateAluno({ onUpdate }) {
         }
     };
 
+    /**
+     * Carrega os dados do aluno nos campos do formulário.
+     */
     const carregarDadosAluno = (aluno) => {
         if (aluno) {
             setErroBusca('');
@@ -160,17 +184,21 @@ export default function CardUpdateAluno({ onUpdate }) {
         }
     };
 
+    /**
+     * Permite apenas letras e acentuação no nome.
+     */
     const formatName = (value) => {
         return value.replace(/[^a-zA-Z\sà-üÀ-Ü]/g, '');
     };
 
-    // --- CORREÇÃO NO HANDLECHANGE ---
+    /**
+     * Atualiza campos do formulário e limpa erro de busca ao digitar.
+     */
     const handleChange = (e) => {
         const { name, value } = e.target;
-        
         switch (name) {
             case 'RA':
-                // Permite apenas números no campo RA
+                // Apenas números no campo RA
                 const onlyNums = value.replace(/[^\d]/g, '');
                 setRa(onlyNums);
                 if (erroBusca) setErroBusca('');
@@ -191,6 +219,7 @@ export default function CardUpdateAluno({ onUpdate }) {
 
     return (
         <>
+            {/* Card de ação */}
             <div className="card-container">
                 {cardData.map((card, index) => (
                     <div key={index} className="card bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow duration-300 border border-gray-200 hover:border-blue-500" onClick={toggleModal}>
@@ -201,6 +230,7 @@ export default function CardUpdateAluno({ onUpdate }) {
                 ))}
             </div>
 
+            {/* Modal de edição */}
             {isModalOpen && (
                 <div id="edit-modal" className="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-[rgba(0,0,0,0.5)] backdrop-blur-sm overflow-y-auto p-4">
                     <div className="relative w-full max-w-md bg-white rounded-lg shadow">
@@ -213,6 +243,7 @@ export default function CardUpdateAluno({ onUpdate }) {
 
                         <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
+                                {/* RA */}
                                 <div className="col-span-2">
                                     <label htmlFor="RA" className="block mb-2 text-sm font-medium text-gray-900">Registro do Aluno (R.A)</label>
                                     <div className='flex items-center gap-3'>
@@ -234,7 +265,7 @@ export default function CardUpdateAluno({ onUpdate }) {
                                         <p className="mt-2 text-sm text-red-600">{erroBusca}</p>
                                     )}
                                 </div>
-
+                                {/* Nome */}
                                 <div className="col-span-2">
                                     <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900">Nome Completo</label>
                                     <input
@@ -244,7 +275,7 @@ export default function CardUpdateAluno({ onUpdate }) {
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" required
                                     />
                                 </div>
-                                
+                                {/* Senha */}
                                 <div className="col-span-2">
                                     <label htmlFor="senha" className="block mb-2 text-sm font-medium text-gray-900">Nova Senha (opcional)</label>
                                     <input
@@ -255,7 +286,7 @@ export default function CardUpdateAluno({ onUpdate }) {
                                         placeholder="Deixe em branco para não alterar"
                                     />
                                 </div>
-                                
+                                {/* Turma */}
                                 <div className="col-span-2">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900">Turma</label>
                                     <input
@@ -281,6 +312,7 @@ export default function CardUpdateAluno({ onUpdate }) {
                 </div>
             )}
             
+            {/* Modal de confirmação */}
             {isConfirmationOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm p-4">
                     <div className="relative bg-white rounded-lg shadow p-6 max-w-sm w-full text-center">

@@ -1,5 +1,11 @@
 "use client";
 
+/*
+  Página principal do Coordenador.
+  Permite gerenciar turmas, alunos e professores.
+  Inclui busca, cards de criação/edição/remoção e gráficos agregados por turma.
+*/
+
 import HeaderCoordenador from "../components/headerCoordenador/page";
 import Footer from "../components/Footer/page";
 import Card from "../components/Card/CardCriar";
@@ -12,18 +18,15 @@ import ModalBuscaAluno from "../components/Modal/ModalGetAlunos";
 import ModalBuscaProfessor from "../components/Modal/ModalGetProfessores";
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from "next/navigation";
-
 import './coord.css';
-
 import GraficoPizza from "../components/graficos/graficoCoordenador.jsx"; 
 
 export default function Coordenador() {
-   
     const searchParams = useSearchParams();
     const [mostrarMensagem, setMostrarMensagem] = useState(false);
     const backendUrl = `http://localhost:3001`;
 
-    // Estados da UI e de dados
+    // Estados de UI e dados principais
     const [turmaAberta, setTurmaAberta] = useState(null);
     const [turmaAbertaProfessores, setTurmaAbertaProfessores] = useState(null);
     const [modalAberto, setModalAberto] = useState(false);
@@ -36,10 +39,10 @@ export default function Coordenador() {
     const [erro, setErro] = useState(null);
     const [carregando, setCarregando] = useState(true);
 
-    //  ALTERADO: A função agora é autossuficiente, buscando o token internamente.
-    // Isso permite que ela seja passada como uma função simples para os componentes filhos.
+    /*
+      Função para buscar e processar os dados agregados do coordenador (alunos/professores/turmas).
+    */
     const buscarDadosCoordenador = async () => {
-        console.log("Iniciando a busca de dados atualizados...");
         setCarregando(true);    
         setErro(null);
 
@@ -65,16 +68,15 @@ export default function Coordenador() {
                 setErro(`Erro ${response.status}: ${errorText}`);
             }
         } catch (error) {
-            console.error("ERRO CRÍTICO na requisição fetch:", error);    
             setErro("Falha na conexão com o servidor.");
         } finally {
             setCarregando(false);    
         }
     };
 
+    // Efeito para mostrar mensagem de carregamento na transição com redirect
     useEffect(() => {
         const vindoDeRedirect = searchParams.get("redirect") === "true";
-
         if (vindoDeRedirect) {
             setMostrarMensagem(true);
             const url = new URL(window.location.href);
@@ -83,12 +85,16 @@ export default function Coordenador() {
         }
     }, [searchParams]);
 
+    // Efeito para buscar dados ao carregar a página
     useEffect(() => {
-        // ⭐ ALTERADO: A chamada inicial agora usa a nova função autossuficiente.
         buscarDadosCoordenador();
         window.scrollTo(0, 0);
     }, []);
 
+    /*
+      Função para processar os dados de alunos e professores,
+      agrupando por turma e formatando para exibição.
+    */
     const processarDados = (dados) => {
         if (!dados || dados.length === 0) {
             setTurmasAlunos([]);    
@@ -102,10 +108,12 @@ export default function Coordenador() {
         const mapaDadosAgregados = {};
 
         dados.forEach((item) => {
+            // Cada item é um registro de aluno numa turma, pode ter dados de professor também!
             if (!item || !item.turma || !item.RA_aluno) return;    
 
             const turmaNome = item.turma.toUpperCase();
             
+            // Acumula dados agregados de faltas/aulas/alunos por turma
             if (!mapaDadosAgregados[turmaNome]) {
                 mapaDadosAgregados[turmaNome] = {
                     totalFaltas: parseInt(item.total_faltas_turma) || 0,    
@@ -114,6 +122,7 @@ export default function Coordenador() {
                 };
             }
 
+            // Alunos por turma
             if (!mapaTurmasAlunos.has(turmaNome)) {
                 mapaTurmasAlunos.set(turmaNome, { nome: turmaNome, alunos: new Map() });    
             }
@@ -130,6 +139,7 @@ export default function Coordenador() {
                 });
             }
 
+            // Professores por turma
             if (!item.cpf_professor) return;
             const turmaProfNome = item.turma_professor ? item.turma_professor.toUpperCase() : turmaNome;
             if (!mapaTurmasProfessores.has(turmaProfNome)) {
@@ -145,9 +155,11 @@ export default function Coordenador() {
             }
         });
 
+        // Converte Maps para arrays e ordena pelas turmas mais comuns
         let turmasAlunosArray = Array.from(mapaTurmasAlunos.values()).map(turma => ({ ...turma, alunos: Array.from(turma.alunos.values()) }));
         let turmasProfessoresArray = Array.from(mapaTurmasProfessores.values()).map(turma => ({ ...turma, professores: Array.from(turma.professores.values()) }));
         
+        // Ordem customizada para turmas padrão
         const ordemDesejada = ['2MD', '2TD', '2ND'];
         const customSort = (a, b) => {
             const indexA = ordemDesejada.indexOf(a.nome);    
@@ -165,29 +177,32 @@ export default function Coordenador() {
         setDadosAgregadosPorTurma(mapaDadosAgregados);
     };
 
+    // Funções para abrir/fechar turmas nos accordions
     const toggleTurma = (turmaNome) => setTurmaAberta(turmaAberta === turmaNome ? null : turmaNome);
     const toggleTurmaProfessores = (turmaNome) => setTurmaAbertaProfessores(turmaAbertaProfessores === turmaNome ? null : turmaNome);
 
-    // LINHA NOVA
-const todosAlunos = useMemo(() =>
-    turmasAlunos.flatMap(turma =>
-        turma.alunos.map(aluno => ({
-            ...aluno, 
-            turma: turma.nome 
-        }))
-    ), [turmasAlunos]
-);
-    // LINHA NOVA
-const todosProfessores = useMemo(() => 
-    turmasProfessores.flatMap(turma => 
-        turma.professores.map(professor => ({
-            ...professor,         
-            turma: turma.nome     
-        }))
-    ), 
-    [turmasProfessores]
-);
+    // Lista de todos os alunos para pesquisa rápida (usado no ModalBuscaAluno)
+    const todosAlunos = useMemo(() =>
+        turmasAlunos.flatMap(turma =>
+            turma.alunos.map(aluno => ({
+                ...aluno, 
+                turma: turma.nome 
+            }))
+        ), [turmasAlunos]
+    );
 
+    // Lista de todos os professores para pesquisa rápida (usado no ModalBuscaProfessor)
+    const todosProfessores = useMemo(() => 
+        turmasProfessores.flatMap(turma => 
+            turma.professores.map(professor => ({
+                ...professor,         
+                turma: turma.nome     
+            }))
+        ), 
+        [turmasProfessores]
+    );
+
+    // Renderização condicional para loading
     if (carregando) {
         return (
             <>    
@@ -210,6 +225,7 @@ const todosProfessores = useMemo(() =>
         );
     }
     
+    // Renderização condicional para erro
     if (erro) {
         return (    
             <div className="bg-[#c9e8ff] min-h-screen flex flex-col">
@@ -225,8 +241,10 @@ const todosProfessores = useMemo(() =>
         );
     }
     
+    // Renderização principal da página
     return (
         <>    
+            {/* Mensagem de carregamento com animação ao vir de redirect/login */}
             {mostrarMensagem && (
                 <div className="slide-in-volta bg-sky-800 z-[9999] fixed inset-0 w-full h-full">
                     <div className="text-4xl justify-center items-center flex w-[100%] h-[100%]">
@@ -238,6 +256,7 @@ const todosProfessores = useMemo(() =>
             <div className="bg-[#c9e8ff] min-h-screen">
                 <HeaderCoordenador />
 
+                {/* Seção de gerenciamento de alunos */}
                 <div className="p-4 md:p-10 text-2xl md:text-3xl text-center text-[#054068]">
                     <h1 className="font-semibold">Gerenciar</h1>
                     <button
@@ -249,22 +268,26 @@ const todosProfessores = useMemo(() =>
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-10 mb-8 px-4">
-                    {/* ⭐ ALTERADO: Passando a função de atualização para os componentes filhos */}
+                    {/* Cards de criar/remover/editar aluno */}
                     <Card onUpdate={buscarDadosCoordenador} />
                     <CardRemover onUpdate={buscarDadosCoordenador} />
                     <CardUpdate onUpdate={buscarDadosCoordenador} />
                 </div>
                 
+                {/* Listagem detalhada de turmas e gráficos de frequência */}
                 <h1 className="text-2xl md:text-3xl text-center text-[#054068] font-semibold mt-8 md:mt-12 mb-4">Detalhes por Turma</h1>
 
                 {turmasAlunos.length === 0 ? (
+                    // Sem turmas
                     <div className="text-center p-6 md:p-10 my-6 md:my-10 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg max-w-4xl mx-auto">    
                         <h2 className="text-lg md:text-xl font-bold">Nenhuma Turma Encontrada</h2>
                     </div>
                 ) : (
+                    // Lista de turmas
                     <div className="flex flex-col items-center gap-4 mt-6 md:mt-10 px-8 md:px-15">    
                         {turmasAlunos.map((turma) => (
                             <div key={turma.nome} className="w-full max-w-4xl bg-white shadow-md rounded-lg overflow-hidden">    
+                                {/* Accordion de turma */}
                                 <div className="flex justify-between items-center p-4 md:p-6 cursor-pointer hover:bg-sky-50 transition-colors" onClick={() => toggleTurma(turma.nome)}>
                                     <div className="bg-sky-100 text-sky-800 px-3 py-1 md:px-4 md:py-2 rounded-full font-medium shadow-inner">
                                         <h2 className="text-xs sm:text-sm md:text-lg">Detalhes da Turma: {turma.nome}</h2>
@@ -274,8 +297,10 @@ const todosProfessores = useMemo(() =>
                                     </svg>
                                 </div>
 
+                                {/* Conteúdo expandido do accordion */}
                                 {turmaAberta === turma.nome && (
                                     <div className="p-2 md:p-4 border-t border-gray-200">    
+                                        {/* Gráfico agregador */}
                                         <div className="mb-4 md:mb-8 flex justify-center">
                                             <div className="w-full max-w-md">
                                                 <GraficoPizza
@@ -286,6 +311,7 @@ const todosProfessores = useMemo(() =>
                                             </div>
                                         </div>
                                         
+                                        {/* Lista de alunos */}
                                         <h3 className="text-lg md:text-xl font-semibold text-sky-800 mb-3 md:mb-4 ml-2">Lista de Alunos</h3>
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-xs md:text-sm text-left text-gray-800">
@@ -314,6 +340,7 @@ const todosProfessores = useMemo(() =>
                     </div>
                 )}
                 
+                {/* Seção de gerenciamento de professores */}
                 <div className="mt-5 p-4 md:p-10">
                     <h1 className="text-2xl md:text-3xl text-center text-[#054068] font-semibold mb-4 md:mb-5">Gerenciar Professores</h1>
 
@@ -327,12 +354,13 @@ const todosProfessores = useMemo(() =>
                     </div>
 
                     <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-10 px-4">
-                        {/*  ALTERADO: Passando a função de atualização para os componentes filhos bora atualiza ai fiada */}
+                        {/* Cards de criar/remover/editar professor */}
                         <CardProf onUpdate={buscarDadosCoordenador} />
                         <CardProfRemover onUpdate={buscarDadosCoordenador} />
                         <CardProfUpdate onUpdate={buscarDadosCoordenador} />
                     </div>
 
+                    {/* Accordions das turmas de professores */}
                     {turmasProfessores.length === 0 ? (
                         <div className="text-center p-6 md:p-10 my-6 md:my-10 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg max-w-4xl mx-auto">    
                             <h2 className="text-lg md:text-xl font-bold">Nenhum Professor Encontrado</h2>
@@ -391,6 +419,7 @@ const todosProfessores = useMemo(() =>
                     )}
                 </div>
 
+                {/* Modais globais de busca de aluno e professor */}
                 <ModalBuscaAluno
                     isOpen={modalAberto}
                     onClose={() => setModalAberto(false)}
@@ -404,6 +433,7 @@ const todosProfessores = useMemo(() =>
                     professores={todosProfessores}
                 />
 
+                {/* Rodapé */}
                 <Footer />
             </div>
         </>

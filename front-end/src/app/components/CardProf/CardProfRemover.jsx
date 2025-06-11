@@ -2,7 +2,16 @@
 
 import { useState } from 'react';
 
-// Função helper para formatar o CPF para exibição
+/**
+ * CardProf
+ *
+ * Componente para remover um professor do sistema.
+ * - Busca professor por CPF, exibe nome/disciplina/turma e confirma remoção.
+ * - Chama onUpdate() após remoção com sucesso.
+ *
+ * Props:
+ * - onUpdate (function): callback para atualizar lista de professores após remoção.
+ */
 const formatCpf = (value) => {
     const onlyNums = value.replace(/[^\d]/g, '');
     const truncatedValue = onlyNums.slice(0, 11);
@@ -12,9 +21,7 @@ const formatCpf = (value) => {
         .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
 };
 
-// O componente aceita a prop 'onUpdate' para notificar o componente pai
 export default function CardProf({ onUpdate }) {
-    
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
 
@@ -36,9 +43,11 @@ export default function CardProf({ onUpdate }) {
         }
     ];
 
+    /**
+     * Abre/fecha o modal e limpa campos/erros.
+     */
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
-
         if (!isModalOpen) {
             setCpf('');
             setNome('');
@@ -49,11 +58,17 @@ export default function CardProf({ onUpdate }) {
         }
     };
 
+    /**
+     * Formata o CPF enquanto digita.
+     */
     const handleCpfChange = (e) => {
         const formattedCpf = formatCpf(e.target.value);
         setCpf(formattedCpf);
     };
 
+    /**
+     * Busca professor pelo CPF no backend.
+     */
     const handleSearch = async () => {
         if (!cpf) {
             setSearchError('Por favor, digite um CPF para buscar.');
@@ -99,10 +114,12 @@ export default function CardProf({ onUpdate }) {
         }
     };
 
-  
+    /**
+     * Submete requisição para remoção do professor.
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         const cpfLimpo = cpf.replace(/\D/g, '');
         const token = localStorage.getItem("token");
         if (!token) {
@@ -121,9 +138,6 @@ export default function CardProf({ onUpdate }) {
             });
 
             if (response.ok) {
-                console.log("[SUCESSO] Remoção bem-sucedida. Ativando modal de confirmação.");
-                // Apenas fecha o modal de remoção e abre o de confirmação.
-                // NÃO CHAME onUpdate() AQUI.
                 setIsModalOpen(false);
                 setIsConfirmationOpen(true);
             } else {
@@ -138,22 +152,20 @@ export default function CardProf({ onUpdate }) {
             setIsLoading(false); 
         }
     };
-    
-    // --- FUNÇÃO DE CONFIRMAÇÃO CORRIGIDA ---
-    const closeConfirmation = () => {
-        // 1. Primeiro, fecha o modal de confirmação.
-        setIsConfirmationOpen(false);
 
-        // 2. AGORA, com o modal já fechado, notificamos o pai para atualizar.
-        // Isso evita a corrida de re-renderização.
+    /**
+     * Fecha modal de confirmação e executa callback para atualizar lista.
+     */
+    const closeConfirmation = () => {
+        setIsConfirmationOpen(false);
         if (onUpdate) {
-            console.log("Fechando confirmação e chamando onUpdate().");
             onUpdate();
         }
     };
 
     return (
         <>
+            {/* Card de ação para abrir modal */}
             <div className="card-container">
                 {cardData.map((card, index) => (
                     <div
@@ -174,6 +186,7 @@ export default function CardProf({ onUpdate }) {
                 ))}
             </div>
 
+            {/* Modal de remoção */}
             <div
                 id="remove-modal-prof"
                 tabIndex="-1"
@@ -262,6 +275,7 @@ export default function CardProf({ onUpdate }) {
                 </div>
             </div>
 
+            {/* Modal de confirmação */}
             {isConfirmationOpen && (
                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm p-4">
                  <div className="relative bg-white rounded-lg shadow p-6 max-w-sm w-full">

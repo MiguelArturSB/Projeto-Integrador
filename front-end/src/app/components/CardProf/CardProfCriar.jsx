@@ -2,11 +2,20 @@
 
 import { useState, useEffect } from 'react';
 
+/**
+ * CardProfCriar
+ *
+ * Componente para cadastrar um novo professor.
+ * Mostra um card de ação, abre modal com formulário validando CPF, nome, senha, disciplina e turma.
+ * Exibe erros do CPF e confirmação de sucesso.
+ *
+ * Props:
+ * - onUpdate (function): callback para atualizar lista de professores após cadastro.
+ */
 export default function CardProfCriar({ onUpdate }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
-    // ADICIONADO: Estado específico para o erro do CPF
-    const [cpfError, setCpfError] = useState('');
+    const [cpfError, setCpfError] = useState(''); // Erro de CPF duplicado ou inválido
     const [carregando, setCarregando] = useState(true);
     const [formData, setFormData] = useState({
         nome: '',
@@ -18,6 +27,7 @@ export default function CardProfCriar({ onUpdate }) {
 
     const backendUrl = `http://localhost:3001`;
 
+    // Dados do card de ação
     const cardData = [
         {
             icon: '+',
@@ -26,38 +36,46 @@ export default function CardProfCriar({ onUpdate }) {
         }
     ];
 
+    /**
+     * Abre/fecha o modal e limpa campos e erro de CPF.
+     */
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
-        // ADICIONADO: Limpa o erro e o formulário ao abrir/fechar o modal
         setCpfError('');
         setFormData({ nome: '', senha: '', cpf: '', disciplina: '', turma: '' });
     };
 
+    /**
+     * Formata o CPF no padrão 000.000.000-00 conforme digita.
+     */
     const formatCPF = (value) => {
         const numericValue = value.replace(/\D/g, '');
         const truncatedValue = numericValue.slice(0, 11);
-      
-        if (truncatedValue.length > 11) {
-          return truncatedValue.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+
+        if (truncatedValue.length > 9) {
+            return truncatedValue.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
         } else if (truncatedValue.length > 6) {
-          return truncatedValue.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+            return truncatedValue.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
         } else if (truncatedValue.length > 3) {
-          return truncatedValue.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+            return truncatedValue.replace(/(\d{3})(\d{1,3})/, '$1.$2');
         }
-      
         return truncatedValue;
     };
-    
- 
+
+    /**
+     * Permite apenas letras e acentos no nome.
+     */
     const formatName = (value) => {
         return value.replace(/[^a-zA-Z\sà-üÀ-Ü]/g, '');
     };
 
+    /**
+     * Atualiza campos do formulário, formatando CPF e nome, e limpa erro de CPF ao digitar.
+     */
     const handleChange = (e) => {
         const { name, value } = e.target;
 
         if (name === 'cpf') {
-            // ADICIONADO: Limpa o erro ao corrigir o campo
             if (cpfError) setCpfError('');
             const formattedCPF = formatCPF(value);
             setFormData(prev => ({ ...prev, [name]: formattedCPF }));
@@ -69,6 +87,9 @@ export default function CardProfCriar({ onUpdate }) {
         }
     };
 
+    /**
+     * Efeito inicial: checa token e zera carregamento.
+     */
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
         if (!storedToken) {
@@ -78,7 +99,10 @@ export default function CardProfCriar({ onUpdate }) {
         window.scrollTo(0, 0);
     }, []);
 
-    // ATUALIZADO: Lógica de envio e tratamento de erro
+    /**
+     * Envia os dados do formulário ao backend.
+     * Trata erros e mostra modal de confirmação em caso de sucesso.
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -94,7 +118,7 @@ export default function CardProfCriar({ onUpdate }) {
             nome_professor: formData.nome,
             materia: formData.disciplina,
             turma_professor: formData.turma,
-            cpf_professor: cpfNumerico, 
+            cpf_professor: cpfNumerico,
             senha_professor: formData.senha,
             qntd_aula: 96,
             aulas_dadas: 0
@@ -117,9 +141,7 @@ export default function CardProfCriar({ onUpdate }) {
                 } catch (jsonError) {
                     console.warn("Corpo da resposta de erro não é um JSON válido.");
                 }
-    
-                console.log("Resposta de erro controlada (ex: 409):", { status: response.status, body: errorData });
-    
+
                 if (response.status === 409) {
                     setCpfError(errorData.message || "Este CPF já está em uso.");
                 } else {
@@ -131,11 +153,8 @@ export default function CardProfCriar({ onUpdate }) {
 
             // Sucesso
             const data = await response.json();
-            console.log("Professor cadastrado com sucesso:", data);
-
             setIsModalOpen(false);
             setIsConfirmationOpen(true);
-
             setFormData({
                 nome: '',
                 senha: '',
@@ -149,6 +168,9 @@ export default function CardProfCriar({ onUpdate }) {
         }
     };
 
+    /**
+     * Fecha modal de confirmação e executa callback para atualizar lista.
+     */
     const closeConfirmation = () => {
         setIsConfirmationOpen(false);
         if (onUpdate) {
@@ -158,6 +180,7 @@ export default function CardProfCriar({ onUpdate }) {
 
     return (
         <>
+            {/* Card de ação para abrir modal */}
             <div className="card-container">
                 {cardData.map((card, index) => (
                     <div
@@ -178,6 +201,7 @@ export default function CardProfCriar({ onUpdate }) {
                 ))}
             </div>
 
+            {/* Modal de cadastro */}
             <div
                 id="professor-modal"
                 tabIndex="-1"
@@ -204,7 +228,7 @@ export default function CardProfCriar({ onUpdate }) {
 
                         <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
-                                {/* Campos de Nome e Senha (sem alterações) */}
+                                {/* Campo Nome */}
                                 <div className="col-span-2">
                                     <label htmlFor="nome" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nome</label>
                                     <input
@@ -219,6 +243,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         required
                                     />
                                 </div>
+                                {/* Campo Senha */}
                                 <div className="col-span-2">
                                     <label htmlFor="senha" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Senha</label>
                                     <input
@@ -233,8 +258,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         required
                                     />
                                 </div>
-
-                                {/* ATUALIZADO: Campo de CPF com validação */}
+                                {/* Campo CPF */}
                                 <div className="col-span-2">
                                     <label htmlFor="cpf" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">CPF</label>
                                     <input
@@ -256,8 +280,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         <p className="mt-2 text-sm text-red-600 dark:text-red-500">{cpfError}</p>
                                     )}
                                 </div>
-                                
-                                {/* Campos de Disciplina e Turma (sem alterações) */}
+                                {/* Campo Disciplina */}
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="disciplina" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Disciplina</label>
                                     <select
@@ -275,6 +298,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         <option value="SOP">SOP</option>
                                     </select>
                                 </div>
+                                {/* Campo Turma */}
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Turma</label>
                                     <input
@@ -304,7 +328,7 @@ export default function CardProfCriar({ onUpdate }) {
                 </div>
             </div>
 
-
+            {/* Modal de confirmação */}
             {isConfirmationOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">
                     <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 p-6 max-w-sm w-full">

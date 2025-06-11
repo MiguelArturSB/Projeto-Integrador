@@ -1,5 +1,11 @@
 "use client";
 
+/*
+  Página principal do painel do Professor.
+  Permite visualizar, marcar e enviar presença dos alunos de sua turma e disciplina.
+  Inclui: header, painel de resumo, tabela de alunos, botão de envio, animações e gráfico.
+*/
+
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -11,16 +17,17 @@ import GraficoPizza from '../components/graficos/graficoProfessor.jsx';
 
 export default function ProfessorTable() {
   const searchParams = useSearchParams();
-  const [mostrarMensagem, setMostrarMensagem] = useState(false);
+  const [mostrarMensagem, setMostrarMensagem] = useState(false); // Animação pós-login/redirect
   const router = useRouter();
-  const [alunos, setAlunos] = useState([]);
-  const [token, setToken] = useState(null);
-  const [decoded, setDecoded] = useState(null);
-  const [animado, setAnimado] = useState(false);
-  const [professorInfo, setProfessorInfo] = useState(null); 
-  const [botaoDesativado, setBotaoDesativado] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [alunos, setAlunos] = useState([]);                      // Lista de alunos da turma
+  const [token, setToken] = useState(null);                      // JWT do professor
+  const [decoded, setDecoded] = useState(null);                  // Payload decodificado do token
+  const [animado, setAnimado] = useState(false);                 // Animação pós-envio de presença
+  const [professorInfo, setProfessorInfo] = useState(null);      // Info agregada da turma/matéria
+  const [botaoDesativado, setBotaoDesativado] = useState(false); // Desativa botão durante envio
+  const [showConfirmModal, setShowConfirmModal] = useState(false); // Modal de confirmação
 
+  // Mostra animação se vier de redirect/login
   useEffect(() => {
     const vindoDeRedirect = searchParams.get("redirect") === "true";
     if (vindoDeRedirect) {
@@ -33,6 +40,7 @@ export default function ProfessorTable() {
 
   const backendUrl = `http://localhost:3001`;
 
+  // Ao montar, recupera token, decodifica e busca lista de alunos
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
@@ -40,13 +48,14 @@ export default function ProfessorTable() {
         const decodedData = jwtDecode(storedToken);
         setToken(storedToken);
         setDecoded(decodedData);
-        view(storedToken, decodedData);
+        view(storedToken, decodedData); // Busca alunos
       } catch (error) {
         console.error("Erro ao decodificar o token (ProfessorTable):", error);
       }
     }
   }, []);
 
+  // Alterna presença/ausência de um aluno localmente na tabela
   const togglePresence = (alunoId) => {
     setAlunos((prevAlunos) =>
       prevAlunos.map((aluno) =>
@@ -57,10 +66,12 @@ export default function ProfessorTable() {
     );
   };
 
+  // Abre/fecha modal de confirmação de envio
   const toggleConfirmModal = () => {
     setShowConfirmModal(!showConfirmModal);
   };
 
+  // Função principal: envia presenças e faltas para o backend
   const handleConfirmAndSend = async () => {
     setShowConfirmModal(false);
 
@@ -69,10 +80,12 @@ export default function ProfessorTable() {
     setAnimado(true);
 
     if (token && decoded && alunos.length > 0) {
+      // Separa alunos presentes e ausentes
       const alunosPresentes = alunos.filter((aluno) => aluno.presente);
       const alunosFaltantes = alunos.filter((aluno) => !aluno.presente);
       const requests = [];
 
+      // Marca presença dos presentes (PUT)
       alunosPresentes.forEach(aluno => {
         requests.push(fetch(`${backendUrl}/presenca/registrar`, {
           method: "PUT",
@@ -81,6 +94,7 @@ export default function ProfessorTable() {
         }));
       });
 
+      // Marca falta dos ausentes (POST)
       alunosFaltantes.forEach(aluno => {
         requests.push(fetch(`${backendUrl}/presenca/marcarhistorico`, {
           method: "POST",
@@ -89,9 +103,11 @@ export default function ProfessorTable() {
         }));
       });
 
+      // Aguarda todas as requisições terminarem
       await Promise.all(requests).catch(err => console.error("Erro em uma das requisições de presença/falta:", err));
 
       try {
+        // Marca aula como realizada
         const idAlunoReferencia = alunos[0].ID_aluno;
         await fetch(`${backendUrl}/presenca/aula`, {
           method: "PUT",
@@ -102,8 +118,10 @@ export default function ProfessorTable() {
         console.error("Erro ao marcar aula:", aulaError);
       }
       
+      // Atualiza a lista após salvar presenças
       await view(token, decoded);
       
+      // Animação de sucesso
       setTimeout(() => {
         setAnimado(false);
       }, 4000); 
@@ -114,6 +132,7 @@ export default function ProfessorTable() {
     }
   };
 
+  // Busca lista de alunos e informações agregadas para o professor
   const view = async (token, decoded) => {
     try {
       const response = await fetch(`${backendUrl}/presenca/viewP`, {
@@ -123,6 +142,7 @@ export default function ProfessorTable() {
       });
       const data = await response.json();
       if (data && Array.isArray(data.view)) {
+        // Marca todos como presentes por padrão ao carregar
         const alunosComPresencaInicial = data.view.map((aluno) => ({ ...aluno, presente: true }));
         setAlunos(alunosComPresencaInicial);
         if (data.view.length > 0) {
@@ -140,6 +160,7 @@ export default function ProfessorTable() {
     <>
       <HeaderProfessor />
       
+      {/* Modal de confirmação de envio de presenças */}
       {showConfirmModal && (
         <div id="confirm-presence-modal" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">
           <div className="relative w-full max-w-md bg-white rounded-lg shadow-lg">
@@ -160,24 +181,26 @@ export default function ProfessorTable() {
         </div>
       )}
 
+      {/* Animação pós-envio de presenças */}
       {animado && (
         <div className="slide-in-loop bg-sky-800 z-[9999] fixed inset-0 flex justify-center items-center">
           <p className="text-black text-3xl sm:text-4xl font-bold">Presenças enviadas!!</p>
         </div>
       )}
 
+      {/* Animação de carregamento pós-login/redirect */}
       {mostrarMensagem && (
         <div className="slide-in-volta bg-sky-800 z-[9999] fixed inset-0 flex justify-center items-center">
           <p className="text-black text-3xl sm:text-4xl font-bold">Carregando <b>.</b><b>.</b><b>.</b></p>
         </div>
       )}
 
-
+      {/* Painel principal do professor */}
       <main className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8">
         <div className="bg-white shadow-2xl rounded-3xl w-full max-w-7xl p-4 sm:p-6 lg:p-8">
           <h1 className="font-bold text-gray-800 mb-6 border-b pb-4 text-2xl sm:text-3xl lg:text-4xl">Painel de Presença</h1>
           
-
+          {/* Resumo superior: turma, aulas totais, aulas marcadas, matéria */}
           <div className="flex flex-col sm:flex-row sm:flex-wrap justify-between items-center mb-6 gap-3 sm:gap-4">
             <div className="bg-sky-100 text-sky-800 px-4 py-2 rounded-full font-medium shadow-inner text-sm w-full sm:w-auto text-center">Turma: <span className="font-semibold">{decoded?.turma_professor}</span></div>
             <div className="bg-sky-100 text-sky-800 px-4 py-2 rounded-full font-medium shadow-inner text-sm w-full sm:w-auto text-center">Aulas Totais: <span className="font-semibold">{professorInfo?.qntd_aula}</span></div>
@@ -185,12 +208,12 @@ export default function ProfessorTable() {
             <div className="bg-emerald-100 text-emerald-800 px-4 py-2 rounded-full font-medium shadow-inner text-sm w-full sm:w-auto text-center">Matéria: <span className="font-semibold">{decoded?.materia}</span></div>
           </div>
 
+          {/* Tabela de alunos para marcar presença */}
           <div className="overflow-x-auto rounded-xl shadow-md ">
             <table className="w-full text-sm text-left text-gray-700">
               <thead className="text-xs text-white uppercase bg-[#1d577b]">
                 <tr>
                   <th scope="col" className="px-4 py-3 sm:px-6">Nome</th>
-
                   <th scope="col" className="px-4 py-3 sm:px-6 hidden sm:table-cell">RA</th>
                   <th scope="col" className="px-4 py-3 sm:px-6">Frequência</th>
                   <th scope="col" className="px-4 py-3 sm:px-6 text-center">Presença</th>
@@ -216,12 +239,12 @@ export default function ProfessorTable() {
             </table>
           </div>
 
-
+          {/* Gráfico de aulas dadas/total */}
           <div className="flex justify-center my-6">
             <GraficoPizza data={professorInfo} key={professorInfo?.aulas_dadas || 0} />
           </div>
 
-
+          {/* Botão de confirmação de presença */}
           <div className="mt-4 flex justify-center sm:justify-end">
             <button 
               onClick={toggleConfirmModal} 
