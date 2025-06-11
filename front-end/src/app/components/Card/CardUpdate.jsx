@@ -15,7 +15,7 @@ export default function CardUpdateAluno({ onUpdate }) {
     const [alunoOriginal, setAlunoOriginal] = useState(null);
     const [houveMudancas, setHouveMudancas] = useState(false);
 
-    const backendUrl = `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3001`;
+    const backendUrl = `http://localhost:3001`;
 
     const cardData = [
         { icon: '%', titulo: 'Editar aluno', descricao: 'Clique para editar os dados de um aluno' }
@@ -54,25 +54,37 @@ export default function CardUpdateAluno({ onUpdate }) {
         }
         const token = localStorage.getItem("token");
         if (!token) {
-            alert("Erro de autenticação. Faça o login novamente.");
+            setErroBusca("Erro de autenticação. Faça o login novamente.");
             return;
         }
         setIsLoading(true);
         setErroBusca('');
         try {
+            // O RA já está limpo (só números) graças ao novo handleChange
             const filtro = { RA_aluno: ra };
             const response = await fetch(`${backendUrl}/coordenador/alunos`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(filtro),
             });
-            if (!response.ok) throw new Error("Erro na comunicação com o servidor.");
+            
+            // --- CORREÇÃO DE TRATAMENTO DE ERRO (BUSCA) ---
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                setErroBusca(errorData.mensagem || "Erro ao buscar aluno.");
+                return;
+            }
+            
             const alunos = await response.json();
-            if (alunos.length === 0) throw new Error("Nenhum aluno encontrado com este R.A.");
+            if (alunos.length === 0) {
+                setErroBusca("Nenhum aluno encontrado com este R.A.");
+                return;
+            }
             carregarDadosAluno(alunos[0]);
+
         } catch (error) {
             console.error("Erro ao buscar aluno:", error);
-            setErroBusca(error.message);
+            setErroBusca("Erro de comunicação. Tente novamente.");
         } finally {
             setIsLoading(false);
         }
@@ -90,6 +102,8 @@ export default function CardUpdateAluno({ onUpdate }) {
             return;
         }
         setIsLoading(true);
+        setErroBusca('');
+
         const dadosParaEnviar = {
             RA_aluno: alunoOriginal.RA_aluno,
             nome_aluno: nome,
@@ -104,12 +118,17 @@ export default function CardUpdateAluno({ onUpdate }) {
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(dadosParaEnviar)
             });
-            if (!response.ok) {
-                const erro = await response.json();
-                throw new Error(erro.mensagem || "Falha ao atualizar o aluno.");
+
+            // --- CORREÇÃO DE TRATAMENTO DE ERRO (SUBMIT) ---
+            if (response.ok) {
+                setIsModalOpen(false);
+                setIsConfirmationOpen(true);
+            } else {
+                const erro = await response.json().catch(() => ({}));
+                // Usando alert para erros de submit, pois o modal principal pode fechar
+                alert(`Erro ao salvar: ${erro.mensagem || "Falha ao atualizar o aluno."}`);
             }
-            setIsModalOpen(false);
-            setIsConfirmationOpen(true);
+
         } catch (error) {
             console.error("Erro ao salvar dados:", error);
             alert(`Erro ao salvar: ${error.message}`);
@@ -141,21 +160,20 @@ export default function CardUpdateAluno({ onUpdate }) {
         }
     };
 
-    // --- NOVAS FUNÇÕES DE FORMATAÇÃO E NOVO HANDLECHANGE ---
-
-    // Formata o nome para aceitar apenas letras e espaços
     const formatName = (value) => {
         return value.replace(/[^a-zA-Z\sà-üÀ-Ü]/g, '');
     };
 
-    // Um único handleChange para todos os campos
+    // --- CORREÇÃO NO HANDLECHANGE ---
     const handleChange = (e) => {
         const { name, value } = e.target;
         
         switch (name) {
             case 'RA':
+                // Permite apenas números no campo RA
+                const onlyNums = value.replace(/[^\d]/g, '');
+                setRa(onlyNums);
                 if (erroBusca) setErroBusca('');
-                setRa(value);
                 break;
             case 'name':
                 setNome(formatName(value));
@@ -200,7 +218,7 @@ export default function CardUpdateAluno({ onUpdate }) {
                                     <div className='flex items-center gap-3'>
                                         <input
                                             type="text" name="RA" id="RA" maxLength={9} value={ra}
-                                            onChange={handleChange} // Usa o novo handler
+                                            onChange={handleChange}
                                             disabled={alunoOriginal !== null}
                                             className={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed ${erroBusca ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
                                             placeholder="Digite o R.A para buscar" required
@@ -221,7 +239,7 @@ export default function CardUpdateAluno({ onUpdate }) {
                                     <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900">Nome Completo</label>
                                     <input
                                         type="text" name="name" id="name" maxLength={40} value={nome}
-                                        onChange={handleChange} // Usa o novo handler
+                                        onChange={handleChange}
                                         disabled={alunoOriginal === null}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" required
                                     />
@@ -231,7 +249,7 @@ export default function CardUpdateAluno({ onUpdate }) {
                                     <label htmlFor="senha" className="block mb-2 text-sm font-medium text-gray-900">Nova Senha (opcional)</label>
                                     <input
                                         type="password" name="senha" id="senha" maxLength={40} value={senha}
-                                        onChange={handleChange} // Usa o novo handler
+                                        onChange={handleChange}
                                         disabled={alunoOriginal === null}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed"
                                         placeholder="Deixe em branco para não alterar"
@@ -242,7 +260,7 @@ export default function CardUpdateAluno({ onUpdate }) {
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900">Turma</label>
                                     <input
                                         type="text" id="turma" name="turma" maxLength={5} value={turma}
-                                        onChange={handleChange} // Usa o novo handler
+                                        onChange={handleChange}
                                         disabled={alunoOriginal === null}
                                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" required
                                     />

@@ -21,7 +21,7 @@ export default function Coordenador() {
    
     const searchParams = useSearchParams();
     const [mostrarMensagem, setMostrarMensagem] = useState(false);
-    const backendUrl = `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3001`;
+    const backendUrl = `http://localhost:3001`;
 
     // Estados da UI e de dados
     const [turmaAberta, setTurmaAberta] = useState(null);

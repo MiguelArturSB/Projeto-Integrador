@@ -9,7 +9,7 @@ export default function ModalHistorico({ isOpen, onClose }) {
     const [token, setToken] = useState('');
     const [decoded, setDecoded] = useState(null);
 
-    const backendUrl = `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3001`;
+    const backendUrl = `http://localhost:3001`;
 
     const handleSubmit = async (token, decoded) => {
 if (!decoded?.idAluno) {

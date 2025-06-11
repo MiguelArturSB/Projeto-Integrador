@@ -10,7 +10,7 @@ import { useSearchParams } from "next/navigation";
 import GraficoPizza from '../components/graficos/graficoAluno.jsx';
 
 export default function HomeAluno() {
-    const backendUrl = `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3001`;
+    const backendUrl = `http://localhost:3001`;
 
     const searchParams = useSearchParams();
     const [mostrarMensagem, setMostrarMensagem] = useState(false);

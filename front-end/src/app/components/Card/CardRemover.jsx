@@ -26,7 +26,7 @@ export default function CardRemover({ onUpdate }) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const backendUrl = `http://${typeof window !== "undefined" ? window.location.hostname : "localhost"}:3001`;
+    const backendUrl = `http://localhost:3001`;
 
     const cardData = [
         {

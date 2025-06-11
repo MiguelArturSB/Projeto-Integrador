@@ -14,7 +14,7 @@ export default function Card({ onUpdate }) {
         turma: ''
     });
 
-    const backendUrl = `http://${typeof window !== "undefined" ? window.location.hostname : "localhost"}:3001`;
+    const backendUrl = `http://localhost:3001`;
 
     const cardData = [
         {

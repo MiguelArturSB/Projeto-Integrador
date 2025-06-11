@@ -31,7 +31,7 @@ export default function ProfessorTable() {
     }
   }, [searchParams]);
 
-  const backendUrl = `http://${typeof window !== "undefined" ? window.location.hostname : "localhost"}:3001`;
+  const backendUrl = `http://localhost:3001`;
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");

@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react'
 import { jwtDecode } from "jwt-decode";
 
 export default function HomeAluno() {
-    const backendUrl = `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3001`;
+    const backendUrl = `http://localhost:3001`;
 
     const [token, setToken] = useState(null);
     const [decoded, setDecoded] = useState(null);

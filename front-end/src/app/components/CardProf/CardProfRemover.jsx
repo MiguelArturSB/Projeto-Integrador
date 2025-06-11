@@ -26,7 +26,7 @@ export default function CardProf({ onUpdate }) {
     const [isLoading, setIsLoading] = useState(false);
     const [searchError, setSearchError] = useState('');
 
-    const backendUrl = `http://${typeof window !== "undefined" ? window.location.hostname : "localhost"}:3001`;
+    const backendUrl = `http://localhost:3001`;
 
     const cardData = [
         {

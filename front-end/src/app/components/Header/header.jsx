@@ -13,7 +13,7 @@ export default function HomeAluno() {
     const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     //adicionei isso
-    const backendUrl = `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3001`;
+    const backendUrl = `http://localhost:3001`;
 
     const [animado, setAnimado] = useState(false)
 

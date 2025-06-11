@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const backendUrl = `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3001`;
+const backendUrl = `http://localhost:3001`;
 
 export default function GraficoPizza() {
   const [presencas, setPresencas] = useState([]);

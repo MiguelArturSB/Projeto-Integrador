@@ -20,7 +20,7 @@ export default function CardProfUpdate({ onUpdate }) {
     const [professorOriginal, setProfessorOriginal] = useState(null);
     const [houveMudancas, setHouveMudancas] = useState(false);
 
-    const backendUrl = `http://${typeof window !== 'undefined' ? window.location.hostname : 'localhost'}:3001`;
+    const backendUrl = `http://localhost:3001`;
 
     const cardData = [
         { icon: '%', titulo: 'Editar professor', descricao: 'Clique para editar os dados de um professor' }
@@ -38,7 +38,6 @@ export default function CardProfUpdate({ onUpdate }) {
         if (isModalOpen) limparFormulario();
     };
 
-    // Efeito que detecta se houve mudanças nos dados do professor
     useEffect(() => {
         if (!professorOriginal) {
             setHouveMudancas(false);
@@ -53,7 +52,6 @@ export default function CardProfUpdate({ onUpdate }) {
         setHouveMudancas(nomeMudou || disciplinaMudou || turmaMudou || qntdAulaMudou || senhaMudou);
     }, [nome, disciplina, turma, qntdAula, senha, professorOriginal]);
 
-    // 1. Busca os dados do professor na API
     const handleBuscar = async () => {
         if (!cpf) {
             setErroBusca("Por favor, digite o CPF para buscar.");
@@ -74,21 +72,31 @@ export default function CardProfUpdate({ onUpdate }) {
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(filtro),
             });
-            if (!response.ok) throw new Error("Erro na comunicação com o servidor.");
+            
+            // --- CORREÇÃO DE TRATAMENTO DE ERRO (BUSCA) ---
+            if (!response.ok) {
+                // Se a resposta não for ok, define o erro e para a execução.
+                const errorData = await response.json().catch(() => ({}));
+                setErroBusca(errorData.mensagem || "Erro ao buscar professor.");
+                return;
+            }
 
             const professores = await response.json();
-            if (professores.length === 0) throw new Error("Nenhum professor encontrado com este CPF.");
+            if (professores.length === 0) {
+                // Se não encontrar, define o erro e para a execução.
+                setErroBusca("Nenhum professor encontrado com este CPF.");
+                return;
+            }
             
             carregarDadosProfessor(professores[0]);
         } catch (error) {
             console.error("Erro ao buscar professor:", error);
-            setErroBusca(error.message);
+            setErroBusca("Erro de comunicação. Tente novamente.");
         } finally {
             setIsLoading(false);
         }
     };
 
-    // 2. Envia os dados atualizados para a API
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!houveMudancas) {
@@ -101,13 +109,15 @@ export default function CardProfUpdate({ onUpdate }) {
             return;
         }
         setIsLoading(true);
+        setErroBusca(''); // Limpa erros antigos
+
         const dadosParaEnviar = {
             cpf_professor: professorOriginal.cpf_professor.replace(/\D/g, ''),
             nome_professor: nome,
             materia: disciplina,
             turma_professor: turma,
             qntd_aula: qntdAula,
-            aulas_dadas: 0,
+            aulas_dadas: professorOriginal.aulas_dadas || 0, // Mantém o valor original
         };
         if (senha) {
             dadosParaEnviar.senha_professor = senha;
@@ -119,12 +129,19 @@ export default function CardProfUpdate({ onUpdate }) {
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(dadosParaEnviar)
             });
-            if (!response.ok) {
-                const erro = await response.json();
-                throw new Error(erro.mensagem || "Falha ao atualizar o professor.");
+            
+            // --- CORREÇÃO DE TRATAMENTO DE ERRO (SUBMIT) ---
+            if (response.ok) {
+                // Se a resposta for OK, mostra o modal de sucesso.
+                setIsModalOpen(false);
+                setIsConfirmationOpen(true);
+            } else {
+                // Se não for OK, lê a mensagem de erro e a exibe.
+                const erro = await response.json().catch(() => ({}));
+                // Usa alert para erros de submit, pois o modal principal já fechou
+                alert(`Erro ao salvar: ${erro.mensagem || "Falha ao atualizar o professor."}`);
             }
-            setIsModalOpen(false);
-            setIsConfirmationOpen(true);
+
         } catch (error) {
             console.error("Erro ao salvar dados:", error);
             alert(`Erro ao salvar: ${error.message}`);
@@ -150,6 +167,7 @@ export default function CardProfUpdate({ onUpdate }) {
                 materia: professor.materia || '',
                 turma_professor: professor.turma_professor || '',
                 qntd_aula: professor.qntd_aula || '',
+                aulas_dadas: professor.aulas_dadas || 0, // Adicionado
             });
             setNome(professor.nome_professor || '');
             setCpf(formatCPF(professor.cpf_professor || ''));
@@ -160,10 +178,9 @@ export default function CardProfUpdate({ onUpdate }) {
         }
     };
     
-    // Funções de formatação e um handler de mudança genérico
     const formatCPF = (value) => {
         const digitos = value.replace(/\D/g, '');
-        let formatado = digitos;
+        let formatado = digitos.slice(0, 11);
         if (digitos.length > 9) {
             formatado = `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6, 9)}-${digitos.slice(9, 11)}`;
         } else if (digitos.length > 6) {
@@ -192,7 +209,7 @@ export default function CardProfUpdate({ onUpdate }) {
                 setSenha(value);
                 break;
             case 'qntdAula':
-                if (value.length <= 4) setQntdAula(value);
+                if (value.length <= 4 && /^\d*$/.test(value)) setQntdAula(value);
                 break;
             case 'disciplina':
                 setDisciplina(value);
@@ -230,28 +247,28 @@ export default function CardProfUpdate({ onUpdate }) {
                         <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
                                 <div className="col-span-2">
-                                    <label htmlFor="cpf" className="block mb-2 text-sm font-medium text-gray-900">CPF</label>
+                                    <label htmlFor="cpf-edit" className="block mb-2 text-sm font-medium text-gray-900">CPF</label>
                                     <div className='flex items-center gap-3'>
-                                        <input type="text" name="cpf" id="cpf" value={cpf} onChange={handleChange} maxLength={14} disabled={professorOriginal !== null} className={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed ${erroBusca ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`} placeholder="Digite o CPF para buscar" required />
+                                        <input type="text" name="cpf" id="cpf-edit" value={cpf} onChange={handleChange} maxLength={14} disabled={professorOriginal !== null} className={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed ${erroBusca ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`} placeholder="Digite o CPF para buscar" required />
                                         <button type="button" onClick={handleBuscar} disabled={isLoading || professorOriginal !== null} className='bg-blue-950 rounded-lg text-white hover:bg-blue-800 transition-all p-2 px-4 disabled:bg-gray-400 disabled:cursor-not-allowed'>{isLoading ? '...' : 'Buscar'}</button>
                                     </div>
                                     {erroBusca && (<p className="mt-2 text-sm text-red-600">{erroBusca}</p>)}
                                 </div>
                                 <div className="col-span-2">
-                                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900">Nome</label>
-                                    <input type="text" name="name" id="name" value={nome} maxLength={40} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" placeholder="Digite o nome do professor" disabled={!professorOriginal} required />
+                                    <label htmlFor="name-edit" className="block mb-2 text-sm font-medium text-gray-900">Nome</label>
+                                    <input type="text" name="name" id="name-edit" value={nome} maxLength={40} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" placeholder="Digite o nome do professor" disabled={!professorOriginal} required />
                                 </div>
                                 <div className="col-span-2">
-                                    <label htmlFor="senha" className="block mb-2 text-sm font-medium text-gray-900">Nova Senha (opcional)</label>
-                                    <input type="password" name="senha" id="senha" value={senha} maxLength={40} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" placeholder="Deixe em branco para não alterar" disabled={!professorOriginal} />
+                                    <label htmlFor="senha-edit" className="block mb-2 text-sm font-medium text-gray-900">Nova Senha (opcional)</label>
+                                    <input type="password" name="senha" id="senha-edit" value={senha} maxLength={40} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" placeholder="Deixe em branco para não alterar" disabled={!professorOriginal} />
                                 </div>
                                 <div className="col-span-2">
-                                    <label htmlFor="qntdAula" className="block mb-2 text-sm font-medium text-gray-900">Quantidade de Aulas</label>
-                                    <input type="number" id="qntdAula" name="qntdAula" value={qntdAula} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" placeholder="Ex: 40" disabled={!professorOriginal} required />
+                                    <label htmlFor="qntdAula-edit" className="block mb-2 text-sm font-medium text-gray-900">Quantidade de Aulas</label>
+                                    <input type="number" id="qntdAula-edit" name="qntdAula" value={qntdAula} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" placeholder="Ex: 40" disabled={!professorOriginal} required />
                                 </div>
                                 <div className="col-span-2 sm:col-span-1">
-                                    <label htmlFor="disciplina" className="block mb-2 text-sm font-medium text-gray-900">Disciplina</label>
-                                    <select id="disciplina" name="disciplina" value={disciplina} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" disabled={!professorOriginal} required>
+                                    <label htmlFor="disciplina-edit" className="block mb-2 text-sm font-medium text-gray-900">Disciplina</label>
+                                    <select id="disciplina-edit" name="disciplina" value={disciplina} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" disabled={!professorOriginal} required>
                                         <option value="" disabled>Selecione</option>
                                         <option value="LER">LER</option>
                                         <option value="ARI">ARI</option>
@@ -261,8 +278,8 @@ export default function CardProfUpdate({ onUpdate }) {
                                     </select>
                                 </div>
                                 <div className="col-span-2 sm:col-span-1">
-                                    <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900">Turma</label>
-                                    <input type="text" id="turma" name="turma" maxLength={5} value={turma} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" placeholder="Ex: 2MD" disabled={!professorOriginal} required />
+                                    <label htmlFor="turma-edit" className="block mb-2 text-sm font-medium text-gray-900">Turma</label>
+                                    <input type="text" id="turma-edit" name="turma" maxLength={5} value={turma} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" placeholder="Ex: 2MD" disabled={!professorOriginal} required />
                                 </div>
                             </div>
                             <button type="submit" disabled={isLoading || !houveMudancas} className="w-full text-white inline-flex items-center justify-center bg-[#1f557b] cursor-pointer hover:bg-[#0e3754] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
