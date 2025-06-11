@@ -1,6 +1,7 @@
 import express from 'express';
 const app = express();
 import cors from 'cors';
+import os from 'os';
 
 import login from './rotas/rotasLogin.js';
 import viewP from './rotas/rotasPresenca.js';
@@ -14,7 +15,7 @@ app.use(express.json());
 app.use('/aluno', viewA);
 app.use('/login', login);
 app.use('/coordenador', rotaCoordenador);
-app.use('/professor', viewP);
+app.use('/presenca', viewP);
 
 // Rota raiz
 app.get('/', (req, res) => {
@@ -25,6 +26,7 @@ app.get('/', (req, res) => {
 app.use((req, res) => {
   res.status(404).json({ mensagem: 'Rota não encontrada.' });
 });
+
 
 const PORT = 3001;
 

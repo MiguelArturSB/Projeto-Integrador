@@ -1,9 +1,7 @@
 import mysql from 'mysql2/promise';
 import bcrypt from 'bcryptjs';
 
-/**
- * Cria um pool de conexões para o MySQL.
- */
+// Cria pool de conexões para MySQL
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
@@ -14,18 +12,11 @@ const pool = mysql.createPool({
   queueLimit: 0
 })
 
-/**
- * Obtém uma conexão do pool.
- */
 async function getConnection() {
   return pool.getConnection();
 };
 
-/**
- * Lê todos os registros de uma tabela, com condição opcional.
- * @param {string} table - Nome da tabela
- * @param {string|null} where - Condição WHERE opcional
- */
+// Lê todos os registros de uma tabela com condição opcional
 async function readAll(table, where = null) {
   const connection = await getConnection();
   try {
@@ -38,29 +29,20 @@ async function readAll(table, where = null) {
   }
 }
 
-/**
- * Lê um registro único da tabela.
- * @param {string} table - Nome da tabela
- * @param {string} where - Condição WHERE
- * @param {Array} params - Parâmetros da condição WHERE
- */
-async function read(table, where, params = []) {
+// Lê um registro único da tabela
+async function read(table, where) {
   const connection = await getConnection();
   try {
     let sql = `SELECT * FROM ${table}`;
     if (where) sql += ` WHERE ${where}`;
-    const [rows] = await connection.execute(sql, params);
+    const [rows] = await connection.execute(sql);
     return rows[0] || null;
   } finally {
     connection.release();
   }
 }
 
-/**
- * Insere um registro na tabela e retorna o ID gerado.
- * @param {string} table - Nome da tabela
- * @param {Object} data - Dados para inserção
- */
+// Insere um registro na tabela e retorna o ID gerado
 async function create(table, data) {
   const connection = await getConnection();
   try {
@@ -75,12 +57,7 @@ async function create(table, data) {
   }
 }
 
-/**
- * Atualiza registros da tabela conforme condição e dados.
- * @param {string} table - Nome da tabela
- * @param {Object} data - Dados a serem atualizados
- * @param {string} where - Condição WHERE
- */
+// Atualiza registros da tabela conforme condição e dados
 async function update(table, data, where) {
   const connection = await getConnection();
   try {
@@ -94,28 +71,19 @@ async function update(table, data, where) {
   }
 }
 
-/**
- * Exclui registros de uma tabela conforme condição.
- * @param {string} table - Nome da tabela
- * @param {string} where - Condição WHERE
- * @param {Array} params - Parâmetros da condição WHERE
- */
-async function deleteRecord(table, where, params = []) {
+// Deleta registros conforme condição
+async function deleteRecord(table, where) {
   const connection = await getConnection();
   try {
     const sql = `DELETE FROM ${table} WHERE ${where}`;
-    const [result] = await connection.execute(sql, params);
-    return result; 
+    const [result] = await connection.execute(sql);
+    return result.affectedRows;
   } finally {
     connection.release();
   }
 }
 
-/**
- * Compara senha em texto puro com hash bcrypt.
- * @param {string} senha - Senha em texto puro
- * @param {string} hash - Hash da senha
- */
+// Compara senha plain text com hash bcrypt
 async function compare(senha, hash) {
   try {
     return await bcrypt.compare(senha, hash);
@@ -124,15 +92,15 @@ async function compare(senha, hash) {
   }
 }
 
-/**
- * Visualiza presença dos alunos em uma turma e matéria específica.
- * @param {string} turma_aluno - Turma do aluno
- * @param {string} materia - Matéria
- */
-async function viewPresenca(turma_aluno, materia) {
+
+//mudei view
+// Visualiza presença dos alunos numa turma, professor e matéria específica
+async function viewPresenca( turma_aluno, materia) {
   const connection = await getConnection();
   try {
-    const sql = `SELECT * FROM freq_turma WHERE turma = ? AND materia = ?;`;
+    const sql = ` SELECT * FROM freq_turma 
+                  WHERE turma = ? AND materia = ?;
+ `;
     const [result] = await connection.execute(sql, [turma_aluno, materia]);
     return result;
   } finally {
@@ -140,18 +108,13 @@ async function viewPresenca(turma_aluno, materia) {
   }
 }
 
-/**
- * Visualiza detalhes do aluno.
- * @param {number} idAluno - ID do aluno
- */
+// Visualiza detalhes do aluno
 async function viewAluno(idAluno) {
   const connection = await getConnection();
   try {
-    const sql = `
-      SELECT nome_aluno, RA_aluno, turma, materia, faltas, total_faltas, total_aulas_turma, percentual_frequencia
-      FROM total_aluno
-      WHERE ID_aluno = ?
-    `;
+    const sql = `SELECT nome_aluno,RA_aluno,turma,materia,faltas,total_faltas,total_aulas_turma,percentual_frequencia
+                  FROM total_aluno
+                  WHERE ID_aluno = ?`;
     const [result] = await connection.execute(sql, [idAluno]);
     return result;
   } finally {
@@ -159,9 +122,7 @@ async function viewAluno(idAluno) {
   }
 }
 
-/**
- * Lê todos os dados da view de frequência da turma.
- */
+
 async function readAllView() {
   const connection = await getConnection();
   try {
@@ -173,12 +134,7 @@ async function readAllView() {
   }
 }
 
-/**
- * Cria registro de falta no histórico do aluno.
- * @param {number} ID_professor - ID do professor
- * @param {number} ID_aluno - ID do aluno
- * @param {string} materia - Matéria
- */
+
 async function creatHistorico(ID_professor, ID_aluno, materia) {
   const connection = await getConnection();
   try {
@@ -186,6 +142,7 @@ async function creatHistorico(ID_professor, ID_aluno, materia) {
       INSERT INTO historico_aluno (ID_professor, ID_aluno, materia, data_falta)
       VALUES (?, ?, ?, ?)
     `;
+
     // Gera a data atual no formato 'YYYY-MM-DD'
     const hoje = new Date();
     const dataFormatada = hoje.toISOString().split('T')[0];
@@ -203,14 +160,14 @@ async function creatHistorico(ID_professor, ID_aluno, materia) {
   }
 }
 
-/**
- * Visualiza o histórico completo de faltas de um aluno.
- * @param {number} idAluno - ID do aluno
- */
+
+
 async function viewHistoricaAluno(idAluno) {
   const connection = await getConnection();
   try {
-    const sql = `SELECT * FROM vw_historico_completo WHERE ID_aluno = ?;`;
+    const sql = `SELECT * FROM vw_historico_completo
+                  WHERE ID_aluno = ?;`;
+
     const [result] = await connection.execute(sql, [idAluno]);
     return result;
   } catch (err) {
@@ -221,16 +178,15 @@ async function viewHistoricaAluno(idAluno) {
   }
 }
 
-/**
- * Visualiza informações do professor pelo ID.
- * @param {number} idProfessor - ID do professor
- */
+
+
 async function viewProfessor(idProfessor) {
   const connection = await getConnection();
   try {
-    const sql = `SELECT nome_professor, cpf_professor, turma_professor
+    const sql = `SELECT nome_professor,cpf_professor,turma_professor
                   FROM total_aluno
                   WHERE ID_professor = ?`;
+
     const [result] = await connection.execute(sql, [idProfessor]);
     return result;
   } catch (err) {
@@ -241,11 +197,7 @@ async function viewProfessor(idProfessor) {
   }
 }
 
-/**
- * Marca falta para o aluno em uma matéria específica (soma 4 faltas).
- * @param {string} materia - Matéria (LER, ARI, LOPAL, PBE, SOP)
- * @param {number} id - ID do aluno
- */
+// Marca falta para o aluno em uma matéria específica (soma 4 faltas)
 async function faltaAluno(materia, id = null) {
   const connection = await getConnection();
   try {
@@ -267,11 +219,7 @@ async function faltaAluno(materia, id = null) {
   }
 }
 
-/**
- * Atualiza número de aulas dadas para o professor relacionado a um aluno e matéria.
- * @param {string} materia - Matéria
- * @param {number} idAluno - ID do aluno
- */
+// Atualiza número de aulas dadas para o professor relacionado a um aluno e matéria
 const atualizarAulasDadasProfessor = async (materia, idAluno) => {
   const connection = await getConnection();
   try {
@@ -288,55 +236,7 @@ const atualizarAulasDadasProfessor = async (materia, idAluno) => {
   }
 };
 
-/**
- * Lista todos os alunos, com filtro opcional.
- * @param {string|null} where - Condição WHERE opcional
- * @param {Array} values - Parâmetros do filtro
- */
-async function listarAlunos(where = null, values = []) {
-  const connection = await getConnection();
-  try {
-    let sql = `SELECT * FROM Alunos`;
-    if (where) sql += ` WHERE ${where}`;
-    const [rows] = await connection.execute(sql, values);
-    return rows;
-  } finally {
-    connection.release();
-  }
-}
 
-/**
- * Lista todos os professores, com filtro opcional.
- * @param {string|null} where - Condição WHERE opcional
- * @param {Array} values - Parâmetros do filtro
- */
-async function listarProfessores(where = null, values = []) {
-  const connection = await getConnection(); 
-  try {
-    let sql = `SELECT * FROM Professores`;
-    if (where) sql += ` WHERE ${where}`;
-    const [rows] = await connection.execute(sql, values);
-    return rows;
-  } finally {
-    connection.release(); 
-  }
-}
 
-export {
-  listarProfessores,
-  listarAlunos,
-  readAll,
-  read,
-  create,
-  update,
-  deleteRecord,
-  compare,
-  viewPresenca,
-  faltaAluno,
-  atualizarAulasDadasProfessor,
-  viewAluno,
-  viewProfessor,
-  creatHistorico,
-  viewHistoricaAluno,
-  readAllView
-};
+
+export { readAll, read, create, update, deleteRecord, compare, viewPresenca, faltaAluno, atualizarAulasDadasProfessor, viewAluno, viewProfessor, creatHistorico, viewHistoricaAluno,readAllView };

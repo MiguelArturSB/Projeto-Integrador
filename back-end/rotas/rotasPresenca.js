@@ -6,9 +6,9 @@ const rota = express.Router();
 
 // Rota para visualizar presenças, protegida por autenticação
 rota.post('/viewP', authMiddleware, viewP);
-///marcarhistorico marca o historio do aluno
+
 rota.post('/marcarhistorico',authMiddleware,marcaHistorico);
-///viewInfo informacao do professor
+
 rota.post('/viewInfo',authMiddleware,viewInformacaoP);
 
 // Rota para marcar falta, protegida por autenticação
