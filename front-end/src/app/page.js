@@ -279,7 +279,7 @@ export default function Portal() {
       <div className="overflow-y-hidden h-screen bg-[url('/backsm.jpg')] md:bg-[url('/background.jpg')] bg-cover bg-center bg-no-repeat  flex flex-col">
         <div className="pr-8 flex justify-end items-center">
 
-          <div className="flex items-center gap-4 w-[100%] md:w-auto">
+          {/* <div className="flex items-center gap-4 w-[100%] md:w-auto">
             <img
             
               className="hidden md:block w-22 md:w-40 mx-38 sm:mx-10 md:mx-0 "
@@ -291,10 +291,10 @@ export default function Portal() {
               <span className="hidden sm:block">Centro Educacional</span>
               <span className="hidden sm:block">Prof. Tereza Costa</span>
             </h2>
-          </div>
+          </div> */}
 
       </div>
-        <div className={`flex flex-col items-center justify-center text-[#1f557b] font-bold text-6xl  titulo transition-opacity duration-700 ${activeForm ? 'fade-out' : 'fade-in'}`}>
+        <div className={`flex flex-col items-center justify-center text-[#1f557b] font-bold text-6xl md:mt-50 titulo transition-opacity duration-700 ${activeForm ? 'fade-out' : 'fade-in'}`}>
           <h1 className='mt-30 md:mt-0 text-[18px] md:text-[49px] lg:text-[50px]'>Olá, seja bem vindo!</h1>
           <h4 className='hidden md:block text-[18px]'>Controle acadêmico de presença de forma prática e segura.</h4>
         </div>
