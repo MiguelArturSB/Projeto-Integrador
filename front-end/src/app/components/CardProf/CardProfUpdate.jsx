@@ -1,14 +1,26 @@
 'use client'
+
 import { useState, useEffect } from 'react';
 
+/**
+ * CardProfUpdate
+ *
+ * Componente para editar os dados de um professor.
+ * Busca professor por CPF, exibe dados, permite edição e validação de campos.
+ * Só envia alterações se houver mudanças reais.
+ * Mostra feedback de sucesso ou erro.
+ *
+ * Props:
+ * - onUpdate (function): callback para atualizar lista de professores após edição.
+ */
 export default function CardProfUpdate({ onUpdate }) {
-    // Estados para controle de UI
+    // Controle de modais e loading
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [erroBusca, setErroBusca] = useState('');
 
-    // Estados do formulário
+    // Campos do formulário
     const [nome, setNome] = useState('');
     const [senha, setSenha] = useState('');
     const [cpf, setCpf] = useState('');
@@ -16,7 +28,7 @@ export default function CardProfUpdate({ onUpdate }) {
     const [turma, setTurma] = useState('');
     const [qntdAula, setQntdAula] = useState('');
 
-    // Estados da lógica de atualização
+    // Estado original do professor (para comparar mudanças)
     const [professorOriginal, setProfessorOriginal] = useState(null);
     const [houveMudancas, setHouveMudancas] = useState(false);
 
@@ -26,6 +38,9 @@ export default function CardProfUpdate({ onUpdate }) {
         { icon: '%', titulo: 'Editar professor', descricao: 'Clique para editar os dados de um professor' }
     ];
 
+    /**
+     * Limpa campos do formulário e estados auxiliares.
+     */
     const limparFormulario = () => {
         setNome(''); setSenha(''); setCpf('');
         setDisciplina(''); setTurma(''); setQntdAula('');
@@ -33,11 +48,17 @@ export default function CardProfUpdate({ onUpdate }) {
         setHouveMudancas(false); setErroBusca('');
     };
 
+    /**
+     * Abre/fecha o modal e limpa o formulário ao fechar.
+     */
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
         if (isModalOpen) limparFormulario();
     };
 
+    /**
+     * Monitora os campos para habilitar/desabilitar o botão de salvar.
+     */
     useEffect(() => {
         if (!professorOriginal) {
             setHouveMudancas(false);
@@ -48,10 +69,12 @@ export default function CardProfUpdate({ onUpdate }) {
         const turmaMudou = turma !== professorOriginal.turma_professor;
         const qntdAulaMudou = String(qntdAula) !== String(professorOriginal.qntd_aula);
         const senhaMudou = senha !== '';
-
         setHouveMudancas(nomeMudou || disciplinaMudou || turmaMudou || qntdAulaMudou || senhaMudou);
     }, [nome, disciplina, turma, qntdAula, senha, professorOriginal]);
 
+    /**
+     * Busca professor pelo CPF no backend.
+     */
     const handleBuscar = async () => {
         if (!cpf) {
             setErroBusca("Por favor, digite o CPF para buscar.");
@@ -72,22 +95,17 @@ export default function CardProfUpdate({ onUpdate }) {
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(filtro),
             });
-            
-            // --- CORREÇÃO DE TRATAMENTO DE ERRO (BUSCA) ---
+
             if (!response.ok) {
-                // Se a resposta não for ok, define o erro e para a execução.
                 const errorData = await response.json().catch(() => ({}));
                 setErroBusca(errorData.mensagem || "Erro ao buscar professor.");
                 return;
             }
-
             const professores = await response.json();
             if (professores.length === 0) {
-                // Se não encontrar, define o erro e para a execução.
                 setErroBusca("Nenhum professor encontrado com este CPF.");
                 return;
             }
-            
             carregarDadosProfessor(professores[0]);
         } catch (error) {
             console.error("Erro ao buscar professor:", error);
@@ -97,6 +115,9 @@ export default function CardProfUpdate({ onUpdate }) {
         }
     };
 
+    /**
+     * Envia alterações para o backend via PATCH.
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!houveMudancas) {
@@ -109,7 +130,7 @@ export default function CardProfUpdate({ onUpdate }) {
             return;
         }
         setIsLoading(true);
-        setErroBusca(''); // Limpa erros antigos
+        setErroBusca('');
 
         const dadosParaEnviar = {
             cpf_professor: professorOriginal.cpf_professor.replace(/\D/g, ''),
@@ -129,19 +150,14 @@ export default function CardProfUpdate({ onUpdate }) {
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(dadosParaEnviar)
             });
-            
-            // --- CORREÇÃO DE TRATAMENTO DE ERRO (SUBMIT) ---
+
             if (response.ok) {
-                // Se a resposta for OK, mostra o modal de sucesso.
                 setIsModalOpen(false);
                 setIsConfirmationOpen(true);
             } else {
-                // Se não for OK, lê a mensagem de erro e a exibe.
                 const erro = await response.json().catch(() => ({}));
-                // Usa alert para erros de submit, pois o modal principal já fechou
                 alert(`Erro ao salvar: ${erro.mensagem || "Falha ao atualizar o professor."}`);
             }
-
         } catch (error) {
             console.error("Erro ao salvar dados:", error);
             alert(`Erro ao salvar: ${error.message}`);
@@ -150,6 +166,9 @@ export default function CardProfUpdate({ onUpdate }) {
         }
     };
 
+    /**
+     * Fecha modal de confirmação e executa callback para atualizar lista.
+     */
     const closeConfirmation = () => {
         setIsConfirmationOpen(false);
         limparFormulario();
@@ -158,6 +177,9 @@ export default function CardProfUpdate({ onUpdate }) {
         }
     };
 
+    /**
+     * Carrega os dados do professor nos campos do formulário.
+     */
     const carregarDadosProfessor = (professor) => {
         if (professor) {
             setErroBusca('');
@@ -167,7 +189,7 @@ export default function CardProfUpdate({ onUpdate }) {
                 materia: professor.materia || '',
                 turma_professor: professor.turma_professor || '',
                 qntd_aula: professor.qntd_aula || '',
-                aulas_dadas: professor.aulas_dadas || 0, // Adicionado
+                aulas_dadas: professor.aulas_dadas || 0,
             });
             setNome(professor.nome_professor || '');
             setCpf(formatCPF(professor.cpf_professor || ''));
@@ -177,7 +199,10 @@ export default function CardProfUpdate({ onUpdate }) {
             setSenha(''); 
         }
     };
-    
+
+    /**
+     * Formata CPF no padrão 000.000.000-00 ao digitar.
+     */
     const formatCPF = (value) => {
         const digitos = value.replace(/\D/g, '');
         let formatado = digitos.slice(0, 11);
@@ -190,11 +215,17 @@ export default function CardProfUpdate({ onUpdate }) {
         }
         return formatado;
     };
-    
+
+    /**
+     * Permite apenas letras e acentuação no nome.
+     */
     const formatName = (value) => {
         return value.replace(/[^a-zA-Z\sà-üÀ-Ü]/g, '');
     };
 
+    /**
+     * Atualiza campos do formulário e limpa erro de busca ao digitar.
+     */
     const handleChange = (e) => {
         const { name, value } = e.target;
         switch (name) {
@@ -224,6 +255,7 @@ export default function CardProfUpdate({ onUpdate }) {
 
     return (
         <>
+            {/* Card de ação */}
             <div className="card-container">
                 {cardData.map((card, index) => (
                     <div key={index} className="card bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow duration-300 border border-gray-200 hover:border-blue-500" onClick={toggleModal}>
@@ -234,6 +266,7 @@ export default function CardProfUpdate({ onUpdate }) {
                 ))}
             </div>
 
+            {/* Modal de edição */}
             {isModalOpen && (
                 <div id="edit-prof-modal" className="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-[rgba(0,0,0,0.5)] backdrop-blur-sm overflow-y-auto p-4">
                     <div className="relative w-full max-w-md bg-white rounded-lg shadow">
@@ -246,6 +279,7 @@ export default function CardProfUpdate({ onUpdate }) {
                         
                         <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
+                                {/* CPF */}
                                 <div className="col-span-2">
                                     <label htmlFor="cpf-edit" className="block mb-2 text-sm font-medium text-gray-900">CPF</label>
                                     <div className='flex items-center gap-3'>
@@ -254,18 +288,22 @@ export default function CardProfUpdate({ onUpdate }) {
                                     </div>
                                     {erroBusca && (<p className="mt-2 text-sm text-red-600">{erroBusca}</p>)}
                                 </div>
+                                {/* Nome */}
                                 <div className="col-span-2">
                                     <label htmlFor="name-edit" className="block mb-2 text-sm font-medium text-gray-900">Nome</label>
                                     <input type="text" name="name" id="name-edit" value={nome} maxLength={40} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" placeholder="Digite o nome do professor" disabled={!professorOriginal} required />
                                 </div>
+                                {/* Senha */}
                                 <div className="col-span-2">
                                     <label htmlFor="senha-edit" className="block mb-2 text-sm font-medium text-gray-900">Nova Senha (opcional)</label>
                                     <input type="password" name="senha" id="senha-edit" value={senha} maxLength={40} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" placeholder="Deixe em branco para não alterar" disabled={!professorOriginal} />
                                 </div>
+                                {/* Quantidade de Aulas */}
                                 <div className="col-span-2">
                                     <label htmlFor="qntdAula-edit" className="block mb-2 text-sm font-medium text-gray-900">Quantidade de Aulas</label>
                                     <input type="number" id="qntdAula-edit" name="qntdAula" value={qntdAula} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" placeholder="Ex: 40" disabled={!professorOriginal} required />
                                 </div>
+                                {/* Disciplina */}
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="disciplina-edit" className="block mb-2 text-sm font-medium text-gray-900">Disciplina</label>
                                     <select id="disciplina-edit" name="disciplina" value={disciplina} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" disabled={!professorOriginal} required>
@@ -277,6 +315,7 @@ export default function CardProfUpdate({ onUpdate }) {
                                         <option value="SOP">SOP</option>
                                     </select>
                                 </div>
+                                {/* Turma */}
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="turma-edit" className="block mb-2 text-sm font-medium text-gray-900">Turma</label>
                                     <input type="text" id="turma-edit" name="turma" maxLength={5} value={turma} onChange={handleChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed" placeholder="Ex: 2MD" disabled={!professorOriginal} required />
@@ -291,6 +330,7 @@ export default function CardProfUpdate({ onUpdate }) {
                 </div>
             )}
             
+            {/* Modal de confirmação */}
             {isConfirmationOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm p-4">
                     <div className="relative bg-white rounded-lg shadow p-6 max-w-sm w-full text-center">

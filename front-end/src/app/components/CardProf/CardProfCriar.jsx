@@ -2,10 +2,20 @@
 
 import { useState, useEffect } from 'react';
 
+/**
+ * CardProfCriar
+ *
+ * Componente para cadastrar um novo professor.
+ * Mostra um card de ação, abre modal com formulário validando CPF, nome, senha, disciplina e turma.
+ * Exibe erros do CPF e confirmação de sucesso.
+ *
+ * Props:
+ * - onUpdate (function): callback para atualizar lista de professores após cadastro.
+ */
 export default function CardProfCriar({ onUpdate }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
-    const [cpfError, setCpfError] = useState('');
+    const [cpfError, setCpfError] = useState(''); // Erro de CPF duplicado ou inválido
     const [carregando, setCarregando] = useState(true);
     const [formData, setFormData] = useState({
         nome: '',
@@ -17,6 +27,7 @@ export default function CardProfCriar({ onUpdate }) {
 
     const backendUrl = `http://localhost:3001`;
 
+    // Dados do card de ação
     const cardData = [
         {
             icon: '+',
@@ -25,12 +36,18 @@ export default function CardProfCriar({ onUpdate }) {
         }
     ];
 
+    /**
+     * Abre/fecha o modal e limpa campos e erro de CPF.
+     */
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
         setCpfError('');
         setFormData({ nome: '', senha: '', cpf: '', disciplina: '', turma: '' });
     };
 
+    /**
+     * Formata o CPF no padrão 000.000.000-00 conforme digita.
+     */
     const formatCPF = (value) => {
         const numericValue = value.replace(/\D/g, '');
         const truncatedValue = numericValue.slice(0, 11);
@@ -40,11 +57,17 @@ export default function CardProfCriar({ onUpdate }) {
         formattedValue = formattedValue.replace(/(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
         return formattedValue;
     };
- 
+
+    /**
+     * Permite apenas letras e acentos no nome.
+     */
     const formatName = (value) => {
         return value.replace(/[^a-zA-Z\sà-üÀ-Ü]/g, '');
     };
 
+    /**
+     * Atualiza campos do formulário, formatando CPF e nome, e limpa erro de CPF ao digitar.
+     */
     const handleChange = (e) => {
         const { name, value } = e.target;
 
@@ -60,6 +83,9 @@ export default function CardProfCriar({ onUpdate }) {
         }
     };
 
+    /**
+     * Efeito inicial: checa token e zera carregamento.
+     */
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
         if (!storedToken) {
@@ -69,6 +95,10 @@ export default function CardProfCriar({ onUpdate }) {
         window.scrollTo(0, 0);
     }, []);
 
+    /**
+     * Envia os dados do formulário ao backend.
+     * Trata erros e mostra modal de confirmação em caso de sucesso.
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -112,9 +142,7 @@ export default function CardProfCriar({ onUpdate }) {
                 } catch (jsonError) {
                     console.warn("Corpo da resposta de erro não é um JSON válido.");
                 }
-    
-                console.log("Resposta de erro controlada (ex: 409):", { status: response.status, body: errorData });
-    
+
                 if (response.status === 409) {
                     setCpfError(errorData.message || "Este CPF já está em uso.");
                 } else {
@@ -125,11 +153,8 @@ export default function CardProfCriar({ onUpdate }) {
             }
 
             const data = await response.json();
-            console.log("Professor cadastrado com sucesso:", data);
-
             setIsModalOpen(false);
             setIsConfirmationOpen(true);
-
             setFormData({
                 nome: '',
                 senha: '',
@@ -143,6 +168,9 @@ export default function CardProfCriar({ onUpdate }) {
         }
     };
 
+    /**
+     * Fecha modal de confirmação e executa callback para atualizar lista.
+     */
     const closeConfirmation = () => {
         setIsConfirmationOpen(false);
         if (onUpdate) {
@@ -152,6 +180,7 @@ export default function CardProfCriar({ onUpdate }) {
 
     return (
         <>
+            {/* Card de ação para abrir modal */}
             <div className="card-container">
                 {cardData.map((card, index) => (
                     <div
@@ -172,6 +201,7 @@ export default function CardProfCriar({ onUpdate }) {
                 ))}
             </div>
 
+            {/* Modal de cadastro */}
             <div
                 id="professor-modal"
                 tabIndex="-1"
@@ -198,6 +228,7 @@ export default function CardProfCriar({ onUpdate }) {
 
                         <form className="p-4 md:p-5" onSubmit={handleSubmit}>
                             <div className="grid gap-4 mb-4 grid-cols-2">
+                                {/* Campo Nome */}
                                 <div className="col-span-2">
                                     <label htmlFor="nome" className="block mb-2 text-sm font-medium text-gray-900">Nome</label>
                                     <input
@@ -212,6 +243,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         required
                                     />
                                 </div>
+                                {/* Campo Senha */}
                                 <div className="col-span-2">
                                     <label htmlFor="senha" className="block mb-2 text-sm font-medium text-gray-900">Senha</label>
                                     <input
@@ -226,7 +258,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         required
                                     />
                                 </div>
-
+                                {/* Campo CPF */}
                                 <div className="col-span-2">
                                     <label htmlFor="cpf" className="block mb-2 text-sm font-medium text-gray-900">CPF</label>
                                     <input
@@ -248,7 +280,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         <p className="mt-2 text-sm text-red-600">{cpfError}</p>
                                     )}
                                 </div>
-                                
+                                {/* Campo Disciplina */}
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="disciplina" className="block mb-2 text-sm font-medium text-gray-900">Disciplina</label>
                                     <select
@@ -266,6 +298,7 @@ export default function CardProfCriar({ onUpdate }) {
                                         <option value="SOP">SOP</option>
                                     </select>
                                 </div>
+                                {/* Campo Turma */}
                                 <div className="col-span-2 sm:col-span-1">
                                     <label htmlFor="turma" className="block mb-2 text-sm font-medium text-gray-900">Turma</label>
                                     <input
@@ -295,6 +328,7 @@ export default function CardProfCriar({ onUpdate }) {
                 </div>
             </div>
 
+            {/* Modal de confirmação */}
             {isConfirmationOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(0,0,0,0.5)] backdrop-blur-sm">
                     <div className="relative bg-white rounded-lg shadow p-6 max-w-sm w-full">

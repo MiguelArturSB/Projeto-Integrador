@@ -1,12 +1,19 @@
 "use client";
 
+/*
+  Página principal do painel do Professor.
+  Permite visualizar, marcar e enviar presença dos alunos de sua turma e disciplina.
+  Inclui: header, painel de resumo, tabela de alunos, botão de envio, animações e gráfico.
+*/
+
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useRouter, useSearchParams } from "next/navigation";
 import './prof.css';
 
 import HeaderProfessor from '../components/HeaderProfessor/headerprof';
-import Footer from '../components/Footer/page.jsx';
+// Corrija também o import do Footer se você renomeou o arquivo
+import Footer from "../components/Footer/page"; // Supondo que você renomeou para Footer.jsx
 import GraficoPizza from '../components/graficos/graficoProfessor.jsx';
 
 export default function ProfessorTable() {
@@ -17,7 +24,7 @@ export default function ProfessorTable() {
   const [token, setToken] = useState(null);
   const [decoded, setDecoded] = useState(null);
   const [animado, setAnimado] = useState(false);
-  const [professorInfo, setProfessorInfo] = useState(null); 
+  const [professorInfo, setProfessorInfo] = useState(null);
   const [botaoDesativado, setBotaoDesativado] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -172,12 +179,10 @@ export default function ProfessorTable() {
         </div>
       )}
 
-
       <main className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8">
         <div className="bg-white shadow-2xl rounded-3xl w-full max-w-7xl p-4 sm:p-6 lg:p-8">
           <h1 className="font-bold text-gray-800 mb-6 border-b pb-4 text-2xl sm:text-3xl lg:text-4xl">Painel de Presença</h1>
           
-
           <div className="flex flex-col sm:flex-row sm:flex-wrap justify-between items-center mb-6 gap-3 sm:gap-4">
             <div className="bg-sky-100 text-sky-800 px-4 py-2 rounded-full font-medium shadow-inner text-sm w-full sm:w-auto text-center">Turma: <span className="font-semibold">{decoded?.turma_professor}</span></div>
             <div className="bg-sky-100 text-sky-800 px-4 py-2 rounded-full font-medium shadow-inner text-sm w-full sm:w-auto text-center">Aulas Totais: <span className="font-semibold">{professorInfo?.qntd_aula}</span></div>
@@ -190,7 +195,6 @@ export default function ProfessorTable() {
               <thead className="text-xs text-white uppercase bg-[#1d577b]">
                 <tr>
                   <th scope="col" className="px-4 py-3 sm:px-6">Nome</th>
-
                   <th scope="col" className="px-4 py-3 sm:px-6 hidden sm:table-cell">RA</th>
                   <th scope="col" className="px-4 py-3 sm:px-6">Frequência</th>
                   <th scope="col" className="px-4 py-3 sm:px-6 text-center">Presença</th>
@@ -217,11 +221,17 @@ export default function ProfessorTable() {
           </div>
 
 
-          <div className="flex justify-center my-6">
-            <GraficoPizza data={professorInfo} key={professorInfo?.aulas_dadas || 0} />
+          <div className="flex justify-center my-8">
+             <div className="w-full max-w-md"> {/* Containe para limitar a largura do gráfico */}
+                <GraficoPizza 
+                    aulasDadas={professorInfo?.aulas_dadas}
+                    aulasTotais={professorInfo?.qntd_aula}
+                    titulo="Progresso da Materia Semestral"
+                    key={professorInfo?.aulas_dadas || 0} // Key para forçar re-renderização quando os dados mudam
+                />
+             </div>
           </div>
-
-
+          
           <div className="mt-4 flex justify-center sm:justify-end">
             <button 
               onClick={toggleConfirmModal} 
