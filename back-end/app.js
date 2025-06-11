@@ -28,7 +28,31 @@ app.use((req, res) => {
 });
 
 
+// Isso serve pra LAN 
+// // Função para obter IP local na faixa privada
+// function getLocalIP() {
+//   const nets = os.networkInterfaces();
+//   const ipRanges = [
+//     /^10\./,
+//     /^192\.168\./,
+//     /^172\.(1[6-9]|2\d|3[01])\./
+//   ];
+
+//   for (const name in nets) {
+//     for (const net of nets[name]) {
+//       if (net.family === 'IPv4' && !net.internal) {
+//         if (ipRanges.some((range) => range.test(net.address))) {
+//           return net.address;
+//         }
+//       }
+//     }
+//   }
+//   return 'localhost';
+// }
+
 const PORT = 3001;
+// const HOST = '0.0.0.0';
+// const ip = getLocalIP();
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
