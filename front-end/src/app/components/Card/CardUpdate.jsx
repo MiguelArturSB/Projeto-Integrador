@@ -9,6 +9,7 @@ export default function CardUpdateAluno({ onUpdate }) {
 
     const [turma, setTurma] = useState('');
     const [ra, setRa] = useState('');
+    const [displayRa, setDisplayRa] = useState(''); // New state for formatted display
     const [nome, setNome] = useState('');
     const [senha, setSenha] = useState('');
 
@@ -22,7 +23,11 @@ export default function CardUpdateAluno({ onUpdate }) {
     ];
 
     const limparFormulario = () => {
-        setTurma(''); setRa(''); setNome(''); setSenha('');
+        setTurma(''); 
+        setRa(''); 
+        setDisplayRa(''); // Clear formatted display
+        setNome(''); 
+        setSenha('');
         setAlunoOriginal(null);
         setHouveMudancas(false);
         setErroBusca('');
@@ -47,6 +52,20 @@ export default function CardUpdateAluno({ onUpdate }) {
         setHouveMudancas(nomeMudou || turmaMudou || senhaMudou);
     }, [nome, turma, senha, alunoOriginal]);
 
+    const formatRaDisplay = (value) => {
+        // Remove all non-digit characters
+        const cleanedValue = value.replace(/\D/g, '');
+        
+        // Format as RA (e.g., 123456789 -> 123.456.789)
+        if (cleanedValue.length <= 3) {
+            return cleanedValue;
+        } else if (cleanedValue.length <= 6) {
+            return `${cleanedValue.slice(0, 3)}.${cleanedValue.slice(3)}`;
+        } else {
+            return `${cleanedValue.slice(0, 3)}.${cleanedValue.slice(3, 6)}.${cleanedValue.slice(6, 9)}`;
+        }
+    };
+
     const handleBuscar = async () => {
         if (!ra) {
             setErroBusca("Por favor, digite o R.A para buscar.");
@@ -60,15 +79,13 @@ export default function CardUpdateAluno({ onUpdate }) {
         setIsLoading(true);
         setErroBusca('');
         try {
-            // O RA já está limpo (só números) graças ao novo handleChange
-            const filtro = { RA_aluno: ra };
+            const filtro = { RA_aluno: ra }; // Using the raw numbers (ra state)
             const response = await fetch(`${backendUrl}/coordenador/alunos`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(filtro),
             });
             
-            // --- CORREÇÃO DE TRATAMENTO DE ERRO (BUSCA) ---
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
                 setErroBusca(errorData.mensagem || "Erro ao buscar aluno.");
@@ -105,7 +122,7 @@ export default function CardUpdateAluno({ onUpdate }) {
         setErroBusca('');
 
         const dadosParaEnviar = {
-            RA_aluno: alunoOriginal.RA_aluno,
+            RA_aluno: alunoOriginal.RA_aluno, // Using the raw numbers
             nome_aluno: nome,
             turma: turma,
         };
@@ -119,13 +136,11 @@ export default function CardUpdateAluno({ onUpdate }) {
                 body: JSON.stringify(dadosParaEnviar)
             });
 
-            // --- CORREÇÃO DE TRATAMENTO DE ERRO (SUBMIT) ---
             if (response.ok) {
                 setIsModalOpen(false);
                 setIsConfirmationOpen(true);
             } else {
                 const erro = await response.json().catch(() => ({}));
-                // Usando alert para erros de submit, pois o modal principal pode fechar
                 alert(`Erro ao salvar: ${erro.mensagem || "Falha ao atualizar o aluno."}`);
             }
 
@@ -155,6 +170,7 @@ export default function CardUpdateAluno({ onUpdate }) {
             });
             setNome(aluno.nome_aluno || '');
             setRa(aluno.RA_aluno || '');
+            setDisplayRa(formatRaDisplay(aluno.RA_aluno || '')); // Format for display
             setTurma(aluno.turma || '');
             setSenha('');
         }
@@ -164,15 +180,16 @@ export default function CardUpdateAluno({ onUpdate }) {
         return value.replace(/[^a-zA-Z\sà-üÀ-Ü]/g, '');
     };
 
-    // --- CORREÇÃO NO HANDLECHANGE ---
     const handleChange = (e) => {
         const { name, value } = e.target;
         
         switch (name) {
             case 'RA':
-                // Permite apenas números no campo RA
-                const onlyNums = value.replace(/[^\d]/g, '');
+                // Keep raw numbers in ra state
+                const onlyNums = value.replace(/\D/g, '');
                 setRa(onlyNums);
+                // Update formatted display
+                setDisplayRa(formatRaDisplay(value));
                 if (erroBusca) setErroBusca('');
                 break;
             case 'name':
@@ -217,14 +234,21 @@ export default function CardUpdateAluno({ onUpdate }) {
                                     <label htmlFor="RA" className="block mb-2 text-sm font-medium text-gray-900">Registro do Aluno (R.A)</label>
                                     <div className='flex items-center gap-3'>
                                         <input
-                                            type="text" name="RA" id="RA" maxLength={9} value={ra}
+                                            type="text" 
+                                            name="RA" 
+                                            id="RA" 
+                                            maxLength={11} // Allowing space for dots in display
+                                            value={displayRa} // Using formatted display value
                                             onChange={handleChange}
                                             disabled={alunoOriginal !== null}
                                             className={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 block w-full p-2.5 disabled:bg-gray-200 disabled:cursor-not-allowed ${erroBusca ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-blue-500'}`}
-                                            placeholder="Digite o R.A para buscar" required
+                                            placeholder="Ex: 123.456.789"
+                                            required
                                         />
                                         <button
-                                            type="button" onClick={handleBuscar} disabled={isLoading || alunoOriginal !== null}
+                                            type="button" 
+                                            onClick={handleBuscar} 
+                                            disabled={isLoading || alunoOriginal !== null}
                                             className='bg-blue-950 rounded-lg text-white hover:bg-blue-800 transition-all p-2 px-4 disabled:bg-gray-400 disabled:cursor-not-allowed'
                                         >
                                             {isLoading ? '...' : 'Buscar'}
