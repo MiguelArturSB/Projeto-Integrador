@@ -222,7 +222,7 @@ export default function ProfessorTable() {
 
 
           <div className="flex justify-center my-8">
-             <div className="w-full max-w-md"> {/* Container para limitar a largura do gráfico */}
+             <div className="w-full max-w-md"> {/* Containe para limitar a largura do gráfico */}
                 <GraficoPizza 
                     aulasDadas={professorInfo?.aulas_dadas}
                     aulasTotais={professorInfo?.qntd_aula}
